@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="assets/style.css" rel=stylesheet>
+    <title>ToDo API</title>
+</head>
+<body>
+<h1>ToDo API</h1>
+<div>
+    <h3>All Todo</h3>
+    <p>GET request for getting all ToDo list</p>
+    <a target="_blank" href="https://papushetodo.herokuapp.com/getAllToDo">https://papushetodo.herokuapp.com/getAllToDo</a>
+</div>
+<div>
+    <h3>Create new ToDo</h3>
+    <p>POST request for creating new ToDo</p>
+    <p>Mandatory Parameters: Name, Title, WhatToDo</p>
+    <p>With rest client app</p>
+    <a href="#">https://papushetodo.herokuapp.com</a>
+</div>
+<div>
+    <h3>Delete ToDo</h3>
+    <p>GET request for deleting ToDo</p>
+    <p>One Parameter: <span class="red">title</span></p>
+    <a href="#">https://papushetodo.herokuapp.com/dropToDo/<span class="red">title</span></a>
+</div>
+<div class="json">
+    <h3>toDo json example</h3>
+    {
+    <p>"name": "papushe",</p>
+    <p>"date": "Fri Aug 18 2017 17:14:20 GMT+0300 (IDT)",</p>
+    <p>"whatToDo": "nothing",</p>
+    <p>"title": maccabi</p>
+    }
+</div>
+<div class="json">
+    <h3>Error handling</h3>
+    {
+    <p>"error": "404 - not found (Wrong input or Wrong url)"</p>
+    }
+</div>
+</body>
+</html>
