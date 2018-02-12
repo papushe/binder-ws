@@ -1,4 +1,4 @@
-let USER = require('../models/user'),
+let USER = require('../models/User'),
     cGetAllTodo = 0,
     cLogin = 0,
     cCreateNewToDo = 0,
