@@ -1,6 +1,4 @@
-let TODO = require('../models/todo'),
-    USER = require('../models/user');
-    // email   = require('emailjs/email');
+let USER = require('../models/user'),
     cGetAllTodo = 0,
     cLogin = 0,
     cCreateNewToDo = 0,
@@ -11,184 +9,188 @@ let TODO = require('../models/todo'),
     cUpdateToD = 0,
     portNumber = '';
 
-
-const   log4js = require('log4js'),
-        logger = log4js.getLogger('logs');
-logger.level = 'info';
-log4js.configure({
-    appenders: { logs: { type: 'file', filename: 'logs.log' } },
-    categories: { default: { appenders: ['logs'], level: 'info' } }
-});
+//
+// const   log4js = require('log4js'),
+//         logger = log4js.getLogger('logs');
+// logger.level = 'info';
+// log4js.configure({
+//     appenders: { logs: { type: 'file', filename: 'logs.log' } },
+//     categories: { default: { appenders: ['logs'], level: 'info' } }
+// });
 
     exports.errorHandling = (req, res) => {
         cErrorHandling++;
-        logger.info(`error 404 - not found (Wrong input or Wrong url, called: ${cErrorHandling}`);
+        // logger.info(`error 404 - not found (Wrong input or Wrong url, called: ${cErrorHandling}`);
         res.json({"error": "404 - not found (Wrong input or Wrong url)"});
     };
 
     exports.createNewUser =  (req, res) => {
         let newUser = new USER({
-            password: req.body.password,
-            userName: req.body.userName,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
+            location: req.body.lastName,
             email: req.body.email,
-            date: createNewDate()
+            phoneNumber:req.body.phoneNumber,
+            datOfBirth: createNewDate(),
+            creationDate: createNewDate(),
+            type:req.body.type,
+            skills:req.body.skills,
+            description:req.body.description,
         });
         newUser.save(
             (err, data) => {
                 if (err) {
-                    logger.info(`something went wrong - User was not create properly!: ${err}`);
+                    // logger.info(`something went wrong - User was not create properly!: ${err}`);
                     res.json(err);
                 }
                 res.json(data);
-                logger.info(`new User: ${newUser} was been created successfully`);
+                // logger.info(`new User: ${newUser} was been created successfully`);
                 cCreateNewUser++;
-                logger.info(`The Api: createNewUser called: ${cCreateNewUser}`);
+                // logger.info(`The Api: createNewUser called: ${cCreateNewUser}`);
             }
         );
     };
-    exports.createNewToDo = (req, res) => {
-    let newToDO = new TODO({
-        email: req.body.email,
-        password: req.body.password,
-        date: createNewDate(),
-        whatToDo: req.body.whatToDo,
-        title: req.body.title
-    });
-    newToDO.save(
-        (err, data) => {
-            if (err) {
-                logger.info(`something went wrong - toDo was not saved properly!: ${err}`);
-                res.json(err);
-            }
-            res.json(data);
-            logger.info(`new toDo: ${newToDO} was been saved successfully`);
-            cCreateNewToDo++;
-            logger.info(`The Api: createNewToDo called: ${cCreateNewToDo}`);
-        }
-    );
-};
-    exports.getAllToDo = (req, res) => {
-        TODO.find({email:{$eq:req.body.email}},
-            (err, data) => {
-                if (err) {
-                    logger.info(`query error: ${err}`);
-                    res.json(err);
-                }
-                cGetAllTodo++;
-                logger.info(`The Api: getAllTest called: ${cGetAllTodo}`);
-                res.json(data);
-            })
-    };
-    exports.changePassword = (req, res) => {
-        USER.find({email:{$eq:req.body.email}},
-            (err, data) => {
-                if (err) {
-                    logger.info(`query error: ${err}`);
-                    console.log(err);
-                    res.json(err);
-                    return;
-                }
-                if(data[0] && data[0].email == req.body.email){
-                    if(data[0].password == req.body.oldPassword){
-                        data[0].set({password : req.body.newPassword});
-                        data[0].save(
-                            (err, data) => {
-                                if (err) {
-                                    logger.info(`something went wrong - new Password was not saved properly!: ${err}`);
-                                    res.json(err);
-                                }
-                                res.json(data);
-                                cChangePassword++;
-                                logger.info(`The Api: changePassword called: ${cChangePassword}`);
-                            }
-                        );
-                    } else {
-                        res.send({ error: 'Wrong Password' })
-                    }
-                } else {
-                    res.send({ error: 'Wrong Email' })
-                }
-        })
-    };
+//     exports.createNewToDo = (req, res) => {
+//     let newToDO = new TODO({
+//         email: req.body.email,
+//         password: req.body.password,
+//         date: createNewDate(),
+//         whatToDo: req.body.whatToDo,
+//         title: req.body.title
+//     });
+//     newToDO.save(
+//         (err, data) => {
+//             if (err) {
+//                 // logger.info(`something went wrong - toDo was not saved properly!: ${err}`);
+//                 res.json(err);
+//             }
+//             res.json(data);
+//             // logger.info(`new toDo: ${newToDO} was been saved successfully`);
+//             cCreateNewToDo++;
+//             // logger.info(`The Api: createNewToDo called: ${cCreateNewToDo}`);
+//         }
+//     );
+// };
+//     exports.getAllToDo = (req, res) => {
+//         TODO.find({email:{$eq:req.body.email}},
+//             (err, data) => {
+//                 if (err) {
+//                     logger.info(`query error: ${err}`);
+//                     res.json(err);
+//                 }
+//                 cGetAllTodo++;
+//                 logger.info(`The Api: getAllTest called: ${cGetAllTodo}`);
+//                 res.json(data);
+//             })
+//     };
+//     exports.changePassword = (req, res) => {
+//         USER.find({email:{$eq:req.body.email}},
+//             (err, data) => {
+//                 if (err) {
+//                     logger.info(`query error: ${err}`);
+//                     console.log(err);
+//                     res.json(err);
+//                     return;
+//                 }
+//                 if(data[0] && data[0].email == req.body.email){
+//                     if(data[0].password == req.body.oldPassword){
+//                         data[0].set({password : req.body.newPassword});
+//                         data[0].save(
+//                             (err, data) => {
+//                                 if (err) {
+//                                     logger.info(`something went wrong - new Password was not saved properly!: ${err}`);
+//                                     res.json(err);
+//                                 }
+//                                 res.json(data);
+//                                 cChangePassword++;
+//                                 logger.info(`The Api: changePassword called: ${cChangePassword}`);
+//                             }
+//                         );
+//                     } else {
+//                         res.send({ error: 'Wrong Password' })
+//                     }
+//                 } else {
+//                     res.send({ error: 'Wrong Email' })
+//                 }
+//         })
+//     };
 
-    exports.updateAllToDo = (req, res) => {
-        TODO.find({_id:{$eq:req.body._id}},
-            (err, data) => {
-                if (err) {
-                    logger.info(`query error: ${err}`);
-                    console.log(err);
-                    res.json(err);
-                    return;
-                }
-                data[0].set({  title : req.body.title,
-                            whatToDo:req.body.whatToDo,
-                            date:createNewDate()});
-                data[0].save(
-                    (err, data) => {
-                        if (err) {
-                            logger.info(`something went wrong - updateToDo was not saved properly!: ${err}`);
-                            res.json(err);
-                        }
-                        res.json(data);
-                        cUpdateToD++;
-                        logger.info(`The Api: updateAllToDo called: ${cUpdateToD}`);
-                    }
-                );
-            })
-    };
+    // exports.updateAllToDo = (req, res) => {
+    //     TODO.find({_id:{$eq:req.body._id}},
+    //         (err, data) => {
+    //             if (err) {
+    //                 logger.info(`query error: ${err}`);
+    //                 console.log(err);
+    //                 res.json(err);
+    //                 return;
+    //             }
+    //             data[0].set({  title : req.body.title,
+    //                         whatToDo:req.body.whatToDo,
+    //                         date:createNewDate()});
+    //             data[0].save(
+    //                 (err, data) => {
+    //                     if (err) {
+    //                         logger.info(`something went wrong - updateToDo was not saved properly!: ${err}`);
+    //                         res.json(err);
+    //                     }
+    //                     res.json(data);
+    //                     cUpdateToD++;
+    //                     logger.info(`The Api: updateAllToDo called: ${cUpdateToD}`);
+    //                 }
+    //             );
+    //         })
+    // };
 
-    exports.getPortNumber = (port) => {
-        portNumber = port;
-
-    };
-    exports.login = (req, res) => {
-        USER.find({email:{$eq:req.body.email}},
-            (err, data) => {
-            if (err) {
-                logger.info(`query error: ${err}`);
-                res.json(err);
-                return;
-            }
-            if(data[0] && data[0].email == req.body.email){
-                if(data[0].password == req.body.password){
-                    cLogin++;
-                    logger.info(`The Api: login called: ${cLogin}`);
-                    data[0].__v = portNumber;
-
-                    res.json(data);
-                } else {
-                    logger.info(`The Api: login called: ${cLogin}`);
-                    res.send({ error: 'Wrong Password' })
-                }
-            } else {
-                res.send({ error: 'Wrong Email' })
-            }
-        })
-    };
-    exports.dropToDo = (req, res) => {
-    TODO.find({_id:{$eq:req.body._id}},
-        (err, data) => {
-            if (err) {
-                logger.info(`query error: ${err}`);
-                res.json(err);
-            }else{
-                TODO.remove({_id:{$eq:data[0]._id}},
-                    (err,toDo) => {
-                        if (err) {
-                            logger.info(`query error: ${err}`);
-                            res.json(err);
-                        }
-                        else logger.info(`${toDo} was deleted successfully!`);
-                        cDropToDo++;
-                        logger.info(`The Api: dropToDo called:${cDropToDo}`);
-                        res.json(data);
-                });
-            }
-
-        })
-    };
+    // exports.getPortNumber = (port) => {
+    //     portNumber = port;
+    //
+    // };
+    // exports.login = (req, res) => {
+    //     USER.find({email:{$eq:req.body.email}},
+    //         (err, data) => {
+    //         if (err) {
+    //             logger.info(`query error: ${err}`);
+    //             res.json(err);
+    //             return;
+    //         }
+    //         if(data[0] && data[0].email == req.body.email){
+    //             if(data[0].password == req.body.password){
+    //                 cLogin++;
+    //                 logger.info(`The Api: login called: ${cLogin}`);
+    //                 data[0].__v = portNumber;
+    //
+    //                 res.json(data);
+    //             } else {
+    //                 logger.info(`The Api: login called: ${cLogin}`);
+    //                 res.send({ error: 'Wrong Password' })
+    //             }
+    //         } else {
+    //             res.send({ error: 'Wrong Email' })
+    //         }
+    //     })
+    // };
+    // exports.dropToDo = (req, res) => {
+    // TODO.find({_id:{$eq:req.body._id}},
+    //     (err, data) => {
+    //         if (err) {
+    //             logger.info(`query error: ${err}`);
+    //             res.json(err);
+    //         }else{
+    //             TODO.remove({_id:{$eq:data[0]._id}},
+    //                 (err,toDo) => {
+    //                     if (err) {
+    //                         logger.info(`query error: ${err}`);
+    //                         res.json(err);
+    //                     }
+    //                     else logger.info(`${toDo} was deleted successfully!`);
+    //                     cDropToDo++;
+    //                     logger.info(`The Api: dropToDo called:${cDropToDo}`);
+    //                     res.json(data);
+    //             });
+    //         }
+    //
+    //     })
+    // };
 
 // exports.sendmail = (req, res)=> {
 //

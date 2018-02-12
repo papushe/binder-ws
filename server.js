@@ -1,6 +1,6 @@
 const   express = require('express'),
         app = express(),
-        toDo = require('./controllers/binderController'),
+        binder = require('./controllers/binderController'),
         PORT   = require('./config').PORT,
         port = PORT || process.env.PORT,
         bodyParser = require('body-parser');
@@ -23,21 +23,21 @@ app.get('/', (req,res) =>{
     res.sendFile(`${__dirname}/index.html`);
 });
 
-app.post('/login/', toDo.login);
+// app.post('/login/', toDo.login);
 
-app.post('/changePassword/', toDo.changePassword);
+// app.post('/changePassword/', toDo.changePassword);
 
-app.post('/updateAllToDo/', toDo.updateAllToDo);
+// app.post('/updateAllToDo/', toDo.updateAllToDo);
 
-app.post('/createNewUser/', toDo.createNewUser);
+app.post('/createNewUser/', binder.createNewUser);
 
 // app.get('/getAllToDo/:email', toDo.getAllToDo);
-app.post('/getAllToDo/', toDo.getAllToDo);
+// app.post('/getAllToDo/', toDo.getAllToDo);
 
-app.post('/createNewToDo/', toDo.createNewToDo);
+// app.post('/createNewToDo/', toDo.createNewToDo);
 
-app.post('/dropToDo/', toDo.dropToDo);
+// app.post('/dropToDo/', toDo.dropToDo);
 
-app.all('*', toDo.errorHandling);
+app.all('*', binder.errorHandling);
 
 app.listen(port, () => {console.log(`listening on port ${port}`);});
