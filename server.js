@@ -2,7 +2,7 @@ const   express = require('express'),
         app = express(),
         binder = require('./controllers/binderController'),
         PORT   = require('./config').PORT,
-        port = PORT || process.env.PORT,
+        port = process.env.PORT || PORT,
         bodyParser = require('body-parser');
 
 // app.set('port',port); //check
