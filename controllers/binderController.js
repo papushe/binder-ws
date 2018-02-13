@@ -36,6 +36,7 @@ let USER = require('../models/User'),
             type:req.body.type,
             skills:req.body.skills,
             description:req.body.description,
+            keyForFirebase:req.body.keyForFirebase
         });
         newUser.save(
             (err, data) => {

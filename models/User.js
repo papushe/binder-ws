@@ -21,6 +21,7 @@ const mongoose = require('mongoose'),
         rank:String,
         skills:[String],
         description:String,
+        keyForFirebase:String
     },{strict: true});
 
 let User = mongoose.model('User', user);
