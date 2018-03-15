@@ -32,7 +32,7 @@ exports.createNewCommunity = (req, res) => {
             };
             USER.findOne({keyForFirebase: {$eq: data.managerId}},
                 (err, data) => {
-                    if (err) {
+                    if (err || data == null) {
                         res.json(err);
                         return;
                     }
