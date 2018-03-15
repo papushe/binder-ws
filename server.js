@@ -1,13 +1,13 @@
-const   express = require('express'),
-        app = express(),
-        binder = require('./controllers/binderController'),
-        PORT   = require('./config').PORT,
-        port = process.env.PORT || PORT,
-        bodyParser = require('body-parser');
+const express = require('express'),
+    http = require('http'),
+    app = express(),
+    server = http.createServer(app),
+    communityController = require('./controllers/communityController'),
+    port = process.env.PORT || require('./config').PORT,
+    bodyParser = require('body-parser');
 
-// app.set('port',port); //check
 app.use(bodyParser.json()); // parsing application/json
-app.use(bodyParser.urlencoded({extended:true})); // parsing application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended: true})); // parsing application/x-www-form-urlencoded
 app.use('/', express.static('./public'));
 app.use('/assets', express.static(`${__dirname}/public`)); // public as assets
 app.use((req, res, next) => {
@@ -19,25 +19,18 @@ app.use((req, res, next) => {
 });
 
 /* All routes  */
-app.get('/', (req,res) =>{
+app.get('/', (req, res) => {
     res.sendFile(`${__dirname}/index.html`);
 });
 
-// app.post('/login/', toDo.login);
+app.post('/createNewCommunity/', communityController.createNewCommunity);
 
-// app.post('/changePassword/', toDo.changePassword);
+app.get('/getCommunities/:key', communityController.getCommunities);
 
-// app.post('/updateAllToDo/', toDo.updateAllToDo);
+app.get('/searchCommunity/:type', communityController.searchCommunity);
 
-app.post('/createNewUser/', binder.createNewUser);
+app.all('*', communityController.errorHandling);
 
-// app.get('/getAllToDo/:email', toDo.getAllToDo);
-// app.post('/getAllToDo/', toDo.getAllToDo);
-
-// app.post('/createNewToDo/', toDo.createNewToDo);
-
-// app.post('/dropToDo/', toDo.dropToDo);
-
-app.all('*', binder.errorHandling);
-
-app.listen(port, () => {console.log(`listening on port ${port}`);});
+server.listen(port, () => {
+    console.log(`listening on port ${port}`);
+});

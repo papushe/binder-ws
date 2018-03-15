@@ -1,20 +1,19 @@
 const mongoose = require('mongoose'),
-      schema   = mongoose.Schema,
+    schema = mongoose.Schema,
 
     community = new schema({
         communityName: String,
         communityDescription: String,
         creationDate: String,
-        classification: String,
         managerId: String,
         authorizedMembers: [{
-            memberId:String
+            memberId: String
         }],
         members: [{
-            memberId:String
+            memberId: String
         }],
         type: String
-    },{strict: true});
+    }, {strict: true});
 
 
 let Community = mongoose.model('Community', community);
