@@ -4,14 +4,10 @@ const mongoose = require('mongoose'),
     user = new schema({
         firstName: String,
         lastName: String,
-        location: {
-            city:String,
-            address:String,
-            building:String
-        },
+        location: String,
         email: String,
         phoneNumber: String,
-        datOfBirth: String,
+        dateOfBirth: String,
         creationDate: String,
         type: String,
         communities:[{

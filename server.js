@@ -1,13 +1,17 @@
-const   express = require('express'),
-        app = express(),
-        binder = require('./controllers/binderController'),
-        PORT   = require('./config').PORT,
-        port = process.env.PORT || PORT,
-        bodyParser = require('body-parser');
+const express = require('express'),
+    http = require('http'),
+    app = express(),
+    server = http.createServer(app),
+    userController = require('./controllers/userController'),
+    communityController = require('./controllers/communityController'),
+    errorController = require('./controllers/errorController'),
+    port = process.env.PORT || require('./config').PORT,
+    bodyParser = require('body-parser'),
+    socketIO = require('socket.io'),
+    io = socketIO(server);
 
-// app.set('port',port); //check
 app.use(bodyParser.json()); // parsing application/json
-app.use(bodyParser.urlencoded({extended:true})); // parsing application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended: true})); // parsing application/x-www-form-urlencoded
 app.use('/', express.static('./public'));
 app.use('/assets', express.static(`${__dirname}/public`)); // public as assets
 app.use((req, res, next) => {
@@ -19,25 +23,40 @@ app.use((req, res, next) => {
 });
 
 /* All routes  */
-app.get('/', (req,res) =>{
+app.get('/', (req, res) => {
     res.sendFile(`${__dirname}/index.html`);
 });
 
-// app.post('/login/', toDo.login);
+app.post('/createNewUser/', userController.createNewUser);
 
-// app.post('/changePassword/', toDo.changePassword);
+app.post('/updateProfile/', userController.updateProfile);
 
-// app.post('/updateAllToDo/', toDo.updateAllToDo);
+app.get('/getProfile/:key', userController.getProfile);
 
-app.post('/createNewUser/', binder.createNewUser);
+app.post('/createNewCommunity/', communityController.createNewCommunity);
 
-// app.get('/getAllToDo/:email', toDo.getAllToDo);
-// app.post('/getAllToDo/', toDo.getAllToDo);
+app.get('/getCommunities/:key', communityController.getCommunities);
 
-// app.post('/createNewToDo/', toDo.createNewToDo);
+app.get('/searchCommunity/:type', communityController.searchCommunity);
 
-// app.post('/dropToDo/', toDo.dropToDo);
+app.all('*', errorController.errorHandling);
 
-app.all('*', binder.errorHandling);
+server.listen(port, () => {
+    console.log(`listening on port ${port}`);
+});
 
-app.listen(port, () => {console.log(`listening on port ${port}`);});
+io.on('connection', (socket) => {
+
+    socket.on('disconnect', function () {
+        io.emit('users-changed', {user: socket.nickname, event: 'left'});
+    });
+
+    socket.on('set-nickname', (nickname) => {
+        socket.nickname = nickname;
+        io.emit('users-changed', {user: nickname, event: 'joined'});
+    });
+
+    socket.on('add-message', (message) => {
+        io.emit('message', {text: message.text, from: socket.nickname, created: new Date()});
+    });
+});
