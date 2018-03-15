@@ -55,7 +55,7 @@ exports.searchCommunity = function (req, res) {
     name = name.split(", ");
     name = name.map(v => v.toLowerCase());
     console.log(name);
-    COMMUNITY.find({communityName: {$in: name}},
+    COMMUNITY.find({communityName: {$in: name}, type: {$ne: 'Secured'}},
         (err, data) => {
             console.log("data " + data);
             console.log("err " + err);
