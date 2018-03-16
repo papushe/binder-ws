@@ -1,5 +1,5 @@
 let USER = require('../models/User'),
-    helpers = require('./helpers');
+    Utils = require('../utils');
 
 exports.createNewUser = (req, res) => {
     let newUser = new USER({
@@ -9,7 +9,7 @@ exports.createNewUser = (req, res) => {
         email: req.body.email,
         phoneNumber: req.body.phoneNumber,
         dateOfBirth: req.body.dateOfBirth,
-        creationDate: helpers.createNewDate(),
+        creationDate: Utils.now(),
         type: req.body.type,
         skills: req.body.skills,
         description: req.body.description,

@@ -1,6 +1,7 @@
 let mongoose = require("mongoose");
 let Community = require('../models/Community');
 let testUtils = require('./testUtils');
+let utils = require('../utils');
 
 let chai = require('chai');
 let chaiHttp = require('chai-http');
@@ -26,7 +27,7 @@ function createCommunity(name, type) {
                 'communityName': name || 'test' + new Date().getTime(),
                 'communityDescription': 'description',
                 'managerId': testUtils.USER_KEY,
-                'creationDate': new Date().toUTCString(),
+                'creationDate': utils.now(),
                 'members': null,
                 'type': type || 'public'
             })

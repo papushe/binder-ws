@@ -3,7 +3,7 @@
  */
 let USER = require('../models/User'),
     COMMUNITY = require('../models/Community'),
-    helpers = require('./helpers'),
+    Utils = require('../utils'),
     manager = 'Manager';
 
 exports.errorHandling = (req, res) => {
@@ -14,7 +14,7 @@ exports.createNewCommunity = (req, res) => {
     let newCommunity = new COMMUNITY({
         communityName: req.body.communityName,
         communityDescription: req.body.communityDescription,
-        creationDate: helpers.createNewDate(),
+        creationDate: Utils.now(),
         managerId: req.body.managerId,
         members: {
             memberId: req.body.managerId,
@@ -55,12 +55,10 @@ exports.searchCommunity = function (req, res) {
     let name = req.params.type;
     name = name.split(", ");
     name = name.map(v => v.toLowerCase());
-    console.log(name);
     COMMUNITY.find({communityName: {$in: name}, type: {$ne: 'Secured'}},
         (err, data) => {
-            console.log("data " + data);
-            console.log("err " + err);
             if (err) {
+                console.log("err occurred when running search");
                 res.json(err);
             }
             res.json(data);
