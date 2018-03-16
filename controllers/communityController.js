@@ -13,7 +13,7 @@ exports.createNewCommunity = (req, res) => {
     let newCommunity = new COMMUNITY({
         communityName: req.body.communityName,
         communityDescription: req.body.communityDescription,
-        creationDate: createNewDate(),
+        creationDate: helpers.createNewDate(),
         managerId: req.body.managerId,
         members: {
             memberId: req.body.managerId,
@@ -54,11 +54,11 @@ exports.searchCommunity = function (req, res) {
     let name = req.params.type;
     name = name.split(", ");
     name = name.map(v => v.toLowerCase());
-    // console.log(name);
+    console.log(name);
     COMMUNITY.find({communityName: {$in: name}, type: {$ne: 'Secured'}},
         (err, data) => {
-            // console.log("data " + data);
-            // console.log("err " + err);
+            console.log("data " + data);
+            console.log("err " + err);
             if (err) {
                 res.json(err);
             }
@@ -67,9 +67,6 @@ exports.searchCommunity = function (req, res) {
 };
 
 exports.getCommunities = function (req, res) {
-    // console.log(req.params.key);
-
-    // db.users.find({members: {$elemMatch: {memberId:req.params.key}}})
 
     COMMUNITY.find({members: {$elemMatch: {memberId: req.params.key}}},
         (err, data) => {
@@ -90,50 +87,4 @@ exports.deleteCommunitiesByKey = function (req, res) {
             }
             res.json(data);
         });
-};
-
-
-
-
-
-
-
-
-
-getRandomString = (length) => {
-    length = 10;
-    let text = "";
-    let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-};
-fixTime = (minutes, second) => {
-    if (second < 10 && second >= 0) {
-        second = '0' + second;
-    }
-    if (minutes < 10 && minutes >= 0) {
-        minutes = '0' + minutes;
-    }
-    return minutes + ':' + second;
-};
-fixDate = (date) => {
-
-    if (date < 10 && date >= 0) {
-        date = '0' + date;
-    }
-    return date;
-};
-
-createNewDate = () => {
-    let date = new Date(),
-        dateTime = fixDate(date.getDate()),
-        monthIndex = fixDate(date.getMonth()),
-        year = date.getFullYear(),
-        fullDate = year + '-' + monthIndex + '-' + dateTime,
-        hour = date.getHours(),
-        minutes = date.getMinutes(),
-        second = date.getSeconds();
-    return fullDate + ', ' + hour + ':' + fixTime(minutes, second);
 };
