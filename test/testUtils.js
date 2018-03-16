@@ -8,3 +8,6 @@ module.exports = {
     BASE_URL:'localhost:4300',
     STATUS_OK:200
 };
+exports.cleanCommunities = () => {
+
+};

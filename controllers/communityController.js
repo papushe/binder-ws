@@ -54,11 +54,11 @@ exports.searchCommunity = function (req, res) {
     let name = req.params.type;
     name = name.split(", ");
     name = name.map(v => v.toLowerCase());
-    console.log(name);
+    // console.log(name);
     COMMUNITY.find({communityName: {$in: name}, type: {$ne: 'Secured'}},
         (err, data) => {
-            console.log("data " + data);
-            console.log("err " + err);
+            // console.log("data " + data);
+            // console.log("err " + err);
             if (err) {
                 res.json(err);
             }
@@ -81,6 +81,17 @@ exports.getCommunities = function (req, res) {
             res.json(data);
         });
 };
+
+exports.deleteCommunitiesByKey = function (req, res) {
+    COMMUNITY.deleteMany({managerId: {$eq: req.params.key}},
+        (err, data) => {
+            if (err) {
+                res.json(err);
+            }
+            res.json(data);
+        });
+};
+
 
 
 
