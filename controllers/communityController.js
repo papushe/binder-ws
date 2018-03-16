@@ -3,6 +3,7 @@
  */
 let USER = require('../models/User'),
     COMMUNITY = require('../models/Community'),
+    helpers = require('./helpers'),
     manager = 'Manager';
 
 exports.errorHandling = (req, res) => {
