@@ -66,7 +66,6 @@ exports.searchCommunity = function (req, res) {
 };
 
 exports.getCommunities = function (req, res) {
-
     COMMUNITY.find({members: {$elemMatch: {memberId: req.params.key}}},
         (err, data) => {
             if (err) {
@@ -87,3 +86,74 @@ exports.deleteCommunitiesByKey = function (req, res) {
             res.json(data);
         });
 };
+
+exports.leaveCommunity = (req, res) => {
+    let userId = req.body.uid;
+    let communityId = req.body.communityId;
+
+    //Step 1: removing user from community members
+    COMMUNITY.findOneAndUpdate({_id: {$eq: communityId}},
+        {$pull: {members: {$elemMatch: {memberId: userId}}}},
+        {'new': true},
+        (err, data) => {
+            if (err) {
+                console.log(`error occurred while removing user: ${userId} from community: ${communityId}`);
+            }
+            //Step 2: remove community if no members left
+            console.log(data);
+            if (data.members.length == 0) {
+                console.log(`removing community: ${communityId}`);
+                COMMUNITY.findOneAndRemove({_id: {$eq: communityId}}, (err) => {
+                    if (err) {
+                        console.log(`error occurred while removing user: ${userId} from community: ${communityId}`);
+                    }
+                });
+            }
+            //Step 3: if the deleted user was the manager set a new one
+            else {
+                if (data.managerId == userId) {
+                    data = updateCommunityManager(data);
+                }
+            }
+            data.save((err, data) => {
+                if (err) {
+                    console.log(`error occurred while removing user: ${userId} from community: ${communityId}`);
+                }
+
+                //Step 4: removing community from user
+                USER.findOneAndUpdate({keyForFirebase: {$eq: userId}},
+                    {$pull: {communities: {$elemMatch: {communityId: communityId}}}},
+                    {'new': true},
+                    (err, data) => {
+                        if (err) {
+                            console.log(`error occurred while removing user community: ${communityId} from communities list: ${err}`);
+                        }
+                        console.log(`community: ${communityId} was removed from communities list for user: ${userId}`);
+                        res.json(true);
+                    });
+            });
+        }
+    );
+};
+
+function updateCommunityManager(community) {
+    let updatedCommunity = community;
+    if (community.authorizedMembers && community.authorizedMembers.length == 0) {
+        community.managerId = community.members[0];
+    }
+    else {
+        community.managerId = community.authorizedMembers[0];
+    }
+
+    USER.findOneAndUpdate({keyForFirebase: {$eq: community.managerId}},
+        {communities: {$elemMatch: {communityId: community.communityId}}},
+        {$set: {$elemMatch: {role: 'Manager'}}},
+        {'new': true},
+        (err, data) => {
+            if (err) {
+                console.log(`failed to update a new manager: ${community.managerId} for community: ${community.communityId}`)
+            }
+            return updatedCommunity;
+        });
+}
+
