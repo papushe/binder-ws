@@ -107,6 +107,12 @@ describe(`Community Controller Tests`, () => {
             });
     });
 
+    /**TODO:
+     * in the future need to add more users to the community,
+     * and check that the authorized member becomes the manager after the first user leaves the community
+     * */
+
+
     it(`it should GET searchCommunity by community name without secured communities`, (done) => {
         let query = 'public, secured, private';
         chai.request(testUtils.BASE_URL)
