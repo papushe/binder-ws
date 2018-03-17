@@ -93,11 +93,11 @@ exports.leaveCommunity = (req, res) => {
 
     //Step 1: removing user from community members
     COMMUNITY.findOneAndUpdate({_id: {$eq: communityId}},
-        {$pull: {members: {$elemMatch: {memberId: userId}}}},
+        {$pull: {members: {$elemMatch: {memberId:{$eq: userId}}}}},
         {'new': true},
         (err, data) => {
             if (err) {
-                console.log(`error occurred while removing user: ${userId} from community: ${communityId}`);
+                console.log(`error occurred while updating community: ${communityId}`);
             }
             //Step 2: remove community if no members left
             console.log(data);
@@ -134,6 +134,65 @@ exports.leaveCommunity = (req, res) => {
             });
         }
     );
+};
+
+exports.joinCommunity = (req, res) => {
+    let userId = req.body.uid;
+    let communityId = req.body.communityId;
+
+    let newCommunity = {
+        communityId: communityId,
+        role: 'Member'
+    };
+
+    //adding user from community members
+    COMMUNITY.findOne({$and: [{_id: {$eq: communityId}}, {type: {$eq: 'Public'}}]},
+        (err, data) => {
+            if (err) {
+                console.log(`error occurred while trying add user: ${userId} to community: ${communityId}: ${err}`);
+                res.json(false);
+            }
+            if (data == null || data.members == null) {
+                console.log(`error occurred while trying add user: ${userId} to community: ${communityId}: ${err}`);
+                res.json(false);
+                return;
+            }
+            data.members.push({memberId: userId});
+            data.save((err, data) => {
+                if (err) {
+                    console.log(`error occurred while trying add user: ${userId} to community: ${communityId}: ${err}`);
+                    res.json(false);
+                    return;
+                }
+                //adding community to user
+                USER.findOne({keyForFirebase: {$eq: userId}},
+                    (err, data) => {
+                        if (err) {
+                            console.log(`error occurred while trying add user community: ${communityId} to communities list: ${err}`);
+                            res.json(false);
+                            return;
+                        }
+
+                        if (data == null || data.communities == null) {
+                            console.log(`error occurred while trying add user: ${userId} to community: ${communityId}: ${err}`);
+                            res.json(false);
+                            return;
+                        }
+
+                        data.communities.push(newCommunity);
+                        console.log(data);
+                        data.save((err, data) => {
+                            if (err) {
+                                console.log(`error occurred while trying add user community: ${communityId} to communities list: ${err}`);
+                                res.json(false);
+                            }
+                            console.log(`community: ${communityId} was added to communities list for user: ${userId}`);
+                            res.json(true);
+                        });
+
+                    });
+            });
+        });
 };
 
 function updateCommunityManager(community) {

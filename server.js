@@ -37,6 +37,8 @@ app.post('/createNewCommunity/', communityController.createNewCommunity);
 
 app.post('/leaveCommunity/', communityController.leaveCommunity);
 
+app.post('/joinCommunity/', communityController.joinCommunity);
+
 app.get('/getCommunities/:key', communityController.getCommunities);
 
 app.get('/deleteCommunities/:key', communityController.deleteCommunitiesByKey);
