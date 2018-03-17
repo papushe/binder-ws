@@ -8,6 +8,8 @@ let chaiHttp = require('chai-http');
 let server = require('../index');
 let should = chai.should();
 
+let communitiesDictionary = [];
+
 chai.use(chaiHttp);
 
 function isSecuredCommunityExist(communities) {
@@ -35,6 +37,15 @@ function createCommunity(name, type) {
                 if (err) reject();
                 resolve(res);
             });
+    });
+}
+
+function storeTestCommunities(communities) {
+    return new Promise((resolve) => {
+        communities.forEach((c) => {
+            communitiesDictionary[c.type] = c._id;
+        });
+        resolve();
     });
 }
 
@@ -75,6 +86,23 @@ describe(`Community Controller Tests`, () => {
                 res.should.have.status(testUtils.STATUS_OK);
                 res.body.should.be.a('array');
                 res.body.length.should.be.eql(3);
+                storeTestCommunities(res.body)
+                    .then(() => {
+                        done()
+                    });
+            });
+    });
+
+    it(`it should POST leaveCommunity and leave the public community`, (done) => {
+        chai.request(testUtils.BASE_URL)
+            .post(`/leaveCommunity/`)
+            .send({
+                'communityId': communitiesDictionary['Public'],
+                'uid': testUtils.USER_KEY,
+            })
+            .end((err, res) => {
+                res.should.have.status(testUtils.STATUS_OK);
+                res.body.should.be.eql(true);
                 done()
             });
     });
@@ -86,8 +114,8 @@ describe(`Community Controller Tests`, () => {
             .end((err, res) => {
                 res.should.have.status(testUtils.STATUS_OK);
                 res.body.should.be.a('array');
-                res.body.length.should.be.eql(2);
-                isSecuredCommunityExist(res.body).should.be.eql(false);
+                res.body.length.should.be.eql(1);
+                res.body[0].type.should.be.eql('Private');
                 done()
             });
     });
