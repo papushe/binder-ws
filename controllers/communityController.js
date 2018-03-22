@@ -54,11 +54,10 @@ exports.createNewCommunity = (req, res) => {
 exports.searchCommunity = function (req, res) {
     let name = req.params.type;
     name = name.split(", ");
-    name = name.map(v => v.toLowerCase());
     COMMUNITY.find({communityName: {$in: name}, type: {$ne: 'Secured'}},
         (err, data) => {
             if (err) {
-                console.log("err occurred when running search");
+                console.log(`err occurred when running search: ${err}`);
                 res.json(err);
             }
             res.json(data);
@@ -90,18 +89,22 @@ exports.deleteCommunitiesByKey = function (req, res) {
 exports.leaveCommunity = (req, res) => {
     let userId = req.body.uid;
     let communityId = req.body.communityId;
+    let community;
+    let newManagerId;
 
     //Step 1: removing user from community members
     COMMUNITY.findOneAndUpdate({_id: {$eq: communityId}},
-        {$pull: {members: {$elemMatch: {memberId:{$eq: userId}}}}},
-        {'new': true},
+        {$pull: {members: {memberId: userId}}},
         (err, data) => {
             if (err) {
                 console.log(`error occurred while updating community: ${communityId}`);
             }
             //Step 2: remove community if no members left
+            if (!data || !data._doc) {
+                res.json(false);
+            }
             console.log(data);
-            if (data.members.length == 0) {
+            if (data._doc.members.length == 1) {
                 console.log(`removing community: ${communityId}`);
                 COMMUNITY.findOneAndRemove({_id: {$eq: communityId}}, (err) => {
                     if (err) {
@@ -111,8 +114,11 @@ exports.leaveCommunity = (req, res) => {
             }
             //Step 3: if the deleted user was the manager set a new one
             else {
-                if (data.managerId == userId) {
-                    data = updateCommunityManager(data);
+                if (data._doc.managerId == userId) {
+                    newManagerId = getNextNewManagerId(data.toObject());
+                    data.set({
+                        managerId: newManagerId
+                    });
                 }
             }
             data.save((err, data) => {
@@ -122,8 +128,7 @@ exports.leaveCommunity = (req, res) => {
 
                 //Step 4: removing community from user
                 USER.findOneAndUpdate({keyForFirebase: {$eq: userId}},
-                    {$pull: {communities: {$elemMatch: {communityId: communityId}}}},
-                    {'new': true},
+                    {$pull: {communities: {communityId: communityId}}},
                     (err, data) => {
                         if (err) {
                             console.log(`error occurred while removing user community: ${communityId} from communities list: ${err}`);
@@ -134,6 +139,17 @@ exports.leaveCommunity = (req, res) => {
             });
         }
     );
+
+
+    //Step 5: update new manager role
+    // USER.update({keyForFirebase: {$eq: newManagerId}}, {communities: {communityId: communityId}},
+    //     {$set: {'communities.$.role': 'Manager'}},
+    //     (err, data) => {
+    //         if (err) {
+    //             console.log(`error occurred while updating user: ${newManagerId} as manager of ${communityId}: ${err}`);
+    //         }
+    //         res.json(true);
+    //     });
 };
 
 exports.joinCommunity = (req, res) => {
@@ -195,24 +211,25 @@ exports.joinCommunity = (req, res) => {
         });
 };
 
-function updateCommunityManager(community) {
-    let updatedCommunity = community;
-    if (community.authorizedMembers && community.authorizedMembers.length == 0) {
-        community.managerId = community.members[0];
-    }
-    else {
-        community.managerId = community.authorizedMembers[0];
-    }
+function getNextNewManagerId(community) {
+    let newManagerId = null;
 
-    USER.findOneAndUpdate({keyForFirebase: {$eq: community.managerId}},
-        {communities: {$elemMatch: {communityId: community.communityId}}},
-        {$set: {$elemMatch: {role: 'Manager'}}},
-        {'new': true},
-        (err, data) => {
-            if (err) {
-                console.log(`failed to update a new manager: ${community.managerId} for community: ${community.communityId}`)
+    if (community.authorizedMembers.length > 0) {
+         community.authorizedMembers.forEach( authMember => {
+            if (authMember.memberId != community.managerId) {
+                newManagerId =  authMember.memberId;
             }
-            return updatedCommunity;
-        });
+        })
+    }
+    if (community.members.length > 0) {
+         community.members.forEach( member => {
+            if (member.memberId != community.managerId) {
+                newManagerId =  member.memberId;
+            }
+        })
+    }
+    return newManagerId;
 }
+
+
 
