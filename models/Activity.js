@@ -1,14 +1,14 @@
 const mongoose = require('mongoose'),
       schema   = mongoose.Schema,
 
-    pickup = new schema({
-        activity_id: String,
+    activity = new schema({
         activity_name: String,
         activity_description: String,
         type: String,
-        created_at: Date,
+        created_at: String,
         consumer_id: String,
         provider_id: String,
+        community_id: String,
         source: [{
             city: String,
             street: String,
@@ -19,11 +19,11 @@ const mongoose = require('mongoose'),
             street: String,
             number: String,
         }],
-        activity_date: Date,
+        activity_date: String,
         notes: String
     },{strict: true});
 
 
-let Pickup = mongoose.model('Pickup', pickup);
+let Activity = mongoose.model('Activity', activity);
 
-module.exports = Pickup;
+module.exports = Activity;
