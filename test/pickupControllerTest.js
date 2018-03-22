@@ -1,5 +1,5 @@
 let mongoose = require("mongoose");
-let Pickup = require('../models/Pickup');
+let Pickup = require('../models/Activity');
 let testUtils = require('./testUtils');
 let utils = require('../utils');
 

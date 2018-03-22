@@ -4,6 +4,7 @@ const express = require('express'),
     server = http.createServer(app),
     userController = require('./controllers/userController'),
     communityController = require('./controllers/communityController'),
+    activityController = require('./controllers/activityController'),
     errorController = require('./controllers/errorController'),
     port = process.env.PORT || require('./config').PORT,
     bodyParser = require('body-parser'),
@@ -44,6 +45,14 @@ app.get('/getCommunities/:key', communityController.getCommunities);
 app.get('/deleteCommunities/:key', communityController.deleteCommunitiesByKey);
 
 app.get('/searchCommunity/:type', communityController.searchCommunity);
+
+app.post('/createNewActivity/', activityController.createNewActivity);
+
+app.get('/getActivitiesByUserId/:key', activityController.getActivitiesByUserId);
+
+app.get('/getActivitiesByCommunityId/:key', activityController.getActivitiesByCommunityId);
+
+app.post('/deleteActivityById/', activityController.deleteActivityById);
 
 app.all('*', errorController.errorHandling);
 
