@@ -1,5 +1,5 @@
 let mongoose = require("mongoose");
-let Pickup = require('../models/Activity');
+let Activity = require('../models/Activity');
 let testUtils = require('./testUtils');
 let utils = require('../utils');
 
@@ -10,7 +10,7 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 
-describe(`Pickup Controller Tests`, () => {
+describe(`Activity Controller Tests`, () => {
 
     //before ALL tests do that.
     before((done) => {
