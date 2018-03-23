@@ -53,7 +53,6 @@ exports.createNewCommunity = (req, res) => {
 
 exports.searchCommunity = function (req, res) {
     let name = req.params.type;
-    // name = name.split(", ");
     COMMUNITY.find(
         {communityName: {$regex: name, $options: "i"}, type: {$ne: 'Secured'}},
         (err, data) => {
