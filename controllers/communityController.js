@@ -53,8 +53,9 @@ exports.createNewCommunity = (req, res) => {
 
 exports.searchCommunity = function (req, res) {
     let name = req.params.type;
-    name = name.split(", ");
-    COMMUNITY.find({communityName: {$in: name}, type: {$ne: 'Secured'}},
+    // name = name.split(", ");
+    COMMUNITY.find(
+        {communityName: {$regex: name, $options: "i"}, type: {$ne: 'Secured'}},
         (err, data) => {
             if (err) {
                 console.log(`err occurred when running search: ${err}`);
