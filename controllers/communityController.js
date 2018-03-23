@@ -141,6 +141,8 @@ exports.leaveCommunity = (req, res) => {
     );
 
 
+
+
     //Step 5: update new manager role
     // USER.update({keyForFirebase: {$eq: newManagerId}}, {communities: {communityId: communityId}},
     //     {$set: {'communities.$.role': 'Manager'}},
@@ -208,6 +210,17 @@ exports.joinCommunity = (req, res) => {
 
                     });
             });
+        });
+};
+
+exports.getCommunityMembers = (req, res) => {
+    USER.find({communities: {$elemMatch: {communityId: req.body.communityId}}},
+        (err, data) => {
+            if (err) {
+                console.log(`got community members successfully`);
+                res.json(err);
+            }
+            res.json(data);
         });
 };
 
