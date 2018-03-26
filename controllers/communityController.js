@@ -51,7 +51,7 @@ exports.createNewCommunity = (req, res) => {
     );
 };
 
-exports.searchCommunity = function (req, res) {
+exports.searchCommunity = (req, res) => {
     let name = req.params.type;
     COMMUNITY.find(
         {communityName: {$regex: name, $options: "i"}, type: {$ne: 'Secured'}},
@@ -64,7 +64,7 @@ exports.searchCommunity = function (req, res) {
         });
 };
 
-exports.getCommunities = function (req, res) {
+exports.getCommunities = (req, res) => {
     COMMUNITY.find({members: {$elemMatch: {memberId: req.params.key}}},
         (err, data) => {
             if (err) {
@@ -76,7 +76,7 @@ exports.getCommunities = function (req, res) {
         });
 };
 
-exports.deleteCommunitiesByKey = function (req, res) {
+exports.deleteCommunitiesByKey = (req, res) => {
     COMMUNITY.deleteMany({managerId: {$eq: req.params.key}},
         (err, data) => {
             if (err) {
@@ -139,8 +139,6 @@ exports.leaveCommunity = (req, res) => {
             });
         }
     );
-
-
 
 
     //Step 5: update new manager role
@@ -228,16 +226,16 @@ function getNextNewManagerId(community) {
     let newManagerId = null;
 
     if (community.authorizedMembers.length > 0) {
-         community.authorizedMembers.forEach( authMember => {
+        community.authorizedMembers.forEach(authMember => {
             if (authMember.memberId != community.managerId) {
-                newManagerId =  authMember.memberId;
+                newManagerId = authMember.memberId;
             }
         })
     }
     if (community.members.length > 0) {
-         community.members.forEach( member => {
+        community.members.forEach(member => {
             if (member.memberId != community.managerId) {
-                newManagerId =  member.memberId;
+                newManagerId = member.memberId;
             }
         })
     }

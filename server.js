@@ -34,6 +34,8 @@ app.post('/updateProfile/', userController.updateProfile);
 
 app.get('/getProfile/:key', userController.getProfile);
 
+app.get('/deleteProfile/:key', userController.deleteProfile);
+
 app.post('/createNewCommunity/', communityController.createNewCommunity);
 
 app.post('/leaveCommunity/', communityController.leaveCommunity);

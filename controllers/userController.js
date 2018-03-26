@@ -1,4 +1,5 @@
 let USER = require('../models/User'),
+    COMMUNITY = require('../models/Community'),
     Utils = require('../utils');
 
 exports.createNewUser = (req, res) => {
@@ -25,7 +26,7 @@ exports.createNewUser = (req, res) => {
     );
 };
 
-exports.getProfile = function (req, res) {
+exports.getProfile = (req, res) => {
     USER.findOne({keyForFirebase: {$eq: req.params.key}},
         (err, data) => {
             if (err) {
@@ -62,3 +63,107 @@ exports.updateProfile = (req, res) => {
             );
         })
 };
+
+exports.deleteProfile = (req, res) => {
+
+    let userId = req.params.key;
+
+    COMMUNITY.find(
+        {members: {$elemMatch: {memberId: userId}}},
+        (err, data) => {
+            if (err) {
+                // console.log(err);
+                res.json(err);
+            }
+            // console.log(data);
+            data.forEach(community => {
+
+                community = deleteFromCommunity(community, userId);
+
+                if (community.newId) {
+                    community.community.set({
+                        managerId: community.newId
+                    });
+                    community.community.save(
+                        (err, data) => {
+                            if (err) {
+                                console.log(err)
+                            }
+                            console.log(data);
+                        }
+                    );
+                } else {
+                    community.community.remove(
+                        (err, data) => {
+                            if (err) {
+                                console.error(err)
+                            }
+                            console.log(data);
+                        })
+                }
+            })
+        });
+
+    //delete the user
+    USER.findOneAndRemove({keyForFirebase: {$eq: userId}},
+        (err, data) => {
+            if (err) {
+                res.json(err);
+            }
+            console.log("delete user");
+            res.json(data);
+        });
+};
+
+function deleteFromCommunity(community, userId) {
+
+    let newId = null;
+    let members = community._doc.members;
+    let authorizedMembers = community._doc.authorizedMembers;
+    let communityId = community._doc._id;
+
+    for (let i = 0; i < members.length; i++) {
+        if (members[i]._doc.memberId == userId) {
+            members.splice(i, 1)
+        }
+    }
+    for (let i = 0; i < authorizedMembers.length; i++) {
+        if (authorizedMembers[i]._doc.memberId == userId) {
+            authorizedMembers.splice(i, 1)
+        }
+    }
+
+    if (community._doc.managerId == userId) {
+        if (authorizedMembers.length > 0) {
+            newId = authorizedMembers[0].memberId;
+            updateUserRole(newId, communityId);
+        } else if (members.length > 0) {
+            newId = members[0].memberId;
+            updateUserRole(newId, communityId);
+        } else {
+            newId = null;
+        }
+    }
+    return {
+        community,
+        newId: newId
+    };
+}
+
+function updateUserRole(userId, communityId) {
+
+    USER.update(
+        {'communities.communityId': communityId},
+        {
+            '$set': {
+                'communities.$.role': 'Manager'
+            }
+        },
+        (err, data) => {
+            if (err) {
+                // res.json(err);
+                console.log(err);
+            }
+            console.log(data)
+        })
+}
