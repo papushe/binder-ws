@@ -4,6 +4,7 @@
 let USER = require('../models/User'),
     COMMUNITY = require('../models/Community'),
     Utils = require('../utils'),
+    SHEARD = require('./sharedController'),
     manager = 'Manager';
 
 exports.errorHandling = (req, res) => {
@@ -119,6 +120,7 @@ exports.leaveCommunity = (req, res) => {
                     data.set({
                         managerId: newManagerId
                     });
+                    SHEARD.updateUserRole(newManagerId, communityId);
                 }
             }
             data.save((err, data) => {
@@ -140,16 +142,6 @@ exports.leaveCommunity = (req, res) => {
         }
     );
 
-
-    //Step 5: update new manager role
-    // USER.update({keyForFirebase: {$eq: newManagerId}}, {communities: {communityId: communityId}},
-    //     {$set: {'communities.$.role': 'Manager'}},
-    //     (err, data) => {
-    //         if (err) {
-    //             console.log(`error occurred while updating user: ${newManagerId} as manager of ${communityId}: ${err}`);
-    //         }
-    //         res.json(true);
-    //     });
 };
 
 exports.joinCommunity = (req, res) => {

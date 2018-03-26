@@ -1,6 +1,7 @@
 let USER = require('../models/User'),
     COMMUNITY = require('../models/Community'),
-    Utils = require('../utils');
+    Utils = require('../utils'),
+    SHARED = require('./sharedController');
 
 exports.createNewUser = (req, res) => {
     let newUser = new USER({
@@ -136,10 +137,10 @@ function deleteFromCommunity(community, userId) {
     if (community._doc.managerId == userId) {
         if (authorizedMembers.length > 0) {
             newId = authorizedMembers[0].memberId;
-            updateUserRole(newId, communityId);
+            SHARED.updateUserRole(newId, communityId);
         } else if (members.length > 0) {
             newId = members[0].memberId;
-            updateUserRole(newId, communityId);
+            SHARED.updateUserRole(newId, communityId);
         } else {
             newId = null;
         }
@@ -150,20 +151,19 @@ function deleteFromCommunity(community, userId) {
     };
 }
 
-function updateUserRole(userId, communityId) {
-
-    USER.update(
-        {'communities.communityId': communityId},
-        {
-            '$set': {
-                'communities.$.role': 'Manager'
-            }
-        },
-        (err, data) => {
-            if (err) {
-                // res.json(err);
-                console.log(err);
-            }
-            console.log(data)
-        })
-}
+// function updateUserRole(userId, communityId) {
+//
+//     USER.updateOne(
+//         {
+//             keyForFirebase: userId,
+//             communities:{$elemMatch:{communityId:{$eq:communityId}}}
+//         },
+//         { $set: { "communities.$.role" : 'Manager' } },
+//         (err, data) => {
+//             if (err) {
+//                 // res.json(err);
+//                 console.log(err);
+//             }
+//             console.log(data)
+//         })
+// }
