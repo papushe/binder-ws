@@ -5,7 +5,6 @@ const express = require('express'),
     userController = require('./controllers/userController'),
     communityController = require('./controllers/communityController'),
     activityController = require('./controllers/activityController'),
-    errorController = require('./controllers/errorController'),
     port = process.env.PORT || require('./config').PORT,
     bodyParser = require('body-parser'),
     socketIO = require('socket.io'),
@@ -39,6 +38,8 @@ app.get('/deleteProfile/:key', userController.deleteProfile);
 app.post('/createNewCommunity/', communityController.createNewCommunity);
 
 app.post('/leaveCommunity/', communityController.leaveCommunity);
+
+app.post('/deleteCommunity/', communityController.deleteCommunity);
 
 app.post('/joinCommunity/', communityController.joinCommunity);
 

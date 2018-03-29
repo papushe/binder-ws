@@ -45,7 +45,12 @@ describe(`Community Controller Tests`, () => {
 
     before((done) => {
         testUniqueId = utils.getRandomString(5) + new Date().getTime();
-        done();
+        chai.request(testUtils.BASE_URL)
+            .get(`/deleteCommunities/${testUtils.USER_KEY}`)
+            .end((err, res) => {
+                res.should.have.status(testUtils.STATUS_OK);
+                done()
+            });
     });
 
 
@@ -120,17 +125,16 @@ describe(`Community Controller Tests`, () => {
             });
     });
 
-    it(`it should POST deleteCommunities`, (done) => {
+    it(`it should POST deleteCommunity`, (done) => {
         chai.request(testUtils.BASE_URL)
-            .get(`/deleteCommunities/${testUtils.USER_KEY}`)
+            .post(`/deleteCommunity/`)
+            .send({
+                'communityId': communitiesDictionary['Public'],
+            })
             .end((err, res) => {
                 res.should.have.status(testUtils.STATUS_OK);
-                chai.request(testUtils.BASE_URL)
-                    .get(`/getCommunities/${testUtils.USER_KEY}`)
-                    .end((err, res) => {
-                        res.body.length.should.be.eql(0);
-                        done()
-                    });
+                res.body.should.be.eql(true);
+                done()
             });
     });
 

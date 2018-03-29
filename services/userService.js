@@ -21,6 +21,7 @@ exports.removeCommunityFromUser = (userId, communityId) => {
         (err, data) => {
             if (err) {
                 console.log(`error occurred while removing user community: ${communityId} from communities list: ${err}`);
+                throw (err);
             }
             console.log(`community: ${communityId} was removed from communities list for user: ${userId}`);
         });

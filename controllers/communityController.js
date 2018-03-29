@@ -127,6 +127,30 @@ exports.leaveCommunity = (req, res) => {
     );
 };
 
+exports.deleteCommunity = (req, res) => {
+    let communityId = req.body.communityId;
+
+    USER.find(
+        {communities: {$elemMatch: {communityId: communityId}}},
+        (err, data) => {
+            if (err) {
+                res.json(err);
+            }
+            data.forEach(function (user) {
+                try {
+                    if (user) {
+                        userService.removeCommunityFromUser(user.keyForFirebase, communityId);
+                    }
+                } catch (e) {
+                    console.error(`failed to remove community ${communityId} from user ${user.keyForFirebase} due to: ${err}`);
+                    res.json(false);
+                }
+            });
+            communityService.deleteCommunityById(communityId);
+            res.json(true);
+        });
+};
+
 exports.joinCommunity = (req, res) => {
     let userId = req.body.uid;
     let communityId = req.body.communityId;
