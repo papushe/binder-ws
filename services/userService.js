@@ -42,7 +42,6 @@ exports.addCommunityToUser = (userId, newCommunity) => {
             }
 
             data.communities.push(newCommunity);
-            console.log(data);
             data.save((err, data) => {
                 if (err) {
                     console.log(`error occurred while trying add user community: ${newCommunity.communityId} to communities list: ${err}`);
