@@ -5,8 +5,7 @@ let USER = require('../models/User'),
     COMMUNITY = require('../models/Community'),
     Utils = require('../utils'),
     userService = require('./../services/userService'),
-    communityService = require('./../services/communityService'),
-    manager = 'Manager';
+    communityService = require('./../services/communityService');
 
 exports.errorHandling = (req, res) => {
     res.json({"error": "404 - not found (Wrong input or Wrong url)"});
@@ -31,7 +30,7 @@ exports.createNewCommunity = (req, res) => {
             // console.log(data)
             const newCommunity = {
                 communityId: data._id,
-                role: manager
+                role: 'Manager'
             };
             USER.findOne({keyForFirebase: {$eq: data.managerId}},
                 (err, data) => {
