@@ -58,7 +58,9 @@ app.get('/getActivitiesByCommunityId/:key', activityController.getActivitiesByCo
 
 app.post('/deleteActivityById/', activityController.deleteActivityById);
 
-app.all('*', errorController.errorHandling);
+app.all('*', (req, res) => {
+    res.json({"error": "404 - not found (Wrong input or Wrong url)"});
+});
 
 server.listen(port, () => {
     console.log(`listening on port ${port}`);

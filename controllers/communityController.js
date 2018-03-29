@@ -7,10 +7,6 @@ let USER = require('../models/User'),
     userService = require('./../services/userService'),
     communityService = require('./../services/communityService');
 
-exports.errorHandling = (req, res) => {
-    res.json({"error": "404 - not found (Wrong input or Wrong url)"});
-};
-
 exports.createNewCommunity = (req, res) => {
     let newCommunity = new COMMUNITY({
         communityName: req.body.communityName,
