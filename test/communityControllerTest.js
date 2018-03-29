@@ -10,16 +10,9 @@ let should = chai.should();
 
 let communitiesDictionary = [];
 
-chai.use(chaiHttp);
+let testUniqueId;
 
-function isSecuredCommunityExist(communities) {
-    communities.forEach((key, value) => {
-        if (value.type === 'Secured') {
-            return true;
-        }
-    });
-    return false;
-}
+chai.use(chaiHttp);
 
 function createCommunity(name, type) {
     return new Promise((resolve, reject) => {
@@ -52,6 +45,7 @@ function storeTestCommunities(communities) {
 describe(`Community Controller Tests`, () => {
 
     before((done) => {
+        testUniqueId = utils.getRandomString(5) + new Date().getTime();
         done();
     });
 
@@ -67,11 +61,11 @@ describe(`Community Controller Tests`, () => {
 
 
     it(`it should POST createNewCommunity`, (done) => {
-        createCommunity('public', 'Public')
+        createCommunity('public' + testUniqueId, 'Public')
             .then(() => {
-                createCommunity('private', 'Private')
+                createCommunity('private' + testUniqueId, 'Private')
                     .then(() => {
-                        createCommunity('secured', 'Secured')
+                        createCommunity('secured' + testUniqueId, 'Secured')
                             .then(() => {
                                 done();
                             });
@@ -114,7 +108,7 @@ describe(`Community Controller Tests`, () => {
 
 
     it(`it should GET searchCommunity by community name without secured communities`, (done) => {
-        let query = 'public, secured, private';
+        let query = testUniqueId;
         chai.request(testUtils.BASE_URL)
             .get(`/searchCommunity/${query}`)
             .end((err, res) => {
@@ -122,6 +116,7 @@ describe(`Community Controller Tests`, () => {
                 res.body.should.be.a('array');
                 res.body.length.should.be.eql(1);
                 res.body[0].type.should.be.eql('Private');
+                res.body[0].communityName.should.be.eql('private' + testUniqueId);
                 done()
             });
     });
