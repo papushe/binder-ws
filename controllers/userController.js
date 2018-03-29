@@ -1,7 +1,7 @@
 let USER = require('../models/User'),
     COMMUNITY = require('../models/Community'),
     Utils = require('../utils'),
-    SHARED = require('./sharedController');
+    userService = require('./../services/userService');
 
 exports.createNewUser = (req, res) => {
     let newUser = new USER({
@@ -137,10 +137,10 @@ function deleteFromCommunity(community, userId) {
     if (community._doc.managerId == userId) {
         if (authorizedMembers.length > 0) {
             newId = authorizedMembers[0].memberId;
-            SHARED.updateUserRole(newId, communityId, 'Manager');
+            userService.updateUserRole(newId, communityId, 'Manager');
         } else if (members.length > 0) {
             newId = members[0].memberId;
-            SHARED.updateUserRole(newId, communityId, 'Manager');
+            userService.updateUserRole(newId, communityId, 'Manager');
         } else {
             newId = null;
         }

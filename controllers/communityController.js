@@ -4,7 +4,7 @@
 let USER = require('../models/User'),
     COMMUNITY = require('../models/Community'),
     Utils = require('../utils'),
-    SHEARD = require('./sharedController'),
+    userService = require('./../services/userService'),
     manager = 'Manager';
 
 exports.errorHandling = (req, res) => {
@@ -120,7 +120,7 @@ exports.leaveCommunity = (req, res) => {
                     data.set({
                         managerId: newManagerId
                     });
-                    SHEARD.updateUserRole(newManagerId, communityId, 'Manager');
+                    userService.updateUserRole(newManagerId, communityId, 'Manager');
                 }
             }
             data.save((err, data) => {
