@@ -5,6 +5,7 @@ let USER = require('../models/User'),
     COMMUNITY = require('../models/Community'),
     Utils = require('../utils'),
     userService = require('./../services/userService'),
+    communityService = require('./../services/communityService'),
     manager = 'Manager';
 
 exports.errorHandling = (req, res) => {
@@ -110,13 +111,14 @@ exports.leaveCommunity = (req, res) => {
                 COMMUNITY.findOneAndRemove({_id: {$eq: communityId}}, (err) => {
                     if (err) {
                         console.log(`error occurred while removing user: ${userId} from community: ${communityId}`);
+                        res.json(false);
                     }
                 });
             }
             //Step 3: if the deleted user was the manager set a new one
             else {
                 if (data._doc.managerId == userId) {
-                    newManagerId = getNextNewManagerId(data.toObject());
+                    newManagerId = communityService.getNextNewManagerId(data.toObject());
                     data.set({
                         managerId: newManagerId
                     });
@@ -126,22 +128,15 @@ exports.leaveCommunity = (req, res) => {
             data.save((err, data) => {
                 if (err) {
                     console.log(`error occurred while removing user: ${userId} from community: ${communityId}`);
+                    res.json(false);
                 }
 
                 //Step 4: removing community from user
-                USER.findOneAndUpdate({keyForFirebase: {$eq: userId}},
-                    {$pull: {communities: {communityId: communityId}}},
-                    (err, data) => {
-                        if (err) {
-                            console.log(`error occurred while removing user community: ${communityId} from communities list: ${err}`);
-                        }
-                        console.log(`community: ${communityId} was removed from communities list for user: ${userId}`);
-                        res.json(true);
-                    });
+                userService.removeCommunityFromUser(userId, communityId);
+                res.json(true);
             });
         }
     );
-
 };
 
 exports.joinCommunity = (req, res) => {
@@ -214,25 +209,6 @@ exports.getCommunityMembers = (req, res) => {
         });
 };
 
-function getNextNewManagerId(community) {
-    let newManagerId = null;
-
-    if (community.authorizedMembers.length > 0) {
-        community.authorizedMembers.forEach(authMember => {
-            if (authMember.memberId != community.managerId) {
-                newManagerId = authMember.memberId;
-            }
-        })
-    }
-    if (community.members.length > 0) {
-        community.members.forEach(member => {
-            if (member.memberId != community.managerId) {
-                newManagerId = member.memberId;
-            }
-        })
-    }
-    return newManagerId;
-}
 
 
 
