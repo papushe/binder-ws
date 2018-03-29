@@ -120,7 +120,7 @@ exports.leaveCommunity = (req, res) => {
                     data.set({
                         managerId: newManagerId
                     });
-                    SHEARD.updateUserRole(newManagerId, communityId);
+                    SHEARD.updateUserRole(newManagerId, communityId, 'Manager');
                 }
             }
             data.save((err, data) => {
