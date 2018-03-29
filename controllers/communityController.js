@@ -105,15 +105,8 @@ exports.leaveCommunity = (req, res) => {
             if (!data || !data._doc) {
                 res.json(false);
             }
-            console.log(data);
             if (data._doc.members.length == 1) {
-                console.log(`removing community: ${communityId}`);
-                COMMUNITY.findOneAndRemove({_id: {$eq: communityId}}, (err) => {
-                    if (err) {
-                        console.log(`error occurred while removing user: ${userId} from community: ${communityId}`);
-                        res.json(false);
-                    }
-                });
+                communityService.deleteCommunityById(communityId);
             }
             //Step 3: if the deleted user was the manager set a new one
             else {
@@ -168,32 +161,8 @@ exports.joinCommunity = (req, res) => {
                     return;
                 }
                 //adding community to user
-                USER.findOne({keyForFirebase: {$eq: userId}},
-                    (err, data) => {
-                        if (err) {
-                            console.log(`error occurred while trying add user community: ${communityId} to communities list: ${err}`);
-                            res.json(false);
-                            return;
-                        }
-
-                        if (data == null || data.communities == null) {
-                            console.log(`error occurred while trying add user: ${userId} to community: ${communityId}: ${err}`);
-                            res.json(false);
-                            return;
-                        }
-
-                        data.communities.push(newCommunity);
-                        console.log(data);
-                        data.save((err, data) => {
-                            if (err) {
-                                console.log(`error occurred while trying add user community: ${communityId} to communities list: ${err}`);
-                                res.json(false);
-                            }
-                            console.log(`community: ${communityId} was added to communities list for user: ${userId}`);
-                            res.json(true);
-                        });
-
-                    });
+                userService.addCommunityToUser(userId, newCommunity);
+                res.json(true);
             });
         });
 };

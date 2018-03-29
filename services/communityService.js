@@ -20,4 +20,16 @@ exports.getNextNewManagerId = (community) => {
     return newManagerId;
 };
 
+exports.deleteCommunityById = (communityId) => {
+    COMMUNITY.findOneAndRemove({_id: {$eq: communityId}}, (err) => {
+        if (err) {
+            console.log(`error occurred when tried to delete community: ${communityId}`);
+            res.json(false);
+        }
+        else {
+            console.log(`community: ${communityId} was deleted`);
+        }
+    });
+};
+
 

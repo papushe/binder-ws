@@ -26,4 +26,32 @@ exports.removeCommunityFromUser = (userId, communityId) => {
         });
 };
 
+exports.addCommunityToUser = (userId, newCommunity) => {
+    USER.findOne({keyForFirebase: {$eq: userId}},
+        (err, data) => {
+            if (err) {
+                console.log(`error occurred while trying add user community: ${newCommunity.communityId} to communities list: ${err}`);
+                res.json(false);
+                return;
+            }
+
+            if (data == null || data.communities == null) {
+                console.log(`error occurred while trying add user: ${userId} to community: ${newCommunity.communityId}: ${err}`);
+                res.json(false);
+                return;
+            }
+
+            data.communities.push(newCommunity);
+            console.log(data);
+            data.save((err, data) => {
+                if (err) {
+                    console.log(`error occurred while trying add user community: ${newCommunity.communityId} to communities list: ${err}`);
+                    res.json(false);
+                }
+                console.log(`community: ${newCommunity.communityId} was added to communities list for user: ${userId}`);
+            });
+
+        });
+};
+
 
