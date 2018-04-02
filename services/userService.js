@@ -4,9 +4,9 @@ exports.updateUserRole = (userId, communityId, role) => {
     USER.updateOne(
         {
             keyForFirebase: userId,
-            communities:{$elemMatch:{communityId:{$eq:communityId}}}
+            communities: {$elemMatch: {communityId: {$eq: communityId}}}
         },
-        { $set: { "communities.$.role" : role } },
+        {$set: {"communities.$.role": role}},
         (err, data) => {
             if (err) {
                 console.log(err);
