@@ -124,17 +124,17 @@ function deleteFromCommunity(community, userId) {
     let communityId = community._doc._id;
 
     for (let i = 0; i < members.length; i++) {
-        if (members[i]._doc.memberId == userId) {
+        if (members[i]._doc.memberId === userId) {
             members.splice(i, 1)
         }
     }
     for (let i = 0; i < authorizedMembers.length; i++) {
-        if (authorizedMembers[i]._doc.memberId == userId) {
+        if (authorizedMembers[i]._doc.memberId === userId) {
             authorizedMembers.splice(i, 1)
         }
     }
 
-    if (community._doc.managerId == userId) {
+    if (community._doc.managerId === userId) {
         if (authorizedMembers.length > 0) {
             newId = authorizedMembers[0].memberId;
             userService.updateUserRole(newId, communityId, 'Manager');
