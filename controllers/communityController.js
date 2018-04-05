@@ -129,6 +129,9 @@ exports.leaveCommunity = (req, res) => {
 
 exports.deleteCommunity = (req, res) => {
     let communityId = req.body.communityId;
+    let userId = req.body.uid;
+
+    console.log(`delete community: ${communityId} was invoked by: ${userId}`);
 
     USER.find(
         {communities: {$elemMatch: {communityId: communityId}}},
