@@ -29,8 +29,14 @@ exports.createNewActivity = (req, res) => {
   });
   newActivity.save(
       (err, data) => {
-          if (err) res.json(err);
-          else res.json(data);
+          if (err) {
+              console.log(`Failed to create activity: ${newActivity} due to: ${err}`);
+              res.json(err);
+          }
+          else {
+              console.log(`Activity: ${data._id} was created successfully!`);
+              res.json(data);
+          }
       }
   );
 };
