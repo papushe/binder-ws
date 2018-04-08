@@ -9,16 +9,8 @@ const mongoose = require('mongoose'),
         consumer_id: String,
         provider_id: String,
         community_id: String,
-        source: [{
-            city: String,
-            street: String,
-            number: String,
-        }],
-        destination: [{
-            city: String,
-            street: String,
-            number: String,
-        }],
+        source: String,
+        destination: String,
         activity_date: String,
         notes: String
     },{strict: true});
