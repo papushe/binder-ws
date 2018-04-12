@@ -145,7 +145,7 @@ exports.deleteCommunity = (req, res) => {
                         userService.removeCommunityFromUser(user.keyForFirebase, communityId);
                     }
                 } catch (e) {
-                    console.error(`failed to remove community ${communityId} from user ${user.keyForFirebase} due to: ${err}`);
+                    console.error(`failed to remove community ${communityId} from user ${user.keyForFirebase} due to: ${e}`);
                     res.json(false);
                 }
             });
@@ -198,6 +198,38 @@ exports.getCommunityMembers = (req, res) => {
             }
             res.json(data);
         });
+};
+
+exports.updateCommunityUserRole = (req, res) => {
+    let userId = req.body.uid;
+    let communityId = req.body.communityId;
+    let role = userService.getRole(req.body.role);
+
+    try {
+        if (role == null) {
+            console.log(`${role} role is invalid`);
+            res.json(false);
+        }
+        //update community
+        switch (role) {
+            case 'Manager':
+                communityService.setNewManager(communityId, null, userId);
+                break;
+            case 'authorizedMember':
+                communityService.setAsAuthorizedMember(communityId, userId);
+                break;
+            case 'Member':
+                communityService.setAsMember(communityId, userId);
+                break;
+            default: break;
+        }
+        //update user
+        userService.updateUserRole(userId, communityId, role);
+        res.json(true);
+    } catch (e) {
+        console.error(`failed to update user: ${userId} role to: ${role} in community ${communityId} due to: ${e}`);
+        res.json(false);
+    }
 };
 
 

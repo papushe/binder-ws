@@ -49,6 +49,8 @@ app.get('/getCommunities/:key', communityController.getCommunities);
 
 app.get('/deleteCommunities/:key', communityController.deleteCommunitiesByKey);
 
+app.post('/updateUserRole/', communityController.updateCommunityUserRole);
+
 app.get('/searchCommunity/:type', communityController.searchCommunity);
 
 app.post('/createNewActivity/', activityController.createNewActivity);

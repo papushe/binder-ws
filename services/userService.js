@@ -1,5 +1,27 @@
 let USER = require('../models/User');
 
+const ROLE_MANAGER = 'Manager';
+const ROLE_AUTHORIZED = 'authorizedMember';
+const ROLE_MEMBER = 'Member';
+
+exports.getRole = (role) => {
+    if (role.match(new RegExp(ROLE_MANAGER, "ig"))) {
+        console.log('manager role!');
+        return ROLE_MANAGER;
+    }
+
+    if (role.match(new RegExp(ROLE_AUTHORIZED, "ig"))) {
+        console.log('authorized role!');
+        return ROLE_AUTHORIZED;
+    }
+
+    if (role.match(new RegExp(ROLE_MEMBER, "ig"))) {
+        console.log('member role!');
+        return ROLE_MEMBER;
+    }
+    return null;
+};
+
 exports.updateUserRole = (userId, communityId, role) => {
     USER.updateOne(
         {
@@ -10,6 +32,7 @@ exports.updateUserRole = (userId, communityId, role) => {
         (err, data) => {
             if (err) {
                 console.log(err);
+                throw (err);
             }
             console.log(data)
         })
