@@ -17,6 +17,7 @@ const mongoose = require('mongoose'),
         rank:String,
         skills:[String],
         description:String,
+        profilePic:String,
         keyForFirebase:String
     },{strict: true});
 

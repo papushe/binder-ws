@@ -15,6 +15,7 @@ exports.createNewUser = (req, res) => {
         type: req.body.type,
         skills: req.body.skills,
         description: req.body.description,
+        profilePic: req.body.profilePic,
         keyForFirebase: req.body.keyForFirebase
     });
     newUser.save(
@@ -53,6 +54,7 @@ exports.updateProfile = (req, res) => {
                 type: req.body.type,
                 skills: req.body.skills,
                 description: req.body.description,
+                profilePic: req.body.profilePic,
             });
             data.save(
                 (err, data) => {

@@ -14,16 +14,8 @@ exports.createNewActivity = (req, res) => {
       consumer_id: req.body.consumerId,
       provider_id: req.body.providerId,
       community_id: req.body.communityId,
-      source: {
-          city: req.body.sourceCity,
-          street: req.body.sourceStreet,
-          number: req.body.sourceNumber
-      },
-      destination: {
-          city: req.body.destCity,
-          street: req.body.destStreet,
-          number: req.body.destNumber
-      },
+      source: req.body.source,
+      destination: req.body.destination,
       activity_date: req.body.activityDate,
       notes: req.body.notes
   });
