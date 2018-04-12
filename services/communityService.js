@@ -41,11 +41,6 @@ exports.setAsAuthorizedMember = (communityId, userId) => {
             }
 
             if (data && data._doc) {
-                if(data._doc.managerId == userId)
-                {
-                    this.setNewManager(communityId, userId);
-                }
-
                 data._doc.authorizedMembers.push({memberId: userId});
                 data.save((err, data) => {
                     if (err) {
@@ -69,10 +64,6 @@ exports.setAsMember = (communityId, userId) => {
             }
 
             if (data && data._doc) {
-                if(data._doc.managerId == userId)
-                {
-                    this.setNewManager(communityId, userId);
-                }
             console.log(`user ${userId} is now a member in ${communityId}`);
          }
             else {
