@@ -1,7 +1,8 @@
 let USER = require('../models/User'),
-    COMMUNITY = require('../models/Community'),
     Utils = require('../utils'),
-    userService = require('./../services/userService');
+    userService = require('./../services/userService'),
+    communityService = require('./../services/communityService'),
+    Promise = require('promise');
 
 exports.createNewUser = (req, res) => {
     let newUser = new USER({
@@ -18,138 +19,60 @@ exports.createNewUser = (req, res) => {
         profilePic: req.body.profilePic,
         keyForFirebase: req.body.keyForFirebase
     });
-    newUser.save(
-        (err, data) => {
-            if (err) {
-                res.json(err);
-            }
-            res.json(data);
-        }
-    );
+  userService.saveNewUser(newUser).then(response => {
+      res.json(response);
+  });
 };
 
 exports.getProfile = (req, res) => {
-    USER.findOne({keyForFirebase: {$eq: req.params.key}},
-        (err, data) => {
-            if (err) {
-                res.json(err);
-            }
-            res.json(data);
-        });
+let userId = req.params.key;
+    userService.getUserProfile(userId).then(response => {
+        res.json(response);
+    });
 };
 
 exports.updateProfile = (req, res) => {
-    USER.findOne({keyForFirebase: {$eq: req.body.keyForFirebase}},
-        (err, data) => {
-            if (err) {
-                res.json(err);
-                return;
-            }
-            data.set({
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                location: req.body.location,
-                phoneNumber: req.body.phoneNumber,
-                dateOfBirth: req.body.dateOfBirth,
-                type: req.body.type,
-                skills: req.body.skills,
-                description: req.body.description,
-                profilePic: req.body.profilePic,
-            });
-            data.save(
-                (err, data) => {
-                    if (err) {
-                        res.json(err);
-                    }
-                    res.json(data);
-                }
-            );
-        })
+    let profileObj = {
+        userId:req.body.keyForFirebase,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        location: req.body.location,
+        phoneNumber: req.body.phoneNumber,
+        dateOfBirth: req.body.dateOfBirth,
+        type: req.body.type,
+        skills: req.body.skills,
+        description: req.body.description,
+        profilePic: req.body.profilePic
+    };
+    console.log(profileObj);
+    userService.updateUserProfile(profileObj).then(response => {
+        res.json(response);
+    });
 };
 
 exports.deleteProfile = (req, res) => {
-
     let userId = req.params.key;
+    let userCommunities;
+    let actions = [];
+    communityService.getUserCommunities(userId).then(communities => {
+        if (communities.length == 0) {
+            userService.deleteUser(userId).then(response => {
+                res.json(response);
+            });
+        }
+        else {
+            userCommunities = communities;
+            userCommunities.forEach(community => {
+                actions.push(communityService.leaveCommunity(userId, community._id));
+            });
+            //delete user from db
+            actions.push(userService.deleteUser(userId));
+            Promise.all(actions).then(response => {
+                res.json(response);
+            });
+        }
+    });
 
-    COMMUNITY.find(
-        {members: {$elemMatch: {memberId: userId}}},
-        (err, data) => {
-            if (err) {
-                // console.log(err);
-                res.json(err);
-            }
-            // console.log(data);
-            data.forEach(community => {
-
-                community = deleteFromCommunity(community, userId);
-
-                if (community.newId) {
-                    community.community.set({
-                        managerId: community.newId
-                    });
-                    community.community.save(
-                        (err, data) => {
-                            if (err) {
-                                console.log(err)
-                            }
-                            console.log(data);
-                        }
-                    );
-                } else {
-                    community.community.remove(
-                        (err, data) => {
-                            if (err) {
-                                console.error(err)
-                            }
-                            console.log(data);
-                        })
-                }
-            })
-        });
-
-    //delete the user
-    USER.findOneAndRemove({keyForFirebase: {$eq: userId}},
-        (err, data) => {
-            if (err) {
-                res.json(err);
-            }
-            console.log("delete user");
-            res.json(data);
-        });
 };
 
-function deleteFromCommunity(community, userId) {
-
-    let newId = null;
-    let members = community._doc.members;
-    let authorizedMembers = community._doc.authorizedMembers;
-    let communityId = community._doc._id;
-
-    for (let i = 0; i < members.length; i++) {
-        if (members[i]._doc.memberId === userId) {
-            members.splice(i, 1)
-        }
-    }
-    for (let i = 0; i < authorizedMembers.length; i++) {
-        if (authorizedMembers[i]._doc.memberId === userId) {
-            authorizedMembers.splice(i, 1)
-        }
-    }
-
-    if (community._doc.managerId === userId) {
-        if (authorizedMembers.length > 0) {
-            newId = authorizedMembers[0].memberId;
-            userService.updateUserRole(newId, communityId, 'Manager');
-        } else if (members.length > 0) {
-            newId = members[0].memberId;
-            userService.updateUserRole(newId, communityId, 'Manager');
-        } else {
-            newId = null;
-        }
-    }
-    return {
-        community,
-        newId: newId
-    };
-}
 

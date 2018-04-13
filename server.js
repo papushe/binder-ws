@@ -49,7 +49,7 @@ app.get('/getCommunities/:key', communityController.getCommunities);
 
 app.get('/deleteCommunities/:key', communityController.deleteCommunitiesByKey);
 
-app.post('/updateUserRole/', communityController.updateCommunityUserRole);
+app.post('/updateCommunityUserRole/', communityController.updateCommunityUserRole);
 
 app.get('/searchCommunity/:type', communityController.searchCommunity);
 

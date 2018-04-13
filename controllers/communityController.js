@@ -5,7 +5,9 @@ let USER = require('../models/User'),
     COMMUNITY = require('../models/Community'),
     Utils = require('../utils'),
     userService = require('./../services/userService'),
-    communityService = require('./../services/communityService');
+    communityService = require('./../services/communityService'),
+    Promise = require('promise');
+
 
 exports.createNewCommunity = (req, res) => {
     let newCommunity = new COMMUNITY({
@@ -18,118 +20,38 @@ exports.createNewCommunity = (req, res) => {
         },
         type: req.body.type
     });
-    newCommunity.save(
-        (err, data) => {
-            if (err) {
-                res.json(err);
-            }
-            // console.log(data)
-            const newCommunity = {
-                communityId: data._id,
-                role: 'Manager'
-            };
-            USER.findOne({keyForFirebase: {$eq: data.managerId}},
-                (err, data) => {
-                    if (err || data == null) {
-                        res.json(err);
-                        return;
-                    }
-                    data.communities.push(newCommunity);
-                    data.save(
-                        (err, data) => {
-                            if (err) {
-                                res.json(err);
-                            }
-                            res.json(data);
-                        }
-                    );
-                })
-        }
-    );
+communityService.saveNewCommunity(newCommunity).then(response => {
+    res.json(response);
+    })
 };
 
 exports.searchCommunity = (req, res) => {
-    let name = req.params.type;
-    COMMUNITY.find(
-        {communityName: {$regex: name, $options: "i"}, type: {$ne: 'Secured'}},
-        (err, data) => {
-            if (err) {
-                console.log(`err occurred when running search: ${err}`);
-                res.json(err);
-            }
-            res.json(data);
-        });
+    let query = req.params.type;
+    communityService.searchCommunities(query).then(response => {
+        res.json(response);
+    })
 };
 
 exports.getCommunities = (req, res) => {
-    COMMUNITY.find({members: {$elemMatch: {memberId: req.params.key}}},
-        (err, data) => {
-            if (err) {
-                // console.log(err);
-                res.json(err);
-            }
-            // console.log(data);
-            res.json(data);
-        });
-};
-
-exports.deleteCommunitiesByKey = (req, res) => {
-    COMMUNITY.deleteMany({managerId: {$eq: req.params.key}},
-        (err, data) => {
-            if (err) {
-                res.json(err);
-            }
-            res.json(data);
-        });
+    let userId = req.params.key;
+    communityService.getUserCommunities(userId).then(response => {
+        res.json(response);
+    })
 };
 
 exports.leaveCommunity = (req, res) => {
     let userId = req.body.uid;
     let communityId = req.body.communityId;
-    let community;
-    let newManagerId;
 
-    //Step 1: removing user from community members
-    COMMUNITY.findOneAndUpdate({_id: {$eq: communityId}},
-        {$pull: {members: {memberId: userId}}},
-        (err, data) => {
-            if (err) {
-                console.log(`error occurred while updating community: ${communityId}`);
-            }
-            //Step 2: remove community if no members left
-            if (!data || !data._doc) {
-                res.json(false);
-            }
-            if (data._doc.members.length == 1) {
-                communityService.deleteCommunityById(communityId);
-            }
-            //Step 3: if the deleted user was the manager set a new one
-            else {
-                if (data._doc.managerId == userId) {
-                    newManagerId = communityService.getNextNewManagerId(data.toObject());
-                    data.set({
-                        managerId: newManagerId
-                    });
-                    userService.updateUserRole(newManagerId, communityId, 'Manager');
-                }
-            }
-            data.save((err, data) => {
-                if (err) {
-                    console.log(`error occurred while removing user: ${userId} from community: ${communityId}`);
-                    res.json(false);
-                }
-
-                //Step 4: removing community from user
-                userService.removeCommunityFromUser(userId, communityId);
-                res.json(true);
-            });
-        }
-    );
+    communityService.leaveCommunity(userId, communityId).then(response => {
+        res.json(response);
+    });
 };
 
 exports.deleteCommunity = (req, res) => {
     let communityId = req.body.communityId;
     let userId = req.body.uid;
+    let actions = [];
 
     console.log(`delete community: ${communityId} was invoked by: ${userId}`);
 
@@ -142,94 +64,86 @@ exports.deleteCommunity = (req, res) => {
             data.forEach(function (user) {
                 try {
                     if (user) {
-                        userService.removeCommunityFromUser(user.keyForFirebase, communityId);
+                        actions.push(userService.removeCommunityFromUser(user.keyForFirebase, communityId));
                     }
                 } catch (e) {
                     console.error(`failed to remove community ${communityId} from user ${user.keyForFirebase} due to: ${e}`);
                     res.json(false);
                 }
             });
-            communityService.deleteCommunityById(communityId);
-            res.json(true);
+            Promise.all(actions).then(() => {
+                communityService.deleteCommunityById(communityId).then((response) =>{
+                    res.json(response);
+                });
+            });
         });
 };
 
 exports.joinCommunity = (req, res) => {
     let userId = req.body.uid;
     let communityId = req.body.communityId;
-
     let newCommunity = {
         communityId: communityId,
         role: 'Member'
     };
 
-    //adding user from community members
-    COMMUNITY.findOne({$and: [{_id: {$eq: communityId}}, {type: {$eq: 'Public'}}]},
-        (err, data) => {
-            if (err) {
-                console.log(`error occurred while trying add user: ${userId} to community: ${communityId}: ${err}`);
-                res.json(false);
-            }
-            if (data == null || data.members == null) {
-                console.log(`error occurred while trying add user: ${userId} to community: ${communityId}: ${err}`);
-                res.json(false);
-                return;
-            }
-            data.members.push({memberId: userId});
-            data.save((err, data) => {
-                if (err) {
-                    console.log(`error occurred while trying add user: ${userId} to community: ${communityId}: ${err}`);
-                    res.json(false);
-                    return;
-                }
-                //adding community to user
-                userService.addCommunityToUser(userId, newCommunity);
-                res.json(true);
-            });
+    //adding user to community members
+    communityService.addUserToCommunityMembers(userId, communityId).then(response => {
+        if (!response) {
+            res.json(response);
+        }
+        //adding community to user
+        userService.addCommunityToUser(userId, newCommunity).then(response => {
+            res.json(response);
         });
+    });
 };
 
 exports.getCommunityMembers = (req, res) => {
-    USER.find({communities: {$elemMatch: {communityId: req.body.communityId}}},
-        (err, data) => {
-            if (err) {
-                console.log(`got community members successfully`);
-                res.json(err);
-            }
-            res.json(data);
-        });
+    communityService.getCommunityMembers(req.body.communityId).then((response) => {
+        res.json(response);
+    });
 };
 
 exports.updateCommunityUserRole = (req, res) => {
     let userId = req.body.uid;
     let communityId = req.body.communityId;
     let role = userService.getRole(req.body.role);
+    let action;
 
     try {
+        console.log(`starting with updating user role...`);
         if (role == null) {
             console.log(`${role} role is invalid`);
             res.json(false);
         }
-        //update community
-        switch (role) {
-            case 'Manager':
-                communityService.setNewManager(communityId, null, userId);
-                break;
-            case 'authorizedMember':
-                communityService.setAsAuthorizedMember(communityId, userId);
-                break;
-            case 'Member':
-                communityService.setAsMember(communityId, userId);
-                break;
-            default: break;
-        }
         //update user
-        userService.updateUserRole(userId, communityId, role);
-        res.json(true);
+        userService.updateUserRole(userId, communityId, role).then((response => {
+            if(!response) {
+                res.json(false);
+            }
+            //update community
+            action = (role == 'authorizedMember') ? communityService.setAsAuthorizedMember : communityService.setAsMember;
+            action(communityId, userId).then(result => {
+                res.json(result);
+            });
+        }));
     } catch (e) {
         console.error(`failed to update user: ${userId} role to: ${role} in community ${communityId} due to: ${e}`);
         res.json(false);
     }
+};
+
+
+//temporally function to tests - DON'T USE IT
+exports.deleteCommunitiesByKey = (req, res) => {
+    COMMUNITY.deleteMany({managerId: {$eq: req.params.key}},
+        (err, data) => {
+            if (err) {
+                res.json(err);
+            }
+            res.json(data);
+        });
 };
 
 
