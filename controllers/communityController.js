@@ -112,7 +112,6 @@ exports.updateCommunityUserRole = (req, res) => {
     let action;
 
     try {
-        console.log(`starting with updating user role...`);
         if (role == null) {
             console.log(`${role} role is invalid`);
             res.json(false);
