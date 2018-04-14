@@ -70,9 +70,10 @@ exports.searchCommunities = (query) => {
             {communityName: {$regex: query, $options: "i"}, type: {$ne: 'Secured'}},
             (err, data) => {
                 if (err) {
-                    console.log(`err occurred when running search: ${err}`);
+                    console.error(`err occurred when running search: ${err}`);
                     reject(false);
                 }
+                console.log(`search found ${data.length} results for query: '${query}'`);
                 resolve(data);
             });
     });
@@ -82,7 +83,7 @@ exports.deleteCommunityById = (communityId) => {
     return new Promise((resolve, reject) => {
         COMMUNITY.findOneAndRemove({_id: {$eq: communityId}}, (err) => {
             if (err) {
-                console.log(`error occurred when tried to delete community: ${communityId}`);
+                console.error(`failed to delete community: ${communityId} due to: ${err}`);
                 reject(false);
             }
             else {
