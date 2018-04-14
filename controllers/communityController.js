@@ -24,8 +24,8 @@ exports.createNewCommunity = (req, res) => {
         .then(response => {
             res.json(response);
         })
-        .catch(reject => {
-            res.json(reject);
+        .catch(err => {
+            res.json(err);
         });
 };
 
@@ -35,8 +35,8 @@ exports.searchCommunity = (req, res) => {
         .then(response => {
             res.json(response);
         })
-        .catch(reject => {
-            res.json(reject);
+        .catch(err => {
+            res.json(err);
         });
 };
 
@@ -46,8 +46,8 @@ exports.getCommunities = (req, res) => {
          .then(response => {
             res.json(response);
         })
-        .catch(reject => {
-            res.json(reject);
+        .catch(err => {
+            res.json(err);
         });
 };
 
@@ -59,8 +59,8 @@ exports.leaveCommunity = (req, res) => {
         .then(response => {
             res.json(response);
         })
-        .catch(reject => {
-        res.json(reject);
+        .catch(err => {
+        res.json(err);
         });
 };
 
@@ -93,8 +93,8 @@ exports.deleteCommunity = (req, res) => {
                     res.json(response);
                 });
             })
-                .catch(reject => {
-                    res.json(reject);
+                .catch(err => {
+                    res.json(err);
                 });
         });
 };
@@ -118,12 +118,12 @@ exports.joinCommunity = (req, res) => {
                 .then(response => {
                     res.json(response);
                 })
-                .catch(reject => {
-                    res.json(reject);
+                .catch(err => {
+                    res.json(err);
                 });
          })
-        .catch(reject => {
-            res.json(reject);
+        .catch(err => {
+            res.json(err);
         });
 };
 
@@ -132,8 +132,8 @@ exports.getCommunityMembers = (req, res) => {
         .then((response) => {
             res.json(response);
         })
-        .catch(reject => {
-            res.json(reject);
+        .catch(err => {
+            res.json(err);
         });
 };
 
@@ -160,12 +160,12 @@ exports.updateCommunityUserRole = (req, res) => {
                     .then(result => {
                         res.json(result);
                     })
-                    .catch(reject => {
-                        res.json(reject);
+                    .catch(err => {
+                        res.json(err);
                     });
              })
-            .catch(reject => {
-                res.json(reject);
+            .catch(err => {
+                res.json(err);
             });
     } catch (e) {
         console.error(`failed to update user: ${userId} role to: ${role} in community ${communityId} due to: ${e}`);

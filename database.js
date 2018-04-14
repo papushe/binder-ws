@@ -17,7 +17,7 @@ mongoose.connect(consts, options).then(() => {
     const conn = mongoose.connection;//get default connection
     // Event handlers for Mongoose
     conn.on('error', (err) => {
-        console.log('Mongoose: Error: ' + err);
+        console.error('Mongoose: Error: ' + err);
     });
     conn.on('open', () => {
         console.log('Mongoose: Connection established');
@@ -30,5 +30,5 @@ mongoose.connect(consts, options).then(() => {
         console.info('Mongoose reconnected!');
     });
 }, (err) => {
-    console.log(`Failed to connect DB  - reason:  ${err}`);
+    console.error(`failed to connect DB  - reason:  ${err}`);
 });

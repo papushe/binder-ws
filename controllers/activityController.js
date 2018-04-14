@@ -24,8 +24,8 @@ exports.createNewActivity = (req, res) => {
         .then(response => {
             res.json(response);
         })
-        .catch(reject => {
-          res.json(reject);
+        .catch(err => {
+          res.json(err);
         });
 };
 
@@ -35,8 +35,8 @@ exports.getActivitiesByUserId = (req, res) => {
         .then(response => {
             res.json(response);
         })
-        .catch(reject => {
-            res.json(reject);
+        .catch(err => {
+            res.json(err);
         });
 };
 
@@ -46,8 +46,8 @@ exports.getActivitiesByCommunityId = (req, res) => {
         .then(response => {
             res.json(response);
         })
-        .catch(reject => {
-            res.json(reject);
+        .catch(err => {
+            res.json(err);
         });
 };
 
@@ -57,7 +57,7 @@ exports.deleteActivityById = (req, res) => {
         .then(response => {
             res.json(response);
         })
-        .catch(reject => {
-            res.json(reject);
+        .catch(err => {
+            res.json(err);
         });
 };

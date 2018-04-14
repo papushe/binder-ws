@@ -6,7 +6,7 @@ exports.saveNewActivity = (newActivity) => {
         newActivity.save(
             (err, data) => {
                 if (err) {
-                    console.log(`Failed to create activity: ${newActivity} due to: ${err}`);
+                    console.error(`failed to create activity: ${newActivity} due to: ${err}`);
                     reject(false);
                 }
                 else {
@@ -23,7 +23,7 @@ exports.getUserActivities = (userId) => {
         ACTIVITY.find({$or: [{consumer_id: {$eq: userId}}, {provider_id: {$eq: userId}}]},
             (err, data) => {
                 if (err) {
-                    console.log(`failed to get user: ${userId} activities due to: ${err}`);
+                    console.error(`failed to get user: ${userId} activities due to: ${err}`);
                     reject(false);
                 }
                 console.log(`got user: ${userId} activities`);
@@ -37,7 +37,7 @@ exports.getCommunityActivities = (communityId) => {
         ACTIVITY.find({community_id: {$eq: communityId}},
             (err, data) => {
                 if (err) {
-                    console.log(`failed to get community: ${communityId} activities due to: ${err}`);
+                    console.error(`failed to get community: ${communityId} activities due to: ${err}`);
                     reject(false);
                 }
                 console.log(`got community: ${communityId} activities`);
@@ -51,7 +51,7 @@ exports.deleteActivityById = (activityId) => {
         ACTIVITY.deleteOne({_id: {$eq: activityId}},
             (err, data) => {
                 if (err) {
-                    console.log(`failed to delete activity: ${activityId} due to: ${err}`);
+                    console.error(`failed to delete activity: ${activityId} due to: ${err}`);
                     reject(false);
                 }
                 console.log(`activity: ${activityId} was deleted!`);

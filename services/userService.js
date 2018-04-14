@@ -19,7 +19,7 @@ exports.saveNewUser = (newUser) => {
     return new Promise((resolve, reject) => {
         newUser.save((err, data) => {
                 if (err) {
-                    console.log(`failed to create user: ${newUser} due to: ${err}`);
+                    console.error(`failed to create user: ${newUser} due to: ${err}`);
                     reject(false);
                 }
                 console.log(`new user: ${newUser._id} was created`);
@@ -35,7 +35,7 @@ exports.getUserProfile = (userId) => {
         USER.findOne({keyForFirebase: {$eq: userId}},
             (err, data) => {
                 if (err) {
-                    console.log(`failed to get user: ${userId} profile due to: ${err}`);
+                    console.error(`failed to get user: ${userId} profile due to: ${err}`);
                     reject(false);
                 }
                 resolve(data);
@@ -48,7 +48,7 @@ exports.updateUserProfile = (profileObj) => {
         USER.findOne({keyForFirebase: {$eq: profileObj.userId}},
             (err, data) => {
                 if (err) {
-                    console.log(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
+                    console.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
                     reject(false);
                 }
                 data.set({
@@ -65,7 +65,7 @@ exports.updateUserProfile = (profileObj) => {
                 data.save(
                     (err, data) => {
                         if (err) {
-                            console.log(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
+                            console.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
                             reject(false);
                         }
                         console.log(`user: ${profileObj.userId} profile was updated`);
@@ -101,7 +101,7 @@ exports.removeCommunityFromUser = (userId, communityId) => {
             {$pull: {communities: {communityId: communityId}}},
             (err, data) => {
                 if (err) {
-                    console.log(`failed to remove user community: ${communityId} from user: ${userId} communities list due to: ${err}`);
+                    console.error(`failed to remove user community: ${communityId} from user: ${userId} communities list due to: ${err}`);
                     reject(false);
                 }
                 console.log(`community: ${communityId} was removed from communities list for user: ${userId}`);
@@ -115,7 +115,7 @@ exports.addCommunityToUser = (userId, newCommunity) => {
         USER.findOne({keyForFirebase: {$eq: userId}},
             (err, data) => {
                 if (err || data == null || data.communities == null) {
-                    console.log(`failed to add user community: ${newCommunity.communityId} to communities list due to: ${err}`);
+                    console.error(`failed to add user community: ${newCommunity.communityId} to communities list due to: ${err}`);
                     reject(false);
                 }
                 data.communities.push(newCommunity);
@@ -136,7 +136,7 @@ exports.deleteUser = (userId) => {
         USER.findOneAndRemove({keyForFirebase: {$eq: userId}},
             (err, data) => {
                 if (err) {
-                    console.log(`failed to delete user: ${userId} due to: ${err}`);
+                    console.error(`failed to delete user: ${userId} due to: ${err}`);
                     reject(false);
                 }
                 console.log(`user: ${userId} was deleted!`);

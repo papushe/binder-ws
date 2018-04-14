@@ -14,10 +14,14 @@ function getNextNewManagerId (community) {
             resolve(community.members[0].memberId);
         }
         else {
-            this.deleteCommunityById(community._id).then(function () {
-                console.log(`community: ${community._id} was empty so it was deleted!`);
-                reject(null);
-            });
+            this.deleteCommunityById(community._id)
+                .then(function () {
+                    console.log(`community: ${community._id} was empty so it was deleted!`);
+                    resolve(null);
+                })
+                .catch(err => {
+                    reject(err);
+                });
         }
     });
 }
@@ -31,13 +35,17 @@ exports.saveNewCommunity = (community) => {
     return new Promise((resolve, reject) => {
         community.save((err, data) => {
                 if (err) {
-                    console.log(`failed to create a new community: ${community} due to: ${err}`);
+                    console.error(`failed to create a new community: ${community} due to: ${err}`);
                     reject(false);
                 }
                 console.log(`user ${community.managerId} created a new community: ${community._id}`);
-                userService.addCommunityToUser(community.managerId, communityObj).then(response => {
-                    resolve(response);
-                });
+                userService.addCommunityToUser(community.managerId, communityObj)
+                    .then(response => {
+                        resolve(response);
+                    })
+                    .catch(err => {
+                        reject(err);
+                    });
             }
         );
     });
@@ -48,7 +56,7 @@ exports.getUserCommunities = (userId) => {
         COMMUNITY.find({members: {$elemMatch: {memberId: userId}}},
             (err, data) => {
                 if (err) {
-                    console.log(`failed to get user: ${userId} communities due to: ${err}`);
+                    console.error(`failed to get user: ${userId} communities due to: ${err}`);
                     reject(false);
                 }
                 resolve(data);
@@ -89,22 +97,19 @@ exports.setAsAuthorizedMember = (communityId, userId) => {
     return new Promise((resolve, reject) => {
         COMMUNITY.findOne({_id: {$eq: communityId}},
             (err, data) => {
-                if (err) {
-                    throw(`error occurred while trying set user: ${userId} as authorized member in community: ${communityId}: ${err}`);
+                if (err || !data) {
+                    console.error(`failed to set user: ${userId} as authorized member in community: ${communityId} due to: ${err}`);
+                    reject(false);
                 }
-                if (data) {
                     data.authorizedMembers.push({memberId: userId});
                     data.save((err) => {
                         if (err) {
-                            throw(`error occurred while trying set user: ${userId} as authorized member in community: ${communityId}: ${err}`);
+                            console.error(`failed to set user: ${userId} as authorized member in community: ${communityId} due to: ${err}`);
+                            reject(false);
                         }
                         console.log(`user ${userId} is now an authorized member in community: ${communityId}`);
                         resolve(true);
                     });
-                }
-                else {
-                    reject(`error occurred while trying set user: ${userId} as authorized member in community: ${communityId}: data is undefined!`);
-                }
             });
     });
 };
@@ -114,16 +119,13 @@ exports.setAsMember = (communityId, userId) => {
         COMMUNITY.findOneAndUpdate({_id: {$eq: communityId}},
             {$pull: {authorizedMembers: {memberId: userId}}},
             (err, data) => {
-                if (err) {
-                    throw(`error occurred while trying set user: ${userId} as a member in community: ${communityId}: ${err}`);
-                }
-
-                if (data && data._doc) {
-                    console.log(`user ${userId} is now a member in ${communityId}`);
-                    resolve(true);
+                if (err || !data || !data._doc) {
+                    console.error(`failed to set user: ${userId} as a member in community: ${communityId} due to: ${err}`);
+                    reject(false);
                 }
                 else {
-                    reject(`error occurred while trying set user: ${userId} as member in community: ${communityId}: data is undefined!`);
+                    console.log(`user ${userId} is now a member in ${communityId}`);
+                    resolve(true);
                 }
             });
     });
@@ -134,32 +136,38 @@ exports.setNewManager = (communityId) => {
         COMMUNITY.findOne({_id: {$eq: communityId}},
             (err, data) => {
                 if (err) {
-                    console.log(`failed to set a new manager in community: ${communityId} due to: ${err}`);
+                    console.error(`failed to set a new manager in community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
                 if (data) {
-                    getNextNewManagerId(data).then(newManager => {
-                        if (newManager == null) {
-                            reject(false);
-                        }
+                    getNextNewManagerId(data)
+                        .then(newManager => {
+                            if (newManager == null) {
 
-                        //set the new managerId
-                        data.managerId = newManager;
-
-                        //delete the new manager from authorized members
-                        let index = data.authorizedMembers.map(o => { return o.memberId; }).indexOf(newManager);
-                        data.authorizedMembers.splice(index,1);
-
-                        //save community after all updates
-                        data.save((err) => {
-                            if (err) {
-                                console.log(`failed to set a new manager in community: ${communityId} due to: ${err}`);
-                                reject(false);
+                                resolve(true);
                             }
-                            console.log(`user: ${newManager} is now a manager in community: ${communityId}`);
-                            resolve(true);
+
+                            //set the new managerId
+                            data.managerId = newManager;
+
+                            //delete the new manager from authorized members
+                            let index = data.authorizedMembers.map(o => { return o.memberId; }).indexOf(newManager);
+                            data.authorizedMembers.splice(index,1);
+
+                            //save community after all updates
+                            data.save((err) => {
+                                if (err) {
+                                    console.error(`failed to set a new manager in community: ${communityId} due to: ${err}`);
+                                    reject(false);
+                                }
+                                console.log(`user: ${newManager} is now a manager in community: ${communityId}`);
+                                resolve(true);
+                            })
+
+                    })
+                        .catch(err => {
+                            reject(err);
                         });
-                    });
                 }
                 reject(false);
             });
@@ -171,7 +179,7 @@ exports.getCommunityMembers = (communityId) => {
         USER.find({communities: {$elemMatch: {communityId: communityId}}},
             (err, data) => {
                 if (err) {
-                    console.log(`failed to get community: ${communityId} members due to: ${err}`);
+                    console.error(`failed to get community: ${communityId} members due to: ${err}`);
                     reject(false);
                 }
                 console.log(`got community ${communityId} members`);
@@ -185,13 +193,13 @@ exports.addUserToCommunityMembers = (userId, communityId) => {
         COMMUNITY.findOne({$and: [{_id: {$eq: communityId}}, {type: {$eq: 'Public'}}]},
             (err, data) => {
                 if (err || data == null || data.members == null) {
-                    console.log(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
+                    console.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
                 data.members.push({memberId: userId});
                 data.save((err, data) => {
                     if (err) {
-                        console.log(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
+                        console.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
                         reject(false);
                     }
                     console.log(`user: ${userId} was added as member to community: ${communityId}`);
@@ -207,7 +215,7 @@ exports.removeUserFromCommunityMembers = (userId, communityId) => {
             {$pull: {members: {memberId: userId}, authorizedMembers: {memberId: userId}}},
             (err, data) => {
                 if (err) {
-                    console.log(`failed to remove user ${userId} from community: ${communityId} due to: ${err}`);
+                    console.error(`failed to remove user ${userId} from community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
                 console.log(`user: ${userId} was removed from community: ${communityId}`);
@@ -219,31 +227,47 @@ exports.removeUserFromCommunityMembers = (userId, communityId) => {
 exports.leaveCommunity = (userId, communityId) => {
     return new Promise((resolve, reject) => {
         //removing user from community members
-        this.removeUserFromCommunityMembers(userId, communityId).then(data => {
-            if (!data) {
-                reject(false);
-            }
-            //remove community if no members left but this user
-            if (data.members.length == 1) {
-                this.deleteCommunityById(communityId).then(response => {
-                    if (!response) {
-                        reject(false);
-                    }
-                })
-            }
-            //removing community from user
-            userService.removeCommunityFromUser(userId, communityId).then(response => {
-                if (!response) {
+        this.removeUserFromCommunityMembers(userId, communityId)
+            .then(data => {
+                if (!data) {
                     reject(false);
                 }
-                //if the deleted member was the manager set a new one
-                if (data.managerId == userId) {
-                    this.setNewManager(communityId).then(response => {
-                        resolve(response);
-                    });
+                //remove community if no members left but this user
+                if (data.members.length == 1) {
+                    this.deleteCommunityById(communityId)
+                        .then(response => {
+                            if (!response) {
+                                reject(false);
+                            }
+                        })
+                        .catch(err => {
+                            reject(err);
+                        });
                 }
-                else resolve(true);
+                //removing community from user
+                userService.removeCommunityFromUser(userId, communityId)
+                    .then(response => {
+                        if (!response) {
+                            reject(false);
+                        }
+                        //if the deleted member was the manager set a new one
+                        if (data.managerId == userId) {
+                            this.setNewManager(communityId)
+                                .then(response => {
+                                    resolve(response);
+                                })
+                        .       catch(err => {
+                                    reject(err);
+                                 });
+                        }
+                        else resolve(true);
+                    })
+                    .catch(err => {
+                        reject(err);
+                    });
+             })
+            .catch(err => {
+                reject(err);
             });
-        });
     });
 };

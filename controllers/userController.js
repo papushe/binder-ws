@@ -23,8 +23,8 @@ exports.createNewUser = (req, res) => {
       .then(response => {
         res.json(response);
     })
-      .catch(reject => {
-          res.json(reject);
+      .catch(err => {
+          res.json(err);
       });
 };
 
@@ -34,8 +34,8 @@ let userId = req.params.key;
         .then(response => {
             res.json(response);
         })
-        .catch(reject => {
-            res.json(reject);
+        .catch(err => {
+            res.json(err);
         });
 };
 
@@ -56,8 +56,8 @@ exports.updateProfile = (req, res) => {
         .then(response => {
             res.json(response);
         })
-        .catch(reject => {
-            res.json(reject);
+        .catch(err => {
+            res.json(err);
         });
 };
 
@@ -72,8 +72,8 @@ exports.deleteProfile = (req, res) => {
                     .then(response => {
                          res.json(response);
                     })
-                    .catch(reject => {
-                        res.json(reject);
+                    .catch(err => {
+                        res.json(err);
                     });
             }
             else {
@@ -87,13 +87,13 @@ exports.deleteProfile = (req, res) => {
                     .then(response => {
                         res.json(response);
                     })
-                    .catch(reject => {
-                        res.json(reject);
+                    .catch(err => {
+                        res.json(err);
                     });
             }
          })
-        .catch(reject => {
-            res.json(reject);
+        .catch(err => {
+            res.json(err);
         });
 };
 
