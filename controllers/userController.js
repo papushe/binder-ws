@@ -52,7 +52,6 @@ exports.updateProfile = (req, res) => {
         description: req.body.description,
         profilePic: req.body.profilePic
     };
-    console.log(profileObj);
     userService.updateUserProfile(profileObj)
         .then(response => {
             res.json(response);
