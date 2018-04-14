@@ -174,7 +174,7 @@ exports.getCommunityMembers = (communityId) => {
                     console.log(`failed to get community: ${communityId} members due to: ${err}`);
                     reject(false);
                 }
-                console.log(`got community members`);
+                console.log(`got community ${communityId} members`);
                 resolve(data);
             });
     });
@@ -184,20 +184,17 @@ exports.addUserToCommunityMembers = (userId, communityId) => {
     return new Promise((resolve, reject) => {
         COMMUNITY.findOne({$and: [{_id: {$eq: communityId}}, {type: {$eq: 'Public'}}]},
             (err, data) => {
-                if (err) {
-                    console.log(`error occurred while trying add user: ${userId} to community: ${communityId}: ${err}`);
-                    reject(false);
-                }
-                if (data == null || data.members == null) {
-                    console.log(`error occurred while trying add user: ${userId} to community: ${communityId}: ${err}`);
+                if (err || data == null || data.members == null) {
+                    console.log(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
                 data.members.push({memberId: userId});
                 data.save((err, data) => {
                     if (err) {
-                        console.log(`error occurred while trying add user: ${userId} to community: ${communityId}: ${err}`);
+                        console.log(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
                         reject(false);
                     }
+                    console.log(`user: ${userId} was added as member to community: ${communityId}`);
                     resolve(true);
                 });
             });
