@@ -20,28 +20,44 @@ exports.createNewActivity = (req, res) => {
       activity_date: req.body.activityDate,
       notes: req.body.notes
   });
-  activityService.saveNewActivity(activityObj).then(response => {
-      res.json(response);
-  });
+  activityService.saveNewActivity(activityObj)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(reject => {
+          res.json(reject);
+        });
 };
 
 exports.getActivitiesByUserId = (req, res) => {
     let userId = req.params.key;
-    activityService.getUserActivities(userId).then(response => {
-        res.json(response);
-    });
+    activityService.getUserActivities(userId)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(reject => {
+            res.json(reject);
+        });
 };
 
 exports.getActivitiesByCommunityId = (req, res) => {
     let communityId = req.params.key;
-    activityService.getCommunityActivities(communityId).then(response => {
-        res.json(response);
-    });
+    activityService.getCommunityActivities(communityId)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(reject => {
+            res.json(reject);
+        });
 };
 
 exports.deleteActivityById = (req, res) => {
     let activityId = req.body.activityId;
-    activityService.deleteActivityById(activityId).then(response => {
-        res.json(response);
-    });
+    activityService.deleteActivityById(activityId)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(reject => {
+            res.json(reject);
+        });
 };

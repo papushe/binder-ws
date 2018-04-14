@@ -20,32 +20,48 @@ exports.createNewCommunity = (req, res) => {
         },
         type: req.body.type
     });
-communityService.saveNewCommunity(newCommunity).then(response => {
-    res.json(response);
-    })
+    communityService.saveNewCommunity(newCommunity)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(reject => {
+            res.json(reject);
+        });
 };
 
 exports.searchCommunity = (req, res) => {
     let query = req.params.type;
-    communityService.searchCommunities(query).then(response => {
-        res.json(response);
-    })
+    communityService.searchCommunities(query)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(reject => {
+            res.json(reject);
+        });
 };
 
 exports.getCommunities = (req, res) => {
     let userId = req.params.key;
-    communityService.getUserCommunities(userId).then(response => {
-        res.json(response);
-    })
+    communityService.getUserCommunities(userId)
+         .then(response => {
+            res.json(response);
+        })
+        .catch(reject => {
+            res.json(reject);
+        });
 };
 
 exports.leaveCommunity = (req, res) => {
     let userId = req.body.uid;
     let communityId = req.body.communityId;
 
-    communityService.leaveCommunity(userId, communityId).then(response => {
-        res.json(response);
-    });
+    communityService.leaveCommunity(userId, communityId)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(reject => {
+        res.json(reject);
+        });
 };
 
 exports.deleteCommunity = (req, res) => {
@@ -71,11 +87,15 @@ exports.deleteCommunity = (req, res) => {
                     res.json(false);
                 }
             });
-            Promise.all(actions).then(() => {
+            Promise.all(actions)
+                .then(() => {
                 communityService.deleteCommunityById(communityId).then((response) =>{
                     res.json(response);
                 });
-            });
+            })
+                .catch(reject => {
+                    res.json(reject);
+                });
         });
 };
 
@@ -88,21 +108,33 @@ exports.joinCommunity = (req, res) => {
     };
 
     //adding user to community members
-    communityService.addUserToCommunityMembers(userId, communityId).then(response => {
-        if (!response) {
-            res.json(response);
-        }
-        //adding community to user
-        userService.addCommunityToUser(userId, newCommunity).then(response => {
-            res.json(response);
+    communityService.addUserToCommunityMembers(userId, communityId)
+        .then(response => {
+            if (!response) {
+                res.json(response);
+            }
+            //adding community to user
+            userService.addCommunityToUser(userId, newCommunity)
+                .then(response => {
+                    res.json(response);
+                })
+                .catch(reject => {
+                    res.json(reject);
+                });
+         })
+        .catch(reject => {
+            res.json(reject);
         });
-    });
 };
 
 exports.getCommunityMembers = (req, res) => {
-    communityService.getCommunityMembers(req.body.communityId).then((response) => {
-        res.json(response);
-    });
+    communityService.getCommunityMembers(req.body.communityId)
+        .then((response) => {
+            res.json(response);
+        })
+        .catch(reject => {
+            res.json(reject);
+        });
 };
 
 exports.updateCommunityUserRole = (req, res) => {
@@ -117,16 +149,24 @@ exports.updateCommunityUserRole = (req, res) => {
             res.json(false);
         }
         //update user
-        userService.updateUserRole(userId, communityId, role).then((response => {
-            if(!response) {
-                res.json(false);
-            }
-            //update community
-            action = (role == 'authorizedMember') ? communityService.setAsAuthorizedMember : communityService.setAsMember;
-            action(communityId, userId).then(result => {
-                res.json(result);
+        userService.updateUserRole(userId, communityId, role)
+            .then(response => {
+                if(!response) {
+                    res.json(false);
+                }
+                //update community
+                action = (role == 'authorizedMember') ? communityService.setAsAuthorizedMember : communityService.setAsMember;
+                action(communityId, userId)
+                    .then(result => {
+                        res.json(result);
+                    })
+                    .catch(reject => {
+                        res.json(reject);
+                    });
+             })
+            .catch(reject => {
+                res.json(reject);
             });
-        }));
     } catch (e) {
         console.error(`failed to update user: ${userId} role to: ${role} in community ${communityId} due to: ${e}`);
         res.json(false);

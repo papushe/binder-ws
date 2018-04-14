@@ -19,16 +19,24 @@ exports.createNewUser = (req, res) => {
         profilePic: req.body.profilePic,
         keyForFirebase: req.body.keyForFirebase
     });
-  userService.saveNewUser(newUser).then(response => {
-      res.json(response);
-  });
+  userService.saveNewUser(newUser)
+      .then(response => {
+        res.json(response);
+    })
+      .catch(reject => {
+          res.json(reject);
+      });
 };
 
 exports.getProfile = (req, res) => {
 let userId = req.params.key;
-    userService.getUserProfile(userId).then(response => {
-        res.json(response);
-    });
+    userService.getUserProfile(userId)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(reject => {
+            res.json(reject);
+        });
 };
 
 exports.updateProfile = (req, res) => {
@@ -45,34 +53,49 @@ exports.updateProfile = (req, res) => {
         profilePic: req.body.profilePic
     };
     console.log(profileObj);
-    userService.updateUserProfile(profileObj).then(response => {
-        res.json(response);
-    });
+    userService.updateUserProfile(profileObj)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(reject => {
+            res.json(reject);
+        });
 };
 
 exports.deleteProfile = (req, res) => {
     let userId = req.params.key;
     let userCommunities;
     let actions = [];
-    communityService.getUserCommunities(userId).then(communities => {
-        if (communities.length == 0) {
-            userService.deleteUser(userId).then(response => {
-                res.json(response);
-            });
-        }
-        else {
-            userCommunities = communities;
-            userCommunities.forEach(community => {
-                actions.push(communityService.leaveCommunity(userId, community._id));
-            });
-            //delete user from db
-            actions.push(userService.deleteUser(userId));
-            Promise.all(actions).then(response => {
-                res.json(response);
-            });
-        }
-    });
-
+    communityService.getUserCommunities(userId)
+        .then(communities => {
+            if (communities.length == 0) {
+                userService.deleteUser(userId)
+                    .then(response => {
+                         res.json(response);
+                    })
+                    .catch(reject => {
+                        res.json(reject);
+                    });
+            }
+            else {
+                userCommunities = communities;
+                userCommunities.forEach(community => {
+                    actions.push(communityService.leaveCommunity(userId, community._id));
+                });
+                //delete user from db
+                actions.push(userService.deleteUser(userId));
+                Promise.all(actions)
+                    .then(response => {
+                        res.json(response);
+                    })
+                    .catch(reject => {
+                        res.json(reject);
+                    });
+            }
+         })
+        .catch(reject => {
+            res.json(reject);
+        });
 };
 
 
