@@ -9,6 +9,7 @@ const express = require('express'),
     bodyParser = require('body-parser'),
     socketIO = require('socket.io'),
     io = socketIO(server);
+require('./socket/groupChat')(io);
 
 app.use(bodyParser.json()); // parsing application/json
 app.use(bodyParser.urlencoded({extended: true})); // parsing application/x-www-form-urlencoded
@@ -67,20 +68,4 @@ app.all('*', (req, res) => {
 
 server.listen(port, () => {
     console.log(`listening on port ${port}`);
-});
-
-io.on('connection', (socket) => {
-
-    socket.on('disconnect', function () {
-        io.emit('users-changed', {user: socket.nickname, event: 'left'});
-    });
-
-    socket.on('set-nickname', (nickname) => {
-        socket.nickname = nickname;
-        io.emit('users-changed', {user: nickname, event: 'joined'});
-    });
-
-    socket.on('add-message', (message) => {
-        io.emit('message', {text: message.text, from: socket.nickname, created: new Date()});
-    });
 });
