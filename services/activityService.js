@@ -40,7 +40,7 @@ exports.getCommunityActivities = (communityId) => {
                     console.error(`failed to get community: ${communityId} activities due to: ${err}`);
                     reject(false);
                 }
-                console.log(`got community: ${communityId} activities`);
+                console.debug(`got community: ${communityId} activities`);
                 resolve(data);
             });
     });
