@@ -8,7 +8,7 @@ exports.errorHandling = (req, res) => {
 
 exports.createNewActivity = (req, res) => {
   let activityObj = new Activity({
-      activity_name: req.body.acitivityName,
+      activity_name: req.body.activityName,
       activity_description: req.body.activityDescription,
       type: req.body.type,
       created_at: Utils.now(),
