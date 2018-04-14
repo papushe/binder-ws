@@ -1,12 +1,13 @@
 let Activity = require('../models/Activity'),
-    Utils = require('../utils');
+    Utils = require('../utils'),
+    activityService = require('../services/activityService');
 
 exports.errorHandling = (req, res) => {
     res.json('Error occurred!')
 };
 
 exports.createNewActivity = (req, res) => {
-  let newActivity = new Activity({
+  let activityObj = new Activity({
       activity_name: req.body.acitivityName,
       activity_description: req.body.activityDescription,
       type: req.body.type,
@@ -19,44 +20,28 @@ exports.createNewActivity = (req, res) => {
       activity_date: req.body.activityDate,
       notes: req.body.notes
   });
-  newActivity.save(
-      (err, data) => {
-          if (err) {
-              console.log(`Failed to create activity: ${newActivity} due to: ${err}`);
-              res.json(err);
-          }
-          else {
-              console.log(`Activity: ${data._id} was created successfully!`);
-              res.json(data);
-          }
-      }
-  );
+  activityService.saveNewActivity(activityObj).then(response => {
+      res.json(response);
+  });
 };
 
 exports.getActivitiesByUserId = (req, res) => {
-    Activity.find({$or: [{consumer_id: {$eq: req.params.key}}, {provider_id: {$eq: req.params.key}}]},
-    (err, data) => {
-        if (err) {
-            res.json(err);
-        }
-        res.json(data);
+    let userId = req.params.key;
+    activityService.getUserActivities(userId).then(response => {
+        res.json(response);
     });
 };
 
 exports.getActivitiesByCommunityId = (req, res) => {
-    Activity.find({community_id: {$eq: req.params.key}},
-        (err, data) => {
-            if (err) {
-                res.json(err);
-            }
-            res.json(data);
-        });
+    let communityId = req.params.key;
+    activityService.getCommunityActivities(communityId).then(response => {
+        res.json(response);
+    });
 };
 
 exports.deleteActivityById = (req, res) => {
-    Activity.deleteOne({_id: {$eq: req.body.activityId}},
-        (err, data) => {
-            if (err) res.json(err);
-            res.json(data);
-        });
+    let activityId = req.body.activityId;
+    activityService.deleteActivityById(activityId).then(response => {
+        res.json(response);
+    });
 };
