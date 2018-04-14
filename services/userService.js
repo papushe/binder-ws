@@ -69,7 +69,7 @@ exports.updateUserProfile = (profileObj) => {
                             reject(false);
                         }
                         console.log(`user: ${profileObj.userId} profile was updated`);
-                        resolve(true);
+                        resolve(data);
                     }
                 );
             })

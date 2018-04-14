@@ -183,7 +183,7 @@ exports.getCommunityMembers = (communityId) => {
                     console.error(`failed to get community: ${communityId} members due to: ${err}`);
                     reject(false);
                 }
-                console.debug(`got community ${communityId} members`);
+                console.log(`got community ${communityId} members`);
                 resolve(data);
             });
     });
