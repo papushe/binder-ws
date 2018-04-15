@@ -2,10 +2,6 @@ let Activity = require('../models/Activity'),
     Utils = require('../utils'),
     activityService = require('../services/activityService');
 
-exports.errorHandling = (req, res) => {
-    res.json('Error occurred!')
-};
-
 exports.createNewActivity = (req, res) => {
   let activityObj = new Activity({
       activity_name: req.body.activityName,

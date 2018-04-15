@@ -3,6 +3,7 @@ const express = require('express'),
     app = express(),
     server = http.createServer(app),
     admin = require('firebase-admin'),
+    serviceAccount = require('./binder-pnk-firebase-adminsdk-nhbvv-5ced6a0ee2.json'),
     userController = require('./controllers/userController'),
     communityController = require('./controllers/communityController'),
     activityController = require('./controllers/activityController'),
@@ -10,7 +11,38 @@ const express = require('express'),
     bodyParser = require('body-parser'),
     socketIO = require('socket.io'),
     io = socketIO(server);
-require('./socket/groupChat')(io);
+    require('./socket/groupChat')(io);
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
+
+
+app.use(validateToken);
+
+function validateToken(req, res, next) {
+    let token = req.get('Authorization');
+    try{
+        if(!token) {
+            console.error(`failed to call: ${req.originalUrl} due to: empty token`);
+            res.json(`permission denied due to invalid token!`);
+        }
+        else {
+            admin.auth().verifyIdToken(token)
+                .then(decodedToken => {
+                    next();
+                })
+                .catch(err => {
+                    console.error(`failed to call: ${req.originalUrl} due to invalid token: ${token}`);
+                    res.json(`permission denied due to invalid token!`);
+                });
+        }
+    }catch (e) {
+        console.error(e);
+        res.json(`permission denied due to invalid token!`);
+    }
+}
+
 
 app.use(bodyParser.json()); // parsing application/json
 app.use(bodyParser.urlencoded({extended: true})); // parsing application/x-www-form-urlencoded
