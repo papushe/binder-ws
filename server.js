@@ -11,7 +11,7 @@ const express = require('express'),
     bodyParser = require('body-parser'),
     socketIO = require('socket.io'),
     io = socketIO(server);
-    require('./socket/groupChat')(io);
+    require('./socket/socketService')(io);
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
