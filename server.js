@@ -9,7 +9,7 @@ const express = require('express'),
     bodyParser = require('body-parser'),
     socketIO = require('socket.io'),
     io = socketIO(server);
-require('./socket/groupChat')(io);
+require('./socket/socketService')(io);
 
 app.use(bodyParser.json()); // parsing application/json
 app.use(bodyParser.urlencoded({extended: true})); // parsing application/x-www-form-urlencoded

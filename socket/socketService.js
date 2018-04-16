@@ -22,9 +22,11 @@ module.exports = (io) => {
         });
 
         socket.on('add-activity', (message) => {
-            io.to(message.room).emit('message', {
-                text: message.text,
+            io.to(message.room).emit('new-add-activity', {
+                activity: message.activity,
                 from: socket.nickname,
+                communityId: message.communityId,
+                room: message.communityId,
                 created: new Date()
             });
         });
