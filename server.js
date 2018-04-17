@@ -18,29 +18,33 @@ admin.initializeApp({
 });
 
 
-app.use(validateToken);
-
 function validateToken(req, res, next) {
     let token = req.get('Authorization');
     try{
+        //CORS
+        if (req.method === 'OPTIONS') {
+            res.status(200).send(`OPTIONS`);
+            return;
+        }
+
         if(!token) {
-            console.error(`failed to call: ${req.originalUrl} due to: empty token`);
-            res.json(`permission denied due to invalid token!`);
+             console.warn(`failed to call: ${req.originalUrl} due to: empty token`);
+             res.status(401).send(`permission denied! missing authorization header`);
         }
         else {
             admin.auth().verifyIdToken(token)
                 .then(decodedToken => {
-                    next();
+                 next();
                 })
                 .catch(err => {
-                    console.error(`failed to call: ${req.originalUrl} due to invalid token: ${token}`);
-                    res.json(`permission denied due to invalid token!`);
+                    console.warn(`failed to call: ${req.originalUrl} due to invalid token: ${token}`);
+                    res.status(401).send(`permission denied! invalid authorization header`);
                 });
         }
-    }catch (e) {
-        console.error(e);
-        res.json(`permission denied due to invalid token!`);
-    }
+     }catch (e) {
+         console.error(e);
+         res.json(`permission denied due to invalid token!`);
+     }
 }
 
 
@@ -55,6 +59,9 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Headers", "Content-Length, Authorization, Origin, X-Requested-With, Content-Type, Accept, application/json");
     next();
 });
+
+app.use(validateToken);
+
 
 /* All routes  */
 app.get('/', (req, res) => {
