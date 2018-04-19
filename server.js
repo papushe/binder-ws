@@ -1,4 +1,5 @@
 const express = require('express'),
+    helmet = require('helmet'),
     http = require('http'),
     app = express(),
     server = http.createServer(app),
@@ -61,6 +62,7 @@ app.use((req, res, next) => {
 });
 
 app.use(validateToken);
+app.use(helmet());
 
 
 /* All routes  */
