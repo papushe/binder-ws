@@ -6,15 +6,7 @@ const ROLE_AUTHORIZED = 'authorizedMember';
 const ROLE_MEMBER = 'Member';
 
 exports.getRole = (role) => {
-    if (role.match(new RegExp('authorized', "ig"))) {
-        console.log(`set as : ${ROLE_AUTHORIZED}`);
-        return ROLE_AUTHORIZED;
-    }
-
-    else {
-        console.log(`set as : ${ROLE_MEMBER}`);
-        return ROLE_MEMBER;
-    }
+    return (role.match(new RegExp('authorized', "ig"))) ? ROLE_AUTHORIZED : ROLE_MEMBER;
 };
 
 exports.saveNewUser = (newUser) => {
