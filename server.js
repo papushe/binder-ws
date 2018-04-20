@@ -3,6 +3,9 @@ const express = require('express'),
     http = require('http'),
     app = express(),
     server = http.createServer(app),
+    userContext = 'user',
+    communityContext = 'community',
+    activityContext = 'activity',
     admin = require('firebase-admin'),
     serviceAccount = require('./binder-pnk-firebase-adminsdk-nhbvv-5ced6a0ee2.json'),
     userController = require('./controllers/userController'),
@@ -17,7 +20,6 @@ const express = require('express'),
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
-
 
 function validateToken(req, res, next) {
     let token = req.get('Authorization');
@@ -70,39 +72,47 @@ app.get('/', (req, res) => {
     res.sendFile(`${__dirname}/index.html`);
 });
 
-app.post('/createNewUser/', userController.createNewUser);
+//User
+app.post(`/${userContext}/create`, userController.createNewUser);
 
-app.post('/updateProfile/', userController.updateProfile);
+app.post(`/${userContext}/update`, userController.updateProfile);
 
-app.get('/getProfile/:key', userController.getProfile);
+app.get(`/${userContext}/get/:key`, userController.getProfile);
 
-app.get('/deleteProfile/:key', userController.deleteProfile);
+app.get(`/${userContext}/delete/:key`, userController.deleteProfile);
 
-app.post('/createNewCommunity/', communityController.createNewCommunity);
+app.get(`/${userContext}/search/:query`, userController.searchUsers);
 
-app.post('/leaveCommunity/', communityController.leaveCommunity);
 
-app.post('/deleteCommunity/', communityController.deleteCommunity);
+//Community
+app.post(`/${communityContext}/create`, communityController.createNewCommunity);
 
-app.post('/joinCommunity/', communityController.joinCommunity);
+app.post(`/${communityContext}/leave`, communityController.leaveCommunity);
 
-app.post('/getCommunityMembers/', communityController.getCommunityMembers);
+app.post(`/${communityContext}/delete`, communityController.deleteCommunity);
 
-app.get('/getCommunities/:key', communityController.getCommunities);
+app.post(`/${communityContext}/join`, communityController.joinCommunity);
 
-app.get('/deleteCommunities/:key', communityController.deleteCommunitiesByKey);
+app.post(`/${communityContext}/members`, communityController.getCommunityMembers);
 
-app.post('/updateCommunityUserRole/', communityController.updateCommunityUserRole);
+app.get(`/${communityContext}/get/:key`, communityController.getCommunities);
 
-app.get('/searchCommunity/:type', communityController.searchCommunity);
+app.get(`/${communityContext}/delete/:key`, communityController.deleteCommunitiesByKey);
 
-app.post('/createNewActivity/', activityController.createNewActivity);
+app.post(`/${communityContext}/updateRole`, communityController.updateCommunityUserRole);
 
-app.get('/getActivitiesByUserId/:key', activityController.getActivitiesByUserId);
+app.get(`/${communityContext}/search/:query`, communityController.searchCommunity);
 
-app.get('/getActivitiesByCommunityId/:key', activityController.getActivitiesByCommunityId);
 
-app.post('/deleteActivityById/', activityController.deleteActivityById);
+//Activity
+app.post(`/${activityContext}/create/`, activityController.createNewActivity);
+
+app.get(`/${activityContext}/getByUserId/:key`, activityController.getActivitiesByUserId);
+
+app.get(`/${activityContext}/getByCommunityId/:key`, activityController.getActivitiesByCommunityId);
+
+app.post(`/${activityContext}/delete/`, activityController.deleteActivityById);
+
 
 app.all('*', (req, res) => {
     res.json({"error": "404 - not found (Wrong input or Wrong url)"});

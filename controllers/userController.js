@@ -97,4 +97,15 @@ exports.deleteProfile = (req, res) => {
         });
 };
 
+exports.searchUsers = (req, res) => {
+    let query = req.params.type;
+    userService.searchUsers(query)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(err => {
+            res.json(err);
+        });
+};
+
 

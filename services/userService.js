@@ -139,4 +139,19 @@ exports.deleteUser = (userId) => {
     });
 };
 
+exports.searchUsers = (query) => {
+    return new Promise((resolve, reject) => {
+        USER.find(
+            {firstName: {$regex: query, $options: "i"}, lastName: {$regex: query, $options: "i"}},
+            (err, data) => {
+                if (err) {
+                    console.error(`err occurred when running search: ${err}`);
+                    reject(false);
+                }
+                console.log(`search found ${data.length} results for query: '${query}'`);
+                resolve(data);
+            });
+    });
+};
+
 
