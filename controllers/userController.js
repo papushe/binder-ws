@@ -98,7 +98,7 @@ exports.deleteProfile = (req, res) => {
 };
 
 exports.searchUsers = (req, res) => {
-    let query = req.params.type;
+    let query = req.params.query || '';
     userService.searchUsers(query)
         .then(response => {
             res.json(response);

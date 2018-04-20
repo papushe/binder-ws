@@ -30,7 +30,7 @@ exports.createNewCommunity = (req, res) => {
 };
 
 exports.searchCommunity = (req, res) => {
-    let query = req.params.type;
+    let query = req.params.query || '';
     communityService.searchCommunities(query)
         .then(response => {
             res.json(response);
