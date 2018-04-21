@@ -189,14 +189,19 @@ exports.getCommunityMembers = (communityId) => {
     });
 };
 
-exports.addUserToCommunityMembers = (userId, communityId) => {
+exports.addUserToCommunityMembers = (userId, communityId, isPrivileged) => {
     return new Promise((resolve, reject) => {
-        COMMUNITY.findOne({$and: [{_id: {$eq: communityId}}, {type: {$eq: 'Public'}}]},
+        COMMUNITY.findOne({_id: {$eq: communityId}},
             (err, data) => {
-                if (err || data == null || data.members == null) {
+                if (err || !data || !data.members) {
                     console.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
+                if (data.type === 'Private' && !isPrivileged) {
+                    console.error(`failed to add user: ${userId} to community: ${communityId} due to: user not allowed`);
+                    reject(false);
+                }
+
                 data.members.push({memberId: userId});
                 data.save((err, data) => {
                     if (err) {
