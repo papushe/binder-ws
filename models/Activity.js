@@ -6,8 +6,14 @@ const mongoose = require('mongoose'),
         activity_description: String,
         type: String,
         created_at: String,
-        consumer_id: String,
-        provider_id: String,
+        consumer: {
+            name: String,
+            id: String
+        },
+        provider: {
+            name: String,
+            id: String
+        },
         community_id: String,
         source: String,
         destination: String,

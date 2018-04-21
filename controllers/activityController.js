@@ -1,6 +1,7 @@
 let Activity = require('../models/Activity'),
     Utils = require('../utils'),
-    activityService = require('../services/activityService');
+    activityService = require('../services/activityService'),
+    userService = require('../services/userService');
 
 exports.createNewActivity = (req, res) => {
   let activityObj = new Activity({
@@ -8,21 +9,29 @@ exports.createNewActivity = (req, res) => {
       activity_description: req.body.activityDescription,
       type: req.body.type,
       created_at: Utils.now(),
-      consumer_id: req.body.consumerId,
-      provider_id: req.body.providerId,
+      consumer: req.body.consumer,
+      provider: req.body.provider,
       community_id: req.body.communityId,
       source: req.body.source,
       destination: req.body.destination,
       activity_date: req.body.activityDate,
       notes: req.body.notes
   });
-  activityService.saveNewActivity(activityObj)
-        .then(response => {
-            res.json(response);
-        })
-        .catch(err => {
-          res.json(err);
-        });
+
+  userService.getUserProfile(activityObj.consumer.id).then(response => {
+      if (!response) {
+          console.error(`failed to find consumer with id: ${activityObj.consumer.id}`);
+          reject(false);
+      }
+      activityObj.consumer.name = `${response.firstName} ${response.lastName}`;
+      activityService.saveNewActivity(activityObj)
+          .then(response => {
+              res.json(response);
+          })
+          .catch(err => {
+              res.json(err);
+          });
+  });
 };
 
 exports.getActivitiesByUserId = (req, res) => {
