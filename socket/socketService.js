@@ -16,10 +16,24 @@ module.exports = (io) => {
             });
         });
 
-        socket.on('join', (params, callback) => {
+        socket.on('join-community', (params) => {
             socket.join(params.room);
-            callback();
+            io.to(params.room).emit('members-changed', {
+                from: socket.nickname,
+                communityName: params.roomName,
+                event: 'joined'
+            });
         });
+
+        socket.on('left-community', (params)=>{
+            io.to(params.room).emit('members-changed', {
+                from: socket.nickname,
+                communityName: params.roomName,
+                event:'left'
+            });
+            socket.leave(params.room);
+        });
+
 
         socket.on('add-activity', (message) => {
             io.to(message.room).emit('new-add-activity', {
