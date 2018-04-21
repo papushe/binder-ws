@@ -200,16 +200,17 @@ exports.addUserToCommunityMembers = (userId, communityId, isPrivileged) => {
                     console.error(`failed to add user: ${userId} to community: ${communityId} due to: user not allowed`);
                     reject(false);
                 }
-
-                data.members.push({memberId: userId});
-                data.save((err, data) => {
-                    if (err) {
-                        console.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
-                        reject(false);
-                    }
-                    console.log(`user: ${userId} was added as member to community: ${communityId}`);
-                    resolve(true);
-                });
+                else {
+                    data.members.push({memberId: userId});
+                    data.save((err, data) => {
+                        if (err) {
+                            console.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
+                            reject(false);
+                        }
+                        console.log(`user: ${userId} was added as member to community: ${communityId}`);
+                        resolve(true);
+                    });
+                }
             });
     });
 };
