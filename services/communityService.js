@@ -144,7 +144,6 @@ exports.setNewManager = (communityId) => {
                     getNextNewManagerId(data)
                         .then(newManager => {
                             if (newManager == null) {
-
                                 resolve(true);
                             }
 
@@ -189,23 +188,29 @@ exports.getCommunityMembers = (communityId) => {
     });
 };
 
-exports.addUserToCommunityMembers = (userId, communityId) => {
+exports.addUserToCommunityMembers = (userId, communityId, isPrivileged) => {
     return new Promise((resolve, reject) => {
-        COMMUNITY.findOne({$and: [{_id: {$eq: communityId}}, {type: {$eq: 'Public'}}]},
+        COMMUNITY.findOne({_id: {$eq: communityId}},
             (err, data) => {
-                if (err || data == null || data.members == null) {
+                if (err || !data || !data.members) {
                     console.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
-                data.members.push({memberId: userId});
-                data.save((err, data) => {
-                    if (err) {
-                        console.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
-                        reject(false);
-                    }
-                    console.log(`user: ${userId} was added as member to community: ${communityId}`);
-                    resolve(true);
-                });
+                if (data.type === 'Private' && !isPrivileged) {
+                    console.error(`failed to add user: ${userId} to community: ${communityId} due to: user not allowed`);
+                    reject(false);
+                }
+                else {
+                    data.members.push({memberId: userId});
+                    data.save((err, data) => {
+                        if (err) {
+                            console.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
+                            reject(false);
+                        }
+                        console.log(`user: ${userId} was added as member to community: ${communityId}`);
+                        resolve(true);
+                    });
+                }
             });
     });
 };
@@ -215,7 +220,7 @@ exports.removeUserFromCommunityMembers = (userId, communityId) => {
         COMMUNITY.findOneAndUpdate({_id: {$eq: communityId}},
             {$pull: {members: {memberId: userId}, authorizedMembers: {memberId: userId}}},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     console.error(`failed to remove user ${userId} from community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
@@ -226,6 +231,7 @@ exports.removeUserFromCommunityMembers = (userId, communityId) => {
 };
 
 exports.leaveCommunity = (userId, communityId) => {
+    let shouldBeDeleted;
     return new Promise((resolve, reject) => {
         //removing user from community members
         this.removeUserFromCommunityMembers(userId, communityId)
@@ -234,7 +240,8 @@ exports.leaveCommunity = (userId, communityId) => {
                     reject(false);
                 }
                 //remove community if no members left but this user
-                if (data.members.length == 1) {
+                if (data.members && data.members.length == 1) {
+                    shouldBeDeleted = true;
                     this.deleteCommunityById(communityId)
                         .then(response => {
                             if (!response) {
@@ -247,21 +254,23 @@ exports.leaveCommunity = (userId, communityId) => {
                 }
                 //removing community from user
                 userService.removeCommunityFromUser(userId, communityId)
-                    .then(response => {
-                        if (!response) {
+                    .then(updatedUser => {
+                        if (!updatedUser) {
                             reject(false);
                         }
                         //if the deleted member was the manager set a new one
-                        if (data.managerId == userId) {
+                        if (data.managerId == userId && !shouldBeDeleted) {
                             this.setNewManager(communityId)
                                 .then(response => {
-                                    resolve(response);
+                                    resolve(updatedUser);
                                 })
                         .       catch(err => {
                                     reject(err);
                                  });
                         }
-                        else resolve(true);
+                        else  {
+                            resolve(updatedUser);
+                        }
                     })
                     .catch(err => {
                         reject(err);

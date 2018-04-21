@@ -100,23 +100,22 @@ exports.deleteCommunity = (req, res) => {
 };
 
 exports.joinCommunity = (req, res) => {
-    let userId = req.body.uid;
-    let communityId = req.body.communityId;
+    let {uid, isPrivileged, communityId} = req.body;
     let newCommunity = {
         communityId: communityId,
         role: 'Member'
     };
 
     //adding user to community members
-    communityService.addUserToCommunityMembers(userId, communityId)
+    communityService.addUserToCommunityMembers(uid, communityId, isPrivileged)
         .then(response => {
             if (!response) {
                 res.json(response);
             }
             //adding community to user
-            userService.addCommunityToUser(userId, newCommunity)
+            userService.addCommunityToUser(uid, newCommunity)
                 .then(response => {
-                    res.json(response);
+                    res.json(!!response);
                 })
                 .catch(err => {
                     res.json(err);
