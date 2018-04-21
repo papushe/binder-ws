@@ -119,7 +119,7 @@ exports.addCommunityToUser = (userId, newCommunity) => {
                         reject(false);
                     }
                     console.log(`community: ${newCommunity.communityId} was added to communities list for user: ${userId}`);
-                    resolve(true);
+                    resolve(data);
                 });
             });
     });

@@ -115,7 +115,7 @@ exports.joinCommunity = (req, res) => {
             //adding community to user
             userService.addCommunityToUser(uid, newCommunity)
                 .then(response => {
-                    res.json(response);
+                    res.json(!!response);
                 })
                 .catch(err => {
                     res.json(err);

@@ -144,7 +144,6 @@ exports.setNewManager = (communityId) => {
                     getNextNewManagerId(data)
                         .then(newManager => {
                             if (newManager == null) {
-
                                 resolve(true);
                             }
 
@@ -220,7 +219,7 @@ exports.removeUserFromCommunityMembers = (userId, communityId) => {
         COMMUNITY.findOneAndUpdate({_id: {$eq: communityId}},
             {$pull: {members: {memberId: userId}, authorizedMembers: {memberId: userId}}},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     console.error(`failed to remove user ${userId} from community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
@@ -231,6 +230,7 @@ exports.removeUserFromCommunityMembers = (userId, communityId) => {
 };
 
 exports.leaveCommunity = (userId, communityId) => {
+    let shouldBeDeleted;
     return new Promise((resolve, reject) => {
         //removing user from community members
         this.removeUserFromCommunityMembers(userId, communityId)
@@ -239,7 +239,8 @@ exports.leaveCommunity = (userId, communityId) => {
                     reject(false);
                 }
                 //remove community if no members left but this user
-                if (data.members.length == 1) {
+                if (data.members && data.members.length == 1) {
+                    shouldBeDeleted = true;
                     this.deleteCommunityById(communityId)
                         .then(response => {
                             if (!response) {
@@ -257,7 +258,7 @@ exports.leaveCommunity = (userId, communityId) => {
                             reject(false);
                         }
                         //if the deleted member was the manager set a new one
-                        if (data.managerId == userId) {
+                        if (data.managerId == userId && !shouldBeDeleted) {
                             this.setNewManager(communityId)
                                 .then(response => {
                                     resolve(response);
@@ -266,7 +267,9 @@ exports.leaveCommunity = (userId, communityId) => {
                                     reject(err);
                                  });
                         }
-                        else resolve(true);
+                        else  {
+                            resolve(true);
+                        }
                     })
                     .catch(err => {
                         reject(err);
