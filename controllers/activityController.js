@@ -17,20 +17,23 @@ exports.createNewActivity = (req, res) => {
       activity_date: req.body.activity_date,
       notes: req.body.notes
   });
-
+  activityObj.activity_date = Utils.normalizeDate(activityObj.activity_date);
   userService.getUserProfile(activityObj.consumer.id).then(response => {
       if (!response) {
           console.error(`failed to find consumer with id: ${activityObj.consumer.id}`);
-          reject(false);
+          res.json(response);
       }
-      activityObj.consumer.name = `${response.firstName} ${response.lastName}`;
-      activityService.saveNewActivity(activityObj)
-          .then(response => {
-              res.json(response);
-          })
-          .catch(err => {
-              res.json(err);
-          });
+      else {
+          activityObj.activity_date = Utils.normalizeDate(activityObj.activity_date);
+          activityObj.consumer.name = `${response.firstName} ${response.lastName}`;
+          activityService.saveNewActivity(activityObj)
+              .then(response => {
+                  res.json(response);
+              })
+              .catch(err => {
+                  res.json(err);
+              });
+      }
   });
 };
 
