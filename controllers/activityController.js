@@ -13,9 +13,11 @@ exports.createNewActivity = (req, res) => {
       community_id: req.body.communityId,
       source: req.body.source,
       destination: req.body.destination,
-      activity_date: req.body.activityDate,
+      activity_date: req.body.activity_date,
       notes: req.body.notes
   });
+  activityObj.activity_date = Utils.normalizeDate(activityObj.activity_date);
+  console.log(activityObj.activity_date);
   activityService.saveNewActivity(activityObj)
         .then(response => {
             res.json(response);
