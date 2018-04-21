@@ -99,7 +99,7 @@ exports.removeCommunityFromUser = (userId, communityId) => {
                     reject(false);
                 }
                 console.log(`community: ${communityId} was removed from communities list for user: ${userId}`);
-                resolve(true);
+                resolve(data.toObject());
             });
     });
 };

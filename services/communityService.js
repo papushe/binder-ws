@@ -253,22 +253,22 @@ exports.leaveCommunity = (userId, communityId) => {
                 }
                 //removing community from user
                 userService.removeCommunityFromUser(userId, communityId)
-                    .then(response => {
-                        if (!response) {
+                    .then(updatedUser => {
+                        if (!updatedUser) {
                             reject(false);
                         }
                         //if the deleted member was the manager set a new one
                         if (data.managerId == userId && !shouldBeDeleted) {
                             this.setNewManager(communityId)
                                 .then(response => {
-                                    resolve(response);
+                                    resolve(updatedUser);
                                 })
                         .       catch(err => {
                                     reject(err);
                                  });
                         }
                         else  {
-                            resolve(true);
+                            resolve(updatedUser);
                         }
                     })
                     .catch(err => {
