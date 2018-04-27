@@ -99,10 +99,24 @@ exports.removeCommunityFromUser = (userId, communityId) => {
                     reject(false);
                 }
                 console.log(`community: ${communityId} was removed from communities list for user: ${userId}`);
-                resolve(data.toObject());
+                data = this.removeCommunityFromSpecificUser(data, communityId);
+                resolve(data);
             });
     });
 };
+
+
+//TODO - temporary
+exports.removeCommunityFromSpecificUser = (user, communityId) => {
+    const removeIndex = user.communities.map(function (item) {
+        return item.communityId;
+    }).indexOf(communityId);
+    if (removeIndex !== -1) {
+        user.communities.splice(removeIndex, 1);
+    }
+    return user;
+};
+
 
 exports.addCommunityToUser = (userId, newCommunity) => {
     return new Promise((resolve, reject) => {
@@ -142,11 +156,12 @@ exports.deleteUser = (userId) => {
 exports.searchUsers = (query) => {
     return new Promise((resolve, reject) => {
         USER.find(
-            {$or:
-                [
-                {firstName: {$regex: query, $options: "i"}},
-                {lastName: {$regex: query, $options: "i"}}
-                ]
+            {
+                $or:
+                    [
+                        {firstName: {$regex: query, $options: "i"}},
+                        {lastName: {$regex: query, $options: "i"}}
+                    ]
             },
             (err, data) => {
                 if (err) {
