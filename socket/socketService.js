@@ -21,17 +21,39 @@ module.exports = (io) => {
             io.to(params.room).emit('members-changed', {
                 from: socket.nickname,
                 communityName: params.roomName,
+                event: 'enter'
+            });
+        });
+
+        socket.on('left-community', (params) => {
+            io.to(params.room).emit('members-changed', {
+                from: socket.nickname,
+                communityName: params.roomName,
+                event: 'left'
+            });
+            socket.leave(params.room);
+
+        });
+
+        socket.on('add-to-community', (params) => {
+            io.to(params.room).emit('members-changed', {
+                from: socket.nickname,
+                communityName: params.roomName,
+                user: params.user,
+                communityId: params.roomId,
                 event: 'joined'
             });
         });
 
-        socket.on('left-community', (params)=>{
+        socket.on('delete-from-community', (params) => {
             io.to(params.room).emit('members-changed', {
                 from: socket.nickname,
                 communityName: params.roomName,
-                event:'left'
+                user: params.user,
+                communityId: params.roomId,
+                event: 'deleted'
             });
-            socket.leave(params.room);
+            // socket.leave(params.room);
         });
 
 

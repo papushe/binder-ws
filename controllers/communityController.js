@@ -43,7 +43,7 @@ exports.searchCommunity = (req, res) => {
 exports.getCommunities = (req, res) => {
     let userId = req.params.key;
     communityService.getUserCommunities(userId)
-         .then(response => {
+        .then(response => {
             res.json(response);
         })
         .catch(err => {
@@ -60,7 +60,7 @@ exports.leaveCommunity = (req, res) => {
             res.json(response);
         })
         .catch(err => {
-        res.json(err);
+            res.json(err);
         });
 };
 
@@ -89,10 +89,10 @@ exports.deleteCommunity = (req, res) => {
             });
             Promise.all(actions)
                 .then(() => {
-                communityService.deleteCommunityById(communityId).then((response) =>{
-                    res.json(response);
-                });
-            })
+                    communityService.deleteCommunityById(communityId).then((response) => {
+                        res.json(response);
+                    });
+                })
                 .catch(err => {
                     res.json(err);
                 });
@@ -115,12 +115,12 @@ exports.joinCommunity = (req, res) => {
             //adding community to user
             userService.addCommunityToUser(uid, newCommunity)
                 .then(response => {
-                    res.json(!!response);
+                    res.json(response);
                 })
                 .catch(err => {
                     res.json(err);
                 });
-         })
+        })
         .catch(err => {
             res.json(err);
         });
@@ -150,7 +150,7 @@ exports.updateCommunityUserRole = (req, res) => {
         //update user
         userService.updateUserRole(userId, communityId, role)
             .then(response => {
-                if(!response) {
+                if (!response) {
                     res.json(false);
                 }
                 //update community
@@ -162,7 +162,7 @@ exports.updateCommunityUserRole = (req, res) => {
                     .catch(err => {
                         res.json(err);
                     });
-             })
+            })
             .catch(err => {
                 res.json(err);
             });
