@@ -99,16 +99,28 @@ module.exports = (io) => {
             });
         });
 
-        // socket.on('add-message', (message) => {
-        //     io.emit('message', {
-        //         text: message.text,
-        //         from: socket.nickname,
-        //         created: new Date()
-        //     });
-        // });
+        socket.on('enter-to-chat-room', (params) => {
+            socket.join(params.room);
+
+            allUsers[params.to].emit('chat-room', {
+                from: socket.nickname,
+                to: params.to,
+                room: params.room,
+                event: 'enter-to-chat-room'
+            });
+        });
+
+        socket.on('add-message', (message) => {
+
+            io.emit('message', {
+                text: message.text,
+                from: socket.nickname,
+                created: new Date()
+            });
+        });
+
 
 // socket functions
-
         function addUserToAllUsers(socket, nickname) {
             socket.nickname = nickname;
             if (socket.nickname in allUsers) {
