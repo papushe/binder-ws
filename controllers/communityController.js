@@ -6,7 +6,8 @@ let USER = require('../models/User'),
     Utils = require('../utils'),
     userService = require('./../services/userService'),
     communityService = require('./../services/communityService'),
-    Promise = require('promise');
+    Promise = require('promise'),
+    logger = Utils.getLogger();
 
 
 exports.createNewCommunity = (req, res) => {
@@ -69,7 +70,7 @@ exports.deleteCommunity = (req, res) => {
     let userId = req.body.uid;
     let actions = [];
 
-    console.log(`delete community: ${communityId} was invoked by: ${userId}`);
+    logger.info(`delete community: ${communityId} was invoked by: ${userId}`);
 
     USER.find(
         {communities: {$elemMatch: {communityId: communityId}}},
@@ -83,7 +84,7 @@ exports.deleteCommunity = (req, res) => {
                         actions.push(userService.removeCommunityFromUser(user.keyForFirebase, communityId));
                     }
                 } catch (e) {
-                    console.error(`failed to remove community ${communityId} from user ${user.keyForFirebase} due to: ${e}`);
+                    logger.error(`failed to remove community ${communityId} from user ${user.keyForFirebase} due to: ${e}`);
                     res.json(false);
                 }
             });
@@ -144,7 +145,7 @@ exports.updateCommunityUserRole = (req, res) => {
 
     try {
         if (role == null) {
-            console.log(`${role} role is invalid`);
+            logger.info(`${role} role is invalid`);
             res.json(false);
         }
         //update user
@@ -167,7 +168,7 @@ exports.updateCommunityUserRole = (req, res) => {
                 res.json(err);
             });
     } catch (e) {
-        console.error(`failed to update user: ${userId} role to: ${role} in community ${communityId} due to: ${e}`);
+        logger.error(`failed to update user: ${userId} role to: ${role} in community ${communityId} due to: ${e}`);
         res.json(false);
     }
 };

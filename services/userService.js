@@ -1,9 +1,11 @@
-let USER = require('../models/User');
-let Promise = require('promise');
+let USER = require('../models/User'),
+    Promise = require('promise'),
+    logger = require('../utils').getLogger();
 
-const ROLE_MANAGER = 'Manager';
-const ROLE_AUTHORIZED = 'authorizedMember';
-const ROLE_MEMBER = 'Member';
+
+const ROLE_MANAGER = 'Manager',
+      ROLE_AUTHORIZED = 'authorizedMember',
+      ROLE_MEMBER = 'Member';
 
 exports.getRole = (role) => {
     return (role.match(new RegExp('authorized', "ig"))) ? ROLE_AUTHORIZED : ROLE_MEMBER;
@@ -13,10 +15,10 @@ exports.saveNewUser = (newUser) => {
     return new Promise((resolve, reject) => {
         newUser.save((err, data) => {
                 if (err) {
-                    console.error(`failed to create user: ${newUser} due to: ${err}`);
+                    logger.error(`failed to create user: ${newUser} due to: ${err}`);
                     reject(false);
                 }
-                console.log(`new user: ${newUser._id} was created`);
+            logger.info(`new user: ${newUser._id} was created`);
                 resolve(true);
             }
         );
@@ -29,7 +31,7 @@ exports.getUserProfile = (userId) => {
         USER.findOne({keyForFirebase: {$eq: userId}},
             (err, data) => {
                 if (err) {
-                    console.error(`failed to get user: ${userId} profile due to: ${err}`);
+                    logger.error(`failed to get user: ${userId} profile due to: ${err}`);
                     reject(false);
                 }
                 resolve(data);
@@ -42,7 +44,7 @@ exports.updateUserProfile = (profileObj) => {
         USER.findOne({keyForFirebase: {$eq: profileObj.userId}},
             (err, data) => {
                 if (err) {
-                    console.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
+                    logger.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
                     reject(false);
                 }
                 data.set({
@@ -59,10 +61,10 @@ exports.updateUserProfile = (profileObj) => {
                 data.save(
                     (err, data) => {
                         if (err) {
-                            console.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
+                            logger.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
                             reject(false);
                         }
-                        console.log(`user: ${profileObj.userId} profile was updated`);
+                        logger.info(`user: ${profileObj.userId} profile was updated`);
                         resolve(data);
                     }
                 );
@@ -80,7 +82,7 @@ exports.updateUserRole = (userId, communityId, role) => {
             {$set: {"communities.$.role": role}},
             (err, data) => {
                 if (err) {
-                    console.log(err);
+                    logger.info(err);
                     reject(err);
                 }
                 resolve(true);
@@ -96,10 +98,10 @@ exports.removeCommunityFromUser = (userId, communityId) => {
             {new: true},
             (err, data) => {
                 if (err) {
-                    console.error(`failed to remove user community: ${communityId} from user: ${userId} communities list due to: ${err}`);
+                    logger.error(`failed to remove user community: ${communityId} from user: ${userId} communities list due to: ${err}`);
                     reject(false);
                 }
-                console.log(`community: ${communityId} was removed from communities list for user: ${userId}`);
+                logger.info(`community: ${communityId} was removed from communities list for user: ${userId}`);
                 resolve(data);
             });
     });
@@ -110,16 +112,16 @@ exports.addCommunityToUser = (userId, newCommunity) => {
         USER.findOne({keyForFirebase: {$eq: userId}},
             (err, data) => {
                 if (err || data == null || data.communities == null) {
-                    console.error(`failed to add user community: ${newCommunity.communityId} to communities list due to: ${err}`);
+                    logger.error(`failed to add user community: ${newCommunity.communityId} to communities list due to: ${err}`);
                     reject(false);
                 }
                 data.communities.push(newCommunity);
                 data.save((err, data) => {
                     if (err) {
-                        console.log(`error occurred while trying add user community: ${newCommunity.communityId} to communities list: ${err}`);
+                        logger.info(`error occurred while trying add user community: ${newCommunity.communityId} to communities list: ${err}`);
                         reject(false);
                     }
-                    console.log(`community: ${newCommunity.communityId} was added to communities list for user: ${userId}`);
+                    logger.info(`community: ${newCommunity.communityId} was added to communities list for user: ${userId}`);
                     resolve(data);
                 });
             });
@@ -131,10 +133,10 @@ exports.deleteUser = (userId) => {
         USER.findOneAndRemove({keyForFirebase: {$eq: userId}},
             (err, data) => {
                 if (err) {
-                    console.error(`failed to delete user: ${userId} due to: ${err}`);
+                    logger.error(`failed to delete user: ${userId} due to: ${err}`);
                     reject(false);
                 }
-                console.log(`user: ${userId} was deleted!`);
+                logger.info(`user: ${userId} was deleted!`);
                 resolve(true);
             });
     });
@@ -152,10 +154,10 @@ exports.searchUsers = (query) => {
             },
             (err, data) => {
                 if (err) {
-                    console.error(`err occurred when running search: ${err}`);
+                    logger.error(`err occurred when running search: ${err}`);
                     reject(false);
                 }
-                console.log(`search found ${data.length} results for query: '${query}'`);
+                logger.info(`search found ${data.length} results for query: '${query}'`);
                 resolve(data);
             });
     });

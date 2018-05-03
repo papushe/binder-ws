@@ -1,6 +1,7 @@
 let MESSAGE = require('../models/Message'),
     Utils = require('../utils'),
-    messageService = require('../services/messageService');
+    messageService = require('../services/messageService'),
+    logger = Utils.getLogger();
 
 exports.createNewMessage = (req, res) => {
     let msgObj = new MESSAGE({

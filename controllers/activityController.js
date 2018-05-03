@@ -1,10 +1,10 @@
 let Activity = require('../models/Activity'),
     Utils = require('../utils'),
     activityService = require('../services/activityService'),
-    userService = require('../services/userService');
+    logger = Utils.getLogger();
 
 exports.createNewActivity = (req, res) => {
-    console.log(`COMMUNITY ID: ${req.body.communityId}`);
+    logger.info(`COMMUNITY ID: ${req.body.communityId}`);
     let activityObj = new Activity({
         activity_name: req.body.activityName,
         activity_description: req.body.activityDescription,
@@ -18,7 +18,6 @@ exports.createNewActivity = (req, res) => {
         activity_date: Utils.normalizeDate(req.body.activity_date),
         notes: req.body.notes
     });
-    // activityObj.activity_date = Utils.normalizeDate(activityObj.activity_date);
     activityService.saveNewActivity(activityObj)
         .then(response => {
             res.json(response);

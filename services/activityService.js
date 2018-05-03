@@ -1,17 +1,18 @@
-let ACTIVITY = require('../models/Activity');
-let Promise = require('promise');
-let Utils = require('../utils');
+let ACTIVITY = require('../models/Activity'),
+    Promise = require('promise'),
+    Utils = require('../utils'),
+    logger = Utils.getLogger();
 
 exports.saveNewActivity = (newActivity) => {
     return new Promise((resolve, reject) => {
         newActivity.save(
             (err, data) => {
                 if (err) {
-                    console.error(`failed to create activity: ${newActivity} due to: ${err}`);
+                    logger.error(`failed to create activity: ${newActivity} due to: ${err}`);
                     reject(false);
                 }
                 else {
-                    console.log(`Activity: ${data._id} was created`);
+                    logger.info(`Activity: ${data._id} was created`);
                     resolve(data);
                 }
             }
@@ -24,10 +25,10 @@ exports.getUserActivities = (userId) => {
         ACTIVITY.find({$or: [{"consumer.id": {$eq: userId}}, {"provider.id": {$eq: userId}}]},
             (err, data) => {
                 if (err) {
-                    console.error(`failed to get user: ${userId} activities due to: ${err}`);
+                    logger.error(`failed to get user: ${userId} activities due to: ${err}`);
                     reject(false);
                 }
-                console.log(`got user: ${userId} activities`);
+                logger.info(`got user: ${userId} activities`);
                 resolve(data);
             });
     });
@@ -38,10 +39,10 @@ exports.getCommunityActivities = (communityId) => {
         ACTIVITY.find({community_id: {$eq: communityId}},
             (err, data) => {
                 if (err) {
-                    console.error(`failed to get community: ${communityId} activities due to: ${err}`);
+                    logger.error(`failed to get community: ${communityId} activities due to: ${err}`);
                     reject(false);
                 }
-                console.log(`got community: ${communityId} activities`);
+                logger.info(`got community: ${communityId} activities`);
                 resolve(data);
             });
     });
@@ -52,10 +53,10 @@ exports.deleteActivityById = (activityId) => {
         ACTIVITY.deleteOne({_id: {$eq: activityId}},
             (err, data) => {
                 if (err) {
-                    console.error(`failed to delete activity: ${activityId} due to: ${err}`);
+                    logger.error(`failed to delete activity: ${activityId} due to: ${err}`);
                     reject(false);
                 }
-                console.log(`activity: ${activityId} was deleted!`);
+                logger.info(`activity: ${activityId} was deleted!`);
                 resolve(true);
             });
     });
@@ -67,7 +68,7 @@ exports.saveExistingActivity = (newActivity, activityId) => {
         ACTIVITY.findOne({_id: activityId},
             (err, data) => {
                 if (err) {
-                    console.error(`Failed to updated activity #${newActivity.activity_name} due to ${err}`);
+                    logger.error(`Failed to updated activity #${newActivity.activity_name} due to ${err}`);
                     reject(false);
                 }
                 data.set({
@@ -86,10 +87,10 @@ exports.saveExistingActivity = (newActivity, activityId) => {
                 data.save(
                     (err, data) => {
                         if (err) {
-                            console.error(`failed to update activity #${newActivity.activity_name} profile due to: ${err}`);
+                            logger.error(`failed to update activity #${newActivity.activity_name} profile due to: ${err}`);
                             reject(false);
                         }
-                        console.log(`user: #${newActivity.activity_name} profile was updated`);
+                        logger.info(`user: #${newActivity.activity_name} profile was updated`);
                         resolve(data);
                     }
                 );

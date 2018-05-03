@@ -1,5 +1,6 @@
 const consts   = require('./config').MLAB_KEY,
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    logger = require('./utils').getLogger();
 
 
 mongoose.Promise = global.Promise;
@@ -17,18 +18,18 @@ mongoose.connect(consts, options).then(() => {
     const conn = mongoose.connection;//get default connection
     // Event handlers for Mongoose
     conn.on('error', (err) => {
-        console.error('Mongoose: Error: ' + err);
+        logger.error('Mongoose: Error: ' + err);
     });
     conn.on('open', () => {
-        console.log('Mongoose: Connection established');
+        logger.info('Mongoose: Connection established');
     });
     conn.on('disconnected', () => {
-        console.log('Mongoose: Connection stopped, recconect');
+        logger.info('Mongoose: Connection stopped, reconnect');
         mongoose.connect(consts, options);
     });
     conn.on('reconnected', () => {
-        console.info('Mongoose reconnected!');
+        logger.info('Mongoose reconnected!');
     });
 }, (err) => {
-    console.error(`failed to connect DB  - reason:  ${err}`);
+    logger.error(`failed to connect DB  - reason:  ${err}`);
 });

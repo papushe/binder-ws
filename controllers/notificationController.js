@@ -1,5 +1,6 @@
 let NOTIFICATION = require('../models/Notification'),
     Utils = require('../utils'),
+    logger = Utils.getLogger();
     notificationService = require('../services/notificationService');
 
 exports.createNewNotification = (req, res) => {

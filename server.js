@@ -17,6 +17,7 @@ const express = require('express'),
     messageController = require('./controllers/messageController'),
     port = process.env.PORT || require('./config').PORT,
     bodyParser = require('body-parser'),
+    logger = require('./utils').getLogger(),
     socketIO = require('socket.io'),
     io = socketIO(server);
     require('./socket/socketService')(io);
@@ -35,7 +36,7 @@ function validateToken(req, res, next) {
         }
 
         if(!token) {
-             console.warn(`failed to call: ${req.originalUrl} due to: empty token`);
+             logger.warn(`failed to call: ${req.originalUrl} due to: empty token`);
              res.status(401).send(`permission denied! missing authorization header`);
         }
         else {
@@ -44,12 +45,12 @@ function validateToken(req, res, next) {
                  next();
                 })
                 .catch(err => {
-                    console.warn(`failed to call: ${req.originalUrl} due to invalid token: ${token}`);
+                    logger.warn(`failed to call: ${req.originalUrl} due to invalid token: ${token}`);
                     res.status(401).send(`permission denied! invalid authorization header`);
                 });
         }
      }catch (e) {
-         console.error(e);
+         logger.error(e);
          res.json(`permission denied due to invalid token!`);
      }
 }
@@ -134,5 +135,5 @@ app.all('*', (req, res) => {
 });
 
 server.listen(port, () => {
-    console.log(`listening on port ${port}`);
+    logger.info(`listening on port ${port}`);
 });

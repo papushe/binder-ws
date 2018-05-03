@@ -1,3 +1,6 @@
+const Utils = require('../utils'),
+      logger = Utils.getLogger();
+
 module.exports = (io) => {
     let allUsers = {},
         roomKey = {},
@@ -12,7 +15,7 @@ module.exports = (io) => {
             io.emit('users-changed', {
                 user: socket.nickname,
                 event: 'left',
-                date: new Date()
+                date: Utils.now()
             });
         });
 
@@ -23,7 +26,7 @@ module.exports = (io) => {
             io.emit('users-changed', {
                 user: nickname,
                 event: 'joined',
-                date: new Date()
+                date: Utils.now()
             });
         });
 
@@ -37,7 +40,7 @@ module.exports = (io) => {
                 communityName: params.roomName,
                 communityId: params.roomId,
                 event: 'enter',
-                date: new Date()
+                date: Utils.now()
             });
         });
 
@@ -54,7 +57,7 @@ module.exports = (io) => {
                 communityName: params.roomName,
                 communityId: params.roomId,
                 event: 'left',
-                date: new Date()
+                date: Utils.now()
             });
             socket.leave(params.room);
 
@@ -99,7 +102,7 @@ module.exports = (io) => {
                 from: socket.nickname,
                 communityId: params.communityId,
                 room: params.communityId,
-                date: new Date()
+                date: Utils.now()
             });
         });
 
@@ -111,7 +114,7 @@ module.exports = (io) => {
                     to: params.to,
                     room: params.room,
                     event: 'enter-to-chat-room',
-                    date: new Date()
+                    date: Utils.now()
                 });
             } else {
                 //user 'to' not connected to the app
@@ -126,7 +129,7 @@ module.exports = (io) => {
                     to: params.to,
                     room: params.room,
                     event: 'joined',
-                    date: new Date()
+                    date: Utils.now()
                 });
             }
         });
@@ -138,7 +141,7 @@ module.exports = (io) => {
                     to: params.to,
                     room: params.room,
                     event: 'left',
-                    date: new Date()
+                    date: Utils.now()
                 });
                 socket.leave(params.room);
             }
@@ -149,7 +152,7 @@ module.exports = (io) => {
             io.emit('message', {
                 text: message.text,
                 from: socket.nickname,
-                date: new Date()
+                date: Utils.now()
             });
         });
 
@@ -185,7 +188,7 @@ module.exports = (io) => {
                 user: params.user,
                 communityId: params.roomId,
                 event: 'deleted',
-                date: new Date()
+                date: Utils.now()
             });
         }
 
@@ -196,7 +199,7 @@ module.exports = (io) => {
                 user: params.user,
                 communityId: params.roomId,
                 event: 'deleted',
-                date: new Date()
+                date: Utils.now()
             });
         }
 
@@ -207,7 +210,7 @@ module.exports = (io) => {
                 user: params.user,
                 communityId: params.roomId,
                 event: 'joined',
-                date: new Date()
+                date: Utils.now()
             });
         }
 
@@ -218,7 +221,7 @@ module.exports = (io) => {
                 user: params.user,
                 communityId: params.roomId,
                 event: 'joined',
-                date: new Date()
+                date: Utils.now()
             });
         }
 

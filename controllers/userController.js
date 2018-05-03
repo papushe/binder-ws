@@ -1,5 +1,6 @@
 let USER = require('../models/User'),
     Utils = require('../utils'),
+    logger = Utils.getLogger(),
     userService = require('./../services/userService'),
     communityService = require('./../services/communityService'),
     Promise = require('promise');

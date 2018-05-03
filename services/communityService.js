@@ -1,22 +1,24 @@
-let COMMUNITY = require('../models/Community');
-let USER = require('../models/User');
-let userService = require('./userService');
-let Promise = require('promise');
+let COMMUNITY = require('../models/Community'),
+    USER = require('../models/User'),
+    userService = require('./userService'),
+    Promise = require('promise'),
+    logger = require('../utils').getLogger();
+
 
 function getNextNewManagerId (community) {
     return new Promise((resolve, reject) => {
         if (community.authorizedMembers.length > 0) {
-            console.log(`user: ${community.authorizedMembers[0].memberId} has been chosen as new manager of community: ${community._id}`);
+            logger.info(`user: ${community.authorizedMembers[0].memberId} has been chosen as new manager of community: ${community._id}`);
             resolve(community.authorizedMembers[0].memberId);
         }
         else if (community.members.length > 0){
-            console.log(`user: ${community.members[0].memberId} has been chosen as new manager of community: ${community._id}`);
+            logger.info(`user: ${community.members[0].memberId} has been chosen as new manager of community: ${community._id}`);
             resolve(community.members[0].memberId);
         }
         else {
             this.deleteCommunityById(community._id)
                 .then(function () {
-                    console.log(`community: ${community._id} was empty so it was deleted!`);
+                    logger.info(`community: ${community._id} was empty so it was deleted!`);
                     resolve(null);
                 })
                 .catch(err => {
@@ -34,18 +36,18 @@ exports.saveNewCommunity = (community) => {
 
     return new Promise((resolve, reject) => {
         community.save((err, data) => {
-                if (err) {
-                    console.error(`failed to create a new community: ${community} due to: ${err}`);
-                    reject(false);
-                }
-                console.log(`user ${community.managerId} created a new community: ${community._id}`);
-                userService.addCommunityToUser(community.managerId, communityObj)
-                    .then(response => {
-                        resolve(response);
-                    })
-                    .catch(err => {
-                        reject(err);
-                    });
+            if (err) {
+                logger.error(`failed to create a new community: ${community} due to: ${err}`);
+                reject(false);
+            }
+            logger.info(`user ${community.managerId} created a new community: ${community._id}`);
+            userService.addCommunityToUser(community.managerId, communityObj)
+                .then(response => {
+                    resolve(response);
+                })
+                .catch(err => {
+                    reject(err);
+                });
             }
         );
     });
@@ -56,7 +58,7 @@ exports.getUserCommunities = (userId) => {
         COMMUNITY.find({members: {$elemMatch: {memberId: userId}}},
             (err, data) => {
                 if (err) {
-                    console.error(`failed to get user: ${userId} communities due to: ${err}`);
+                    logger.error(`failed to get user: ${userId} communities due to: ${err}`);
                     reject(false);
                 }
                 resolve(data);
@@ -70,10 +72,10 @@ exports.searchCommunities = (query) => {
             {communityName: {$regex: query, $options: "i"}, type: {$ne: 'Secured'}},
             (err, data) => {
                 if (err) {
-                    console.error(`err occurred when running search: ${err}`);
+                    logger.error(`err occurred when running search: ${err}`);
                     reject(false);
                 }
-                console.log(`search found ${data.length} results for query: '${query}'`);
+                logger.info(`search found ${data.length} results for query: '${query}'`);
                 resolve(data);
             });
     });
@@ -83,11 +85,11 @@ exports.deleteCommunityById = (communityId) => {
     return new Promise((resolve, reject) => {
         COMMUNITY.findOneAndRemove({_id: {$eq: communityId}}, (err) => {
             if (err) {
-                console.error(`failed to delete community: ${communityId} due to: ${err}`);
+                logger.error(`failed to delete community: ${communityId} due to: ${err}`);
                 reject(false);
             }
             else {
-                console.log(`community: ${communityId} was deleted`);
+                logger.info(`community: ${communityId} was deleted`);
                 resolve(true);
             }
         });
@@ -99,16 +101,16 @@ exports.setAsAuthorizedMember = (communityId, userId) => {
         COMMUNITY.findOne({_id: {$eq: communityId}},
             (err, data) => {
                 if (err || !data) {
-                    console.error(`failed to set user: ${userId} as authorized member in community: ${communityId} due to: ${err}`);
+                    logger.error(`failed to set user: ${userId} as authorized member in community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
                     data.authorizedMembers.push({memberId: userId});
                     data.save((err) => {
                         if (err) {
-                            console.error(`failed to set user: ${userId} as authorized member in community: ${communityId} due to: ${err}`);
+                            logger.error(`failed to set user: ${userId} as authorized member in community: ${communityId} due to: ${err}`);
                             reject(false);
                         }
-                        console.log(`user ${userId} is now an authorized member in community: ${communityId}`);
+                        logger.info(`user ${userId} is now an authorized member in community: ${communityId}`);
                         resolve(true);
                     });
             });
@@ -122,11 +124,11 @@ exports.setAsMember = (communityId, userId) => {
             {new: true},
             (err, data) => {
                 if (err || !data || !data._doc) {
-                    console.error(`failed to set user: ${userId} as a member in community: ${communityId} due to: ${err}`);
+                    logger.error(`failed to set user: ${userId} as a member in community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
                 else {
-                    console.log(`user ${userId} is now a member in ${communityId}`);
+                    logger.info(`user ${userId} is now a member in ${communityId}`);
                     resolve(true);
                 }
             });
@@ -138,7 +140,7 @@ exports.setNewManager = (communityId) => {
         COMMUNITY.findOne({_id: {$eq: communityId}},
             (err, data) => {
                 if (err) {
-                    console.error(`failed to set a new manager in community: ${communityId} due to: ${err}`);
+                    logger.error(`failed to set a new manager in community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
                 if (data) {
@@ -158,10 +160,10 @@ exports.setNewManager = (communityId) => {
                             //save community after all updates
                             data.save((err) => {
                                 if (err) {
-                                    console.error(`failed to set a new manager in community: ${communityId} due to: ${err}`);
+                                    logger.error(`failed to set a new manager in community: ${communityId} due to: ${err}`);
                                     reject(false);
                                 }
-                                console.log(`user: ${newManager} is now a manager in community: ${communityId}`);
+                                logger.info(`user: ${newManager} is now a manager in community: ${communityId}`);
                                 resolve(true);
                             })
 
@@ -180,10 +182,10 @@ exports.getCommunityMembers = (communityId) => {
         USER.find({communities: {$elemMatch: {communityId: communityId}}},
             (err, data) => {
                 if (err) {
-                    console.error(`failed to get community: ${communityId} members due to: ${err}`);
+                    logger.error(`failed to get community: ${communityId} members due to: ${err}`);
                     reject(false);
                 }
-                console.log(`got community ${communityId} members`);
+                logger.info(`got community ${communityId} members`);
                 resolve(data);
             });
     });
@@ -194,21 +196,21 @@ exports.addUserToCommunityMembers = (userId, communityId, isPrivileged) => {
         COMMUNITY.findOne({_id: {$eq: communityId}},
             (err, data) => {
                 if (err || !data || !data.members) {
-                    console.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
+                    logger.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
                 if (data.type === 'Private' && !isPrivileged) {
-                    console.error(`failed to add user: ${userId} to community: ${communityId} due to: user not allowed`);
+                    logger.error(`failed to add user: ${userId} to community: ${communityId} due to: user not allowed`);
                     reject(false);
                 }
                 else {
                     data.members.push({memberId: userId});
                     data.save((err, data) => {
                         if (err) {
-                            console.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
+                            logger.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
                             reject(false);
                         }
-                        console.log(`user: ${userId} was added as member to community: ${communityId}`);
+                        logger.info(`user: ${userId} was added as member to community: ${communityId}`);
                         resolve(true);
                     });
                 }
@@ -222,10 +224,10 @@ exports.removeUserFromCommunityMembers = (userId, communityId) => {
             {$pull: {members: {memberId: userId}, authorizedMembers: {memberId: userId}}},
             (err, data) => {
                 if (err || !data) {
-                    console.error(`failed to remove user ${userId} from community: ${communityId} due to: ${err}`);
+                    logger.error(`failed to remove user ${userId} from community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
-                console.log(`user: ${userId} was removed from community: ${communityId}`);
+                logger.info(`user: ${userId} was removed from community: ${communityId}`);
                 resolve(data.toObject());
             });
     });
