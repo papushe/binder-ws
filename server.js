@@ -114,6 +114,8 @@ app.get(`/${activityContext}/community/get/:key`, activityController.getActiviti
 
 app.post(`/${activityContext}/delete/`, activityController.deleteActivityById);
 
+app.post(`/${activityContext}/updateActivity/`, activityController.updateActivity);
+
 
 //Notification
 app.post(`/${notificationContext}/create`, notificationController.createNewNotification);
