@@ -113,6 +113,8 @@ app.get(`/${activityContext}/getByCommunityId/:key`, activityController.getActiv
 
 app.post(`/${activityContext}/delete/`, activityController.deleteActivityById);
 
+app.post(`/${activityContext}/updateActivity/`, activityController.updateActivity);
+
 
 app.all('*', (req, res) => {
     res.json({"error": "404 - not found (Wrong input or Wrong url)"});

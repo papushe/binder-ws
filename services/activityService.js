@@ -1,5 +1,6 @@
 let ACTIVITY = require('../models/Activity');
 let Promise = require('promise');
+let Utils = require('../utils');
 
 exports.saveNewActivity = (newActivity) => {
     return new Promise((resolve, reject) => {
@@ -20,7 +21,7 @@ exports.saveNewActivity = (newActivity) => {
 
 exports.getUserActivities = (userId) => {
     return new Promise((resolve, reject) => {
-        ACTIVITY.find({$or: [{consumer_id: {$eq: userId}}, {provider_id: {$eq: userId}}]},
+        ACTIVITY.find({$or: [{"consumer.id": {$eq: userId}}, {"provider.id": {$eq: userId}}]},
             (err, data) => {
                 if (err) {
                     console.error(`failed to get user: ${userId} activities due to: ${err}`);
@@ -61,3 +62,37 @@ exports.deleteActivityById = (activityId) => {
 };
 
 
+exports.saveExistingActivity = (newActivity, activityId) => {
+    return new Promise((resolve, reject) => {
+        ACTIVITY.findOne({_id: activityId},
+            (err, data) => {
+                if (err) {
+                    console.error(`Failed to updated activity #${newActivity.activity_name} due to ${err}`);
+                    reject(false);
+                }
+                data.set({
+                    activity_name: newActivity.activity_name,
+                    activity_description: newActivity.activity_description,
+                    type: newActivity.type,
+                    created_at: Utils.now(),
+                    consumer: newActivity.consumer,
+                    provider: newActivity.provider,
+                    community_id: newActivity.community_id,
+                    source: newActivity.source,
+                    destination: newActivity.destination,
+                    activity_date: Utils.normalizeDate(newActivity.activity_date),
+                    notes: newActivity.notes
+                });
+                data.save(
+                    (err, data) => {
+                        if (err) {
+                            console.error(`failed to update activity #${newActivity.activity_name} profile due to: ${err}`);
+                            reject(false);
+                        }
+                        console.log(`user: #${newActivity.activity_name} profile was updated`);
+                        resolve(data);
+                    }
+                );
+            })
+    })
+};

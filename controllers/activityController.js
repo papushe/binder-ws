@@ -4,6 +4,7 @@ let Activity = require('../models/Activity'),
     userService = require('../services/userService');
 
 exports.createNewActivity = (req, res) => {
+    console.log(`COMMUNITY ID: ${req.body.communityId}`);
     let activityObj = new Activity({
         activity_name: req.body.activityName,
         activity_description: req.body.activityDescription,
@@ -14,10 +15,10 @@ exports.createNewActivity = (req, res) => {
         community_id: req.body.communityId,
         source: req.body.source,
         destination: req.body.destination,
-        activity_date: req.body.activity_date,
+        activity_date: Utils.normalizeDate(req.body.activity_date),
         notes: req.body.notes
     });
-    activityObj.activity_date = Utils.normalizeDate(activityObj.activity_date);
+    // activityObj.activity_date = Utils.normalizeDate(activityObj.activity_date);
     activityService.saveNewActivity(activityObj)
         .then(response => {
             res.json(response);
@@ -58,4 +59,29 @@ exports.deleteActivityById = (req, res) => {
         .catch(err => {
             res.json(err);
         });
+};
+
+exports.updateActivity = (req, res) => {
+    let activityObj = new Activity({
+        activity_name: req.body.activityName,
+        activity_description: req.body.activityDescription,
+        type: req.body.type,
+        created_at: Utils.now(),
+        consumer: req.body.consumer,
+        provider: req.body.provider,
+        community_id: req.body.communityId,
+        source: req.body.source,
+        destination: req.body.destination,
+        activity_date: Utils.normalizeDate(req.body.activity_date),
+        notes: req.body.notes
+    });
+    let activityId = req.body.activityId;
+    activityService.saveExistingActivity(activityObj, activityId)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(err => {
+            res.json(err);
+        })
+
 };

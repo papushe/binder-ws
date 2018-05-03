@@ -281,3 +281,17 @@ exports.leaveCommunity = (userId, communityId) => {
             });
     });
 };
+
+exports.getCommunityById = (communityId) => {
+        return new Promise((resolve, reject) => {
+            COMMUNITY.findOne({_id: {$eq: communityId}},
+                (err, data) => {
+                if (err || !data) {
+                    reject(false);
+                }
+                else {
+                    resolve(data);
+                }
+        });
+    });
+};
