@@ -100,7 +100,7 @@ app.post(`/${communityContext}/members`, communityController.getCommunityMembers
 
 app.get(`/${communityContext}/get/:key`, communityController.getCommunities);
 
-app.post(`/${communityContext}/updateRole`, communityController.updateCommunityUserRole);
+app.post(`/${communityContext}/update-role`, communityController.updateCommunityUserRole);
 
 app.get(`/${communityContext}/search/:query`, communityController.searchCommunity);
 
