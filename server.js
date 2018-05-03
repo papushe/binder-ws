@@ -92,15 +92,13 @@ app.post(`/${communityContext}/create`, communityController.createNewCommunity);
 
 app.post(`/${communityContext}/leave`, communityController.leaveCommunity);
 
-app.post(`/${communityContext}/delete`, communityController.deleteCommunity);
+app.delete(`/${communityContext}`, communityController.deleteCommunity);
 
 app.post(`/${communityContext}/join`, communityController.joinCommunity);
 
 app.post(`/${communityContext}/members`, communityController.getCommunityMembers);
 
 app.get(`/${communityContext}/get/:key`, communityController.getCommunities);
-
-app.get(`/${communityContext}/delete/:key`, communityController.deleteCommunitiesByKey);
 
 app.post(`/${communityContext}/updateRole`, communityController.updateCommunityUserRole);
 
