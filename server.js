@@ -6,11 +6,13 @@ const express = require('express'),
     userContext = 'user',
     communityContext = 'community',
     activityContext = 'activity',
+    notificationContext = 'notification',
     admin = require('firebase-admin'),
     serviceAccount = require('./binder-pnk-firebase-adminsdk-nhbvv-5ced6a0ee2.json'),
     userController = require('./controllers/userController'),
     communityController = require('./controllers/communityController'),
     activityController = require('./controllers/activityController'),
+    notificationController = require('./controllers/notificationController'),
     port = process.env.PORT || require('./config').PORT,
     bodyParser = require('body-parser'),
     socketIO = require('socket.io'),
@@ -22,32 +24,32 @@ admin.initializeApp({
 });
 
 function validateToken(req, res, next) {
-    let token = req.get('Authorization');
-    try{
-        //CORS
-        if (req.method === 'OPTIONS') {
-            res.status(200).send(`OPTIONS`);
-            return;
-        }
-
-        if(!token) {
-             console.warn(`failed to call: ${req.originalUrl} due to: empty token`);
-             res.status(401).send(`permission denied! missing authorization header`);
-        }
-        else {
-            admin.auth().verifyIdToken(token)
-                .then(decodedToken => {
+    // let token = req.get('Authorization');
+    // try{
+    //     //CORS
+    //     if (req.method === 'OPTIONS') {
+    //         res.status(200).send(`OPTIONS`);
+    //         return;
+    //     }
+    //
+    //     if(!token) {
+    //          console.warn(`failed to call: ${req.originalUrl} due to: empty token`);
+    //          res.status(401).send(`permission denied! missing authorization header`);
+    //     }
+    //     else {
+    //         admin.auth().verifyIdToken(token)
+    //             .then(decodedToken => {
                  next();
-                })
-                .catch(err => {
-                    console.warn(`failed to call: ${req.originalUrl} due to invalid token: ${token}`);
-                    res.status(401).send(`permission denied! invalid authorization header`);
-                });
-        }
-     }catch (e) {
-         console.error(e);
-         res.json(`permission denied due to invalid token!`);
-     }
+    //             })
+    //             .catch(err => {
+    //                 console.warn(`failed to call: ${req.originalUrl} due to invalid token: ${token}`);
+    //                 res.status(401).send(`permission denied! invalid authorization header`);
+    //             });
+    //     }
+    //  }catch (e) {
+    //      console.error(e);
+    //      res.json(`permission denied due to invalid token!`);
+    //  }
 }
 
 
@@ -107,11 +109,17 @@ app.get(`/${communityContext}/search/:query`, communityController.searchCommunit
 //Activity
 app.post(`/${activityContext}/create/`, activityController.createNewActivity);
 
-app.get(`/${activityContext}/getByUserId/:key`, activityController.getActivitiesByUserId);
+app.get(`/${activityContext}/user/get/:key`, activityController.getActivitiesByUserId);
 
-app.get(`/${activityContext}/getByCommunityId/:key`, activityController.getActivitiesByCommunityId);
+app.get(`/${activityContext}/community/get/:key`, activityController.getActivitiesByCommunityId);
 
 app.post(`/${activityContext}/delete/`, activityController.deleteActivityById);
+
+
+//Notification
+app.post(`/${notificationContext}/create`, notificationController.createNewNotification);
+
+app.get(`/${notificationContext}/get/:key`, notificationController.getNotificationsByUserId);
 
 
 app.all('*', (req, res) => {
