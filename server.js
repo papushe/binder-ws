@@ -24,34 +24,33 @@ admin.initializeApp({
 });
 
 function validateToken(req, res, next) {
-    // let token = req.get('Authorization');
-    // try{
-    //     //CORS
-    //     if (req.method === 'OPTIONS') {
-    //         res.status(200).send(`OPTIONS`);
-    //         return;
-    //     }
-    //
-    //     if(!token) {
-    //          console.warn(`failed to call: ${req.originalUrl} due to: empty token`);
-    //          res.status(401).send(`permission denied! missing authorization header`);
-    //     }
-    //     else {
-    //         admin.auth().verifyIdToken(token)
-    //             .then(decodedToken => {
-                 next();
-    //             })
-    //             .catch(err => {
-    //                 console.warn(`failed to call: ${req.originalUrl} due to invalid token: ${token}`);
-    //                 res.status(401).send(`permission denied! invalid authorization header`);
-    //             });
-    //     }
-    //  }catch (e) {
-    //      console.error(e);
-    //      res.json(`permission denied due to invalid token!`);
-    //  }
-}
+    let token = req.get('Authorization');
+    try{
+        //CORS
+        if (req.method === 'OPTIONS') {
+            res.status(200).send(`OPTIONS`);
+            return;
+        }
 
+        if(!token) {
+             console.warn(`failed to call: ${req.originalUrl} due to: empty token`);
+             res.status(401).send(`permission denied! missing authorization header`);
+        }
+        else {
+            admin.auth().verifyIdToken(token)
+                .then(decodedToken => {
+                 next();
+                })
+                .catch(err => {
+                    console.warn(`failed to call: ${req.originalUrl} due to invalid token: ${token}`);
+                    res.status(401).send(`permission denied! invalid authorization header`);
+                });
+        }
+     }catch (e) {
+         console.error(e);
+         res.json(`permission denied due to invalid token!`);
+     }
+}
 
 app.use(bodyParser.json()); // parsing application/json
 app.use(bodyParser.urlencoded({extended: true})); // parsing application/x-www-form-urlencoded
