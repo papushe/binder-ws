@@ -6,11 +6,15 @@ const express = require('express'),
     userContext = 'user',
     communityContext = 'community',
     activityContext = 'activity',
+    notificationContext = 'notification',
+    messageContext = 'message',
     admin = require('firebase-admin'),
     serviceAccount = require('./binder-pnk-firebase-adminsdk-nhbvv-5ced6a0ee2.json'),
     userController = require('./controllers/userController'),
     communityController = require('./controllers/communityController'),
     activityController = require('./controllers/activityController'),
+    notificationController = require('./controllers/notificationController'),
+    messageController = require('./controllers/messageController'),
     port = process.env.PORT || require('./config').PORT,
     bodyParser = require('body-parser'),
     socketIO = require('socket.io'),
@@ -50,7 +54,6 @@ function validateToken(req, res, next) {
      }
 }
 
-
 app.use(bodyParser.json()); // parsing application/json
 app.use(bodyParser.urlencoded({extended: true})); // parsing application/x-www-form-urlencoded
 app.use('/', express.static('./public'));
@@ -89,7 +92,7 @@ app.post(`/${communityContext}/create`, communityController.createNewCommunity);
 
 app.post(`/${communityContext}/leave`, communityController.leaveCommunity);
 
-app.post(`/${communityContext}/delete`, communityController.deleteCommunity);
+app.delete(`/${communityContext}`, communityController.deleteCommunity);
 
 app.post(`/${communityContext}/join`, communityController.joinCommunity);
 
@@ -97,9 +100,7 @@ app.post(`/${communityContext}/members`, communityController.getCommunityMembers
 
 app.get(`/${communityContext}/get/:key`, communityController.getCommunities);
 
-app.get(`/${communityContext}/delete/:key`, communityController.deleteCommunitiesByKey);
-
-app.post(`/${communityContext}/updateRole`, communityController.updateCommunityUserRole);
+app.post(`/${communityContext}/update-role`, communityController.updateCommunityUserRole);
 
 app.get(`/${communityContext}/search/:query`, communityController.searchCommunity);
 
@@ -107,13 +108,25 @@ app.get(`/${communityContext}/search/:query`, communityController.searchCommunit
 //Activity
 app.post(`/${activityContext}/create/`, activityController.createNewActivity);
 
-app.get(`/${activityContext}/getByUserId/:key`, activityController.getActivitiesByUserId);
+app.get(`/${activityContext}/user/get/:key`, activityController.getActivitiesByUserId);
 
-app.get(`/${activityContext}/getByCommunityId/:key`, activityController.getActivitiesByCommunityId);
+app.get(`/${activityContext}/community/get/:key`, activityController.getActivitiesByCommunityId);
 
 app.post(`/${activityContext}/delete/`, activityController.deleteActivityById);
 
 app.post(`/${activityContext}/updateActivity/`, activityController.updateActivity);
+
+
+//Notification
+app.post(`/${notificationContext}/create`, notificationController.createNewNotification);
+
+app.get(`/${notificationContext}/get/:key`, notificationController.getNotificationsByUserId);
+
+
+//Message
+app.post(`/${messageContext}/create`, messageController.createNewMessage);
+
+app.get(`/${messageContext}/get/:key`, messageController.getMessagesByRoomId);
 
 
 app.all('*', (req, res) => {

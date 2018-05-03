@@ -171,19 +171,3 @@ exports.updateCommunityUserRole = (req, res) => {
         res.json(false);
     }
 };
-
-
-//temporally function to tests - DON'T USE IT
-exports.deleteCommunitiesByKey = (req, res) => {
-    COMMUNITY.deleteMany({managerId: {$eq: req.params.key}},
-        (err, data) => {
-            if (err) {
-                res.json(err);
-            }
-            res.json(data);
-        });
-};
-
-
-
-
