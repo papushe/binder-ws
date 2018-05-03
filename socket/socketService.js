@@ -11,7 +11,8 @@ module.exports = (io) => {
 
             io.emit('users-changed', {
                 user: socket.nickname,
-                event: 'left'
+                event: 'left',
+                date: new Date()
             });
         });
 
@@ -21,7 +22,8 @@ module.exports = (io) => {
 
             io.emit('users-changed', {
                 user: nickname,
-                event: 'joined'
+                event: 'joined',
+                date: new Date()
             });
         });
 
@@ -34,7 +36,8 @@ module.exports = (io) => {
                 from: socket.nickname,
                 communityName: params.roomName,
                 communityId: params.roomId,
-                event: 'enter'
+                event: 'enter',
+                date: new Date()
             });
         });
 
@@ -50,7 +53,8 @@ module.exports = (io) => {
                 from: socket.nickname,
                 communityName: params.roomName,
                 communityId: params.roomId,
-                event: 'left'
+                event: 'left',
+                date: new Date()
             });
             socket.leave(params.room);
 
@@ -95,18 +99,19 @@ module.exports = (io) => {
                 from: socket.nickname,
                 communityId: params.communityId,
                 room: params.communityId,
-                created: new Date()
+                date: new Date()
             });
         });
 
         socket.on('enter-to-chat-room', (params) => {
             socket.join(params.room);
-            if (allUsers[params.to]) {
-                allUsers[params.to].emit('chat-room', {
-                    from: socket.nickname,
+            if (allUsers[params.to.fullName]) {
+                allUsers[params.to.fullName].emit('chat-room', {
+                    from: params.from,
                     to: params.to,
                     room: params.room,
-                    event: 'enter-to-chat-room'
+                    event: 'enter-to-chat-room',
+                    date: new Date()
                 });
             } else {
                 //user 'to' not connected to the app
@@ -115,23 +120,25 @@ module.exports = (io) => {
 
         socket.on('join-to-chat-room', (params) => {
             socket.join(params.room);
-            if (allUsers[params.to]) {
-                allUsers[params.to].emit('change-event-chat-room', {
-                    from: socket.nickname,
+            if (allUsers[params.to.fullName]) {
+                allUsers[params.to.fullName].emit('change-event-chat-room', {
+                    from: params.from,
                     to: params.to,
                     room: params.room,
-                    event: 'joined'
+                    event: 'joined',
+                    date: new Date()
                 });
             }
         });
 
         socket.on('left-from-chat-room', (params) => {
-            if (allUsers[params.to]) {
-                allUsers[params.to].emit('change-event-chat-room', {
-                    from: socket.nickname,
+            if (allUsers[params.to.fullName]) {
+                allUsers[params.to.fullName].emit('change-event-chat-room', {
+                    from: params.from,
                     to: params.to,
                     room: params.room,
-                    event: 'left'
+                    event: 'left',
+                    date: new Date()
                 });
                 socket.leave(params.room);
             }
@@ -142,7 +149,7 @@ module.exports = (io) => {
             io.emit('message', {
                 text: message.text,
                 from: socket.nickname,
-                created: new Date()
+                date: new Date()
             });
         });
 
@@ -177,7 +184,8 @@ module.exports = (io) => {
                 communityName: params.roomName,
                 user: params.user,
                 communityId: params.roomId,
-                event: 'deleted'
+                event: 'deleted',
+                date: new Date()
             });
         }
 
@@ -187,7 +195,8 @@ module.exports = (io) => {
                 communityName: params.roomName,
                 user: params.user,
                 communityId: params.roomId,
-                event: 'deleted'
+                event: 'deleted',
+                date: new Date()
             });
         }
 
@@ -197,7 +206,8 @@ module.exports = (io) => {
                 communityName: params.roomName,
                 user: params.user,
                 communityId: params.roomId,
-                event: 'joined'
+                event: 'joined',
+                date: new Date()
             });
         }
 
@@ -207,7 +217,8 @@ module.exports = (io) => {
                 communityName: params.roomName,
                 user: params.user,
                 communityId: params.roomId,
-                event: 'joined'
+                event: 'joined',
+                date: new Date()
             });
         }
 
