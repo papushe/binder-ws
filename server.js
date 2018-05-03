@@ -7,12 +7,14 @@ const express = require('express'),
     communityContext = 'community',
     activityContext = 'activity',
     notificationContext = 'notification',
+    messageContext = 'message',
     admin = require('firebase-admin'),
     serviceAccount = require('./binder-pnk-firebase-adminsdk-nhbvv-5ced6a0ee2.json'),
     userController = require('./controllers/userController'),
     communityController = require('./controllers/communityController'),
     activityController = require('./controllers/activityController'),
     notificationController = require('./controllers/notificationController'),
+    messageController = require('./controllers/messageController'),
     port = process.env.PORT || require('./config').PORT,
     bodyParser = require('body-parser'),
     socketIO = require('socket.io'),
@@ -119,6 +121,12 @@ app.post(`/${activityContext}/delete/`, activityController.deleteActivityById);
 app.post(`/${notificationContext}/create`, notificationController.createNewNotification);
 
 app.get(`/${notificationContext}/get/:key`, notificationController.getNotificationsByUserId);
+
+
+//Message
+app.post(`/${messageContext}/create`, messageController.createNewMessage);
+
+app.get(`/${messageContext}/get/:key`, messageController.getMessagesByUserId());
 
 
 app.all('*', (req, res) => {
