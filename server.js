@@ -92,7 +92,7 @@ app.post(`/${communityContext}/create`, communityController.createNewCommunity);
 
 app.post(`/${communityContext}/leave`, communityController.leaveCommunity);
 
-app.delete(`/${communityContext}`, communityController.deleteCommunity);
+app.post(`/${communityContext}/delete`, communityController.deleteCommunity);
 
 app.post(`/${communityContext}/join`, communityController.joinCommunity);
 
