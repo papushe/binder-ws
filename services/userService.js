@@ -93,30 +93,17 @@ exports.removeCommunityFromUser = (userId, communityId) => {
         USER.findOneAndUpdate(
             {keyForFirebase: {$eq: userId}},
             {$pull: {communities: {communityId: communityId}}},
+            {new: true},
             (err, data) => {
                 if (err) {
                     console.error(`failed to remove user community: ${communityId} from user: ${userId} communities list due to: ${err}`);
                     reject(false);
                 }
                 console.log(`community: ${communityId} was removed from communities list for user: ${userId}`);
-                data = this.removeCommunityFromSpecificUser(data, communityId);
                 resolve(data);
             });
     });
 };
-
-
-//TODO - temporary
-exports.removeCommunityFromSpecificUser = (user, communityId) => {
-    const removeIndex = user.communities.map(function (item) {
-        return item.communityId;
-    }).indexOf(communityId);
-    if (removeIndex !== -1) {
-        user.communities.splice(removeIndex, 1);
-    }
-    return user;
-};
-
 
 exports.addCommunityToUser = (userId, newCommunity) => {
     return new Promise((resolve, reject) => {

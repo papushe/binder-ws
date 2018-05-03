@@ -119,6 +119,7 @@ exports.setAsMember = (communityId, userId) => {
     return new Promise((resolve, reject) => {
         COMMUNITY.findOneAndUpdate({_id: {$eq: communityId}},
             {$pull: {authorizedMembers: {memberId: userId}}},
+            {new: true},
             (err, data) => {
                 if (err || !data || !data._doc) {
                     console.error(`failed to set user: ${userId} as a member in community: ${communityId} due to: ${err}`);
@@ -240,7 +241,7 @@ exports.leaveCommunity = (userId, communityId) => {
                     reject(false);
                 }
                 //remove community if no members left but this user
-                if (data.members && data.members.length == 1) {
+                if (data.members && data.members.length == 0) {
                     shouldBeDeleted = true;
                     this.deleteCommunityById(communityId)
                         .then(response => {
