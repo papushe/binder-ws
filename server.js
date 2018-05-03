@@ -45,7 +45,7 @@ function validateToken(req, res, next) {
                  next();
                 })
                 .catch(err => {
-                    logger.warn(`failed to call: ${req.originalUrl} due to invalid token: ${token}`);
+                    logger.warn(`failed to call: ${req.originalUrl} invalid token!`);
                     res.status(401).send(`permission denied! invalid authorization header`);
                 });
         }
