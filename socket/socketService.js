@@ -43,7 +43,7 @@ module.exports = (io) => {
             if (params.room in connectedUserInSpecificCommunity &&
                 socket.nickname in connectedUserInSpecificCommunity[params.room]) {
 
-                deleteUserFromConnectedUserInSpecificCommunity(params, userName);
+                deleteUserFromConnectedUserInSpecificCommunity(params, socket.nickname);
             }
 
             io.to(params.room).emit('members-changed', {
@@ -101,13 +101,40 @@ module.exports = (io) => {
 
         socket.on('enter-to-chat-room', (params) => {
             socket.join(params.room);
+            if (allUsers[params.to]) {
+                allUsers[params.to].emit('chat-room', {
+                    from: socket.nickname,
+                    to: params.to,
+                    room: params.room,
+                    event: 'enter-to-chat-room'
+                });
+            } else {
+                //user 'to' not connected to the app
+            }
+        });
 
-            allUsers[params.to].emit('chat-room', {
-                from: socket.nickname,
-                to: params.to,
-                room: params.room,
-                event: 'enter-to-chat-room'
-            });
+        socket.on('join-to-chat-room', (params) => {
+            socket.join(params.room);
+            if (allUsers[params.to]) {
+                allUsers[params.to].emit('change-event-chat-room', {
+                    from: socket.nickname,
+                    to: params.to,
+                    room: params.room,
+                    event: 'joined'
+                });
+            }
+        });
+
+        socket.on('left-from-chat-room', (params) => {
+            if (allUsers[params.to]) {
+                allUsers[params.to].emit('change-event-chat-room', {
+                    from: socket.nickname,
+                    to: params.to,
+                    room: params.room,
+                    event: 'left'
+                });
+                socket.leave(params.room);
+            }
         });
 
         socket.on('add-message', (message) => {
