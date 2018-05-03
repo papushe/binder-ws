@@ -6,6 +6,7 @@ exports.createNewMessage = (req, res) => {
     let msgObj = new MESSAGE({
         from: req.body.from,
         to: req.body.to,
+        room: req.body.room,
         status: req.body.status || 'unread',
         creation_date: Utils.now(),
         content: req.body.content || '',
@@ -19,9 +20,9 @@ exports.createNewMessage = (req, res) => {
         });
 };
 
-exports.getMessagesByUserId = (req, res) => {
-    let userId = req.params.key;
-    messageService.getUserMessages(userId)
+exports.getMessagesByRoomId = (req, res) => {
+    let roomId = req.params.key;
+    messageService.getRoomMessages(roomId)
         .then(response => {
             res.json(response);
         })

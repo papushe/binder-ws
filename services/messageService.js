@@ -18,15 +18,15 @@ exports.saveNewMessage = (msg) => {
     });
 };
 
-exports.getUserMessages = (userId) => {
+exports.getRoomMessages = (roomId) => {
     return new Promise((resolve, reject) => {
-        MESSAGE.find({"to.id": {$eq: userId}},
+        MESSAGE.find({room: {$eq: roomId}},
             (err, data) => {
                 if (err) {
-                    console.error(`failed to get user: ${userId} messages due to: ${err}`);
+                    console.error(`failed to get room: ${roomId} messages due to: ${err}`);
                     reject(false);
                 }
-                console.log(`got user: ${userId} messages`);
+                console.log(`got room: ${roomId} messages`);
                 resolve(data);
             });
     });

@@ -126,7 +126,7 @@ app.get(`/${notificationContext}/get/:key`, notificationController.getNotificati
 //Message
 app.post(`/${messageContext}/create`, messageController.createNewMessage);
 
-app.get(`/${messageContext}/get/:key`, messageController.getMessagesByUserId());
+app.get(`/${messageContext}/get/:key`, messageController.getMessagesByRoomId);
 
 
 app.all('*', (req, res) => {

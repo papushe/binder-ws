@@ -2,14 +2,9 @@ const mongoose = require('mongoose'),
     schema = mongoose.Schema,
 
     message = new schema({
-        from: {
-            name: String,
-            id: String
-        },
-        to: {
-            name: String,
-            id: String
-        },
+        from: String,
+        to: String,
+        room: String,
         status: String,
         creation_date: String,
         content: String
