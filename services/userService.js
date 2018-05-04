@@ -7,6 +7,7 @@ const ROLE_MANAGER = 'Manager',
       ROLE_AUTHORIZED = 'authorizedMember',
       ROLE_MEMBER = 'Member';
 
+
 exports.getRole = (role) => {
     return (role.match(new RegExp('authorized', "ig"))) ? ROLE_AUTHORIZED : ROLE_MEMBER;
 };
