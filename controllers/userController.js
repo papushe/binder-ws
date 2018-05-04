@@ -8,8 +8,8 @@ let USER = require('../models/User'),
 exports.rankUser = (req, res) => {
     let vote = {};
     vote.userId = req.body.userId;
-    vote.up = req.body.up;
-    vote.down = req.body.down;
+    vote.up = req.body.up || false;
+    vote.down = req.body.down || false;
 
     userService.rankUser(vote)
         .then(response => {
