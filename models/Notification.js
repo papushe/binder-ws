@@ -3,11 +3,11 @@ const mongoose = require('mongoose'),
 
     notification = new schema({
         from: {
-            name: String,
+            fullName: String,
             id: String
         },
         to: {
-            name: String,
+            fullName: String,
             id: String
         },
         room: String,

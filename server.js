@@ -20,7 +20,7 @@ const express = require('express'),
     logger = require('./utils').getLogger(),
     socketIO = require('socket.io'),
     io = socketIO(server);
-    require('./socket/socketService')(io);
+require('./socket/socketService')(io);
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -28,31 +28,31 @@ admin.initializeApp({
 
 function validateToken(req, res, next) {
     let token = req.get('Authorization');
-    try{
+    try {
         //CORS
         if (req.method === 'OPTIONS') {
             res.status(200).send(`OPTIONS`);
             return;
         }
 
-        if(!token) {
-             logger.warn(`failed to call: ${req.originalUrl} due to: empty token`);
-             res.status(401).send(`permission denied! missing authorization header`);
+        if (!token) {
+            logger.warn(`failed to call: ${req.originalUrl} due to: empty token`);
+            res.status(401).send(`permission denied! missing authorization header`);
         }
         else {
             admin.auth().verifyIdToken(token)
                 .then(decodedToken => {
-                 next();
+                    next();
                 })
                 .catch(err => {
                     logger.warn(`failed to call: ${req.originalUrl} invalid token!`);
                     res.status(401).send(`permission denied! invalid authorization header`);
                 });
         }
-     }catch (e) {
-         logger.error(e);
-         res.json(`permission denied due to invalid token!`);
-     }
+    } catch (e) {
+        logger.error(e);
+        res.json(`permission denied due to invalid token!`);
+    }
 }
 
 app.use(bodyParser.json()); // parsing application/json

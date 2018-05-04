@@ -1,10 +1,11 @@
 const Utils = require('../utils'),
-      logger = Utils.getLogger();
+    logger = Utils.getLogger();
 
 module.exports = (io) => {
     let allUsers = {},
         roomKey = {},
-        connectedUserInSpecificCommunity = {};
+        connectedUserInSpecificCommunity = {},
+        connectedUserInSpecificChatRoom = {};
 
     io.on('connection', (socket) => {
 
@@ -46,11 +47,7 @@ module.exports = (io) => {
 
         socket.on('left-community', (params) => {
 
-            if (params.room in connectedUserInSpecificCommunity &&
-                socket.nickname in connectedUserInSpecificCommunity[params.room]) {
-
-                deleteUserFromConnectedUserInSpecificCommunity(params, socket.nickname);
-            }
+            deleteUserFromConnectedUserInSpecificCommunity(params, socket.nickname);
 
             io.to(params.room).emit('members-changed', {
                 from: socket.nickname,
@@ -108,6 +105,9 @@ module.exports = (io) => {
 
         socket.on('enter-to-chat-room', (params) => {
             socket.join(params.room);
+
+            enterToPrivateChatRoom(params);
+
             if (allUsers[params.to.fullName]) {
                 allUsers[params.to.fullName].emit('chat-room', {
                     from: params.from,
@@ -123,8 +123,11 @@ module.exports = (io) => {
 
         socket.on('join-to-chat-room', (params) => {
             socket.join(params.room);
-            if (allUsers[params.to.fullName]) {
-                allUsers[params.to.fullName].emit('change-event-chat-room', {
+
+            enterToPrivateChatRoom(params);
+
+            if (allUsers[params.to]) {
+                allUsers[params.to].emit('change-event-chat-room', {
                     from: params.from,
                     to: params.to,
                     room: params.room,
@@ -135,7 +138,11 @@ module.exports = (io) => {
         });
 
         socket.on('left-from-chat-room', (params) => {
-            if (allUsers[params.to.fullName]) {
+
+            deleteFromPrivateChatRoom(params);
+
+            if (params.to.fullName in connectedUserInSpecificChatRoom[params.room]) {
+
                 allUsers[params.to.fullName].emit('change-event-chat-room', {
                     from: params.from,
                     to: params.to,
@@ -147,11 +154,13 @@ module.exports = (io) => {
             }
         });
 
-        socket.on('add-message', (message) => {
+        socket.on('add-message', (params) => {
 
-            io.emit('message', {
-                text: message.text,
+            // io.emit('message', {
+            io.to(params.room).emit('message', {
+                text: params.message,
                 from: socket.nickname,
+                room: params.room,
                 date: Utils.now()
             });
         });
@@ -178,7 +187,25 @@ module.exports = (io) => {
         }
 
         function deleteUserFromConnectedUserInSpecificCommunity(params, userName) {
-            delete connectedUserInSpecificCommunity[params.room][userName];
+
+            if (params.room in connectedUserInSpecificCommunity &&
+                socket.nickname in connectedUserInSpecificCommunity[params.room]) {
+
+                delete connectedUserInSpecificCommunity[params.room][userName];
+            }
+        }
+
+        function enterToPrivateChatRoom(params) {
+            roomKey[socket.nickname] = socket;
+            connectedUserInSpecificChatRoom[params.room] = roomKey;
+        }
+
+        function deleteFromPrivateChatRoom(params) {
+            if (params.room in connectedUserInSpecificChatRoom &&
+                socket.nickname in connectedUserInSpecificChatRoom[params.room]) {
+
+                delete connectedUserInSpecificChatRoom[params.room][socket.nickname];
+            }
         }
 
         function privateDeleteFromCommunity(userName, params) {
