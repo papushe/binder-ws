@@ -5,6 +5,21 @@ let USER = require('../models/User'),
     communityService = require('./../services/communityService'),
     Promise = require('promise');
 
+exports.rankUser = (req, res) => {
+    let vote = {};
+    vote.userId = req.body.userId;
+    vote.up = req.body.up;
+    vote.down = req.body.down;
+
+    userService.rankUser(vote)
+        .then(response => {
+            res.json(response)
+        })
+        .catch(err => {
+            res.json(err);
+        })
+};
+
 exports.createNewUser = (req, res) => {
     let newUser = new USER({
         firstName: req.body.firstName,

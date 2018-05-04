@@ -12,6 +12,38 @@ exports.getRole = (role) => {
     return (role.match(new RegExp('authorized', "ig"))) ? ROLE_AUTHORIZED : ROLE_MEMBER;
 };
 
+exports.rankUser = (vote) => {
+    return new Promise((resolve, reject) => {
+        USER.findOne({keyForFirebase: {$eq: vote.userId}},
+            (err, data) => {
+                if (err || !data) {
+                    logger.error(`failed to rate user: ${vote.userId} due to: ${err}`);
+                    reject(false);
+                }
+                if (vote.up) {
+                    data._doc.votes.up += 1;
+                }
+                else if (vote.down) {
+                    data._doc.votes.down += 1;
+                }
+                data.set({
+                    "votes.up": (vote.up) ? data.votes.up ++ : data.votes.up,
+                    "votes.down": (vote.down) ? data.votes.down ++ : data.votes.down
+                });
+                data.save(
+                    (err, data) => {
+                        if (err) {
+                            logger.error(`failed to rank user: ${vote.userId} due to: ${err}`);
+                            reject(false);
+                        }
+                        logger.info(`user: ${vote.userId} rank was updated`);
+                        resolve(data);
+                    }
+                );
+            });
+    });
+};
+
 exports.saveNewUser = (newUser) => {
     return new Promise((resolve, reject) => {
         newUser.save((err, data) => {
@@ -163,5 +195,3 @@ exports.searchUsers = (query) => {
             });
     });
 };
-
-

@@ -87,6 +87,9 @@ app.get(`/${userContext}/delete/:key`, userController.deleteProfile);
 
 app.get(`/${userContext}/search/:query`, userController.searchUsers);
 
+app.post(`/${userContext}/vote/`, userController.rankUser);
+
+
 
 //Community
 app.post(`/${communityContext}/create`, communityController.createNewCommunity);
