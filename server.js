@@ -109,6 +109,7 @@ app.post(`/${communityContext}/update-role`, communityController.updateCommunity
 app.get(`/${communityContext}/search/:query`, communityController.searchCommunity);
 
 
+
 //Activity
 app.post(`/${activityContext}/create/`, activityController.createNewActivity);
 
@@ -121,6 +122,7 @@ app.post(`/${activityContext}/delete/`, activityController.deleteActivityById);
 app.post(`/${activityContext}/updateActivity/`, activityController.updateActivity);
 
 
+
 //Notification
 app.post(`/${notificationContext}/create`, notificationController.createNewNotification);
 
@@ -130,10 +132,13 @@ app.get(`/${notificationContext}/get/:key`, notificationController.getNotificati
 
 app.post(`/${notificationContext}/delete/`, notificationController.deleteNotificationById);
 
+
+
 //Message
 app.post(`/${messageContext}/create`, messageController.createNewMessage);
 
 app.get(`/${messageContext}/get/:key`, messageController.getMessagesByRoomId);
+
 
 
 app.all('*', (req, res) => {
