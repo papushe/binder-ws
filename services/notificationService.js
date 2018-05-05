@@ -24,7 +24,7 @@ exports.updateNotification = (notificationObj) => {
         NOTIFICATION.findOne({"to.id": {$eq: notificationObj.id}},
             (err, data) => {
                 if (err) {
-                    logger.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
+                    logger.error(`failed to update notification: ${notificationObj.id} due to: ${err}`);
                     reject(false);
                 }
                 data.set({
@@ -33,10 +33,10 @@ exports.updateNotification = (notificationObj) => {
                 data.save(
                     (err, data) => {
                         if (err) {
-                            logger.error(`failed to save notification: ${notificationObj.to.id} profile due to: ${err}`);
+                            logger.error(`failed to save notification: ${notificationObj.to.id} due to: ${err}`);
                             reject(false);
                         }
-                        logger.info(`user: ${notificationObj.id} profile was updated`);
+                        logger.info(`notification: ${notificationObj.id} was updated`);
                         resolve(data);
                     }
                 );
