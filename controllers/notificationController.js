@@ -1,6 +1,5 @@
 let NOTIFICATION = require('../models/Notification'),
     Utils = require('../utils'),
-    logger = Utils.getLogger();
     notificationService = require('../services/notificationService');
 
 exports.createNewNotification = (req, res) => {
@@ -22,9 +21,34 @@ exports.createNewNotification = (req, res) => {
         });
 };
 
+exports.updateNotification = (req, res) => {
+    let notificationObj = {
+        status: req.body.status,
+        id: req.body.id
+    };
+    notificationService.updateNotification(notificationObj)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(err => {
+            res.json(err);
+        });
+};
+
 exports.getNotificationsByUserId = (req, res) => {
     let userId = req.params.key;
     notificationService.getUserNotifications(userId)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(err => {
+            res.json(err);
+        });
+};
+
+exports.deleteNotificationById = (req, res) => {
+    let notificationId = req.body.id;
+    notificationService.deleteNotificationById(notificationId)
         .then(response => {
             res.json(response);
         })

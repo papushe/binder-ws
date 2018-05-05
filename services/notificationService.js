@@ -19,6 +19,32 @@ exports.saveNewNotification = (notification) => {
     });
 };
 
+exports.updateNotification = (notificationObj) => {
+    return new Promise((resolve, reject) => {
+        NOTIFICATION.findOne({"to.id": {$eq: notificationObj.id}},
+            (err, data) => {
+                if (err) {
+                    logger.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
+                    reject(false);
+                }
+                data.set({
+                    status: notificationObj.status
+                });
+                data.save(
+                    (err, data) => {
+                        if (err) {
+                            logger.error(`failed to save notification: ${notificationObj.to.id} profile due to: ${err}`);
+                            reject(false);
+                        }
+                        logger.info(`user: ${notificationObj.id} profile was updated`);
+                        resolve(data);
+                    }
+                );
+            })
+    });
+};
+
+
 exports.getUserNotifications = (userId) => {
     return new Promise((resolve, reject) => {
         NOTIFICATION.find({"to.id": {$eq: userId}},
@@ -29,6 +55,20 @@ exports.getUserNotifications = (userId) => {
                 }
                 logger.info(`got user: ${userId} notifications`);
                 resolve(data);
+            });
+    });
+};
+
+exports.deleteNotificationById = (notificationId) => {
+    return new Promise((resolve, reject) => {
+        NOTIFICATION.deleteOne({"to.id": {$eq: notificationId}},
+            (err, data) => {
+                if (err) {
+                    logger.error(`failed to delete notification: ${notificationId} due to: ${err}`);
+                    reject(false);
+                }
+                logger.info(`notification: ${notificationId} was deleted!`);
+                resolve(true);
             });
     });
 };

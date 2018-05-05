@@ -124,8 +124,11 @@ app.post(`/${activityContext}/updateActivity/`, activityController.updateActivit
 //Notification
 app.post(`/${notificationContext}/create`, notificationController.createNewNotification);
 
+app.post(`/${notificationContext}/update`, notificationController.updateNotification);
+
 app.get(`/${notificationContext}/get/:key`, notificationController.getNotificationsByUserId);
 
+app.post(`/${notificationContext}/delete/`, notificationController.deleteNotificationById);
 
 //Message
 app.post(`/${messageContext}/create`, messageController.createNewMessage);
