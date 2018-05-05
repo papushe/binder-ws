@@ -61,7 +61,7 @@ exports.getUserNotifications = (userId) => {
 
 exports.deleteNotificationById = (notificationId) => {
     return new Promise((resolve, reject) => {
-        NOTIFICATION.deleteOne({"to.id": {$eq: notificationId}},
+        NOTIFICATION.deleteOne({_id: {$eq: notificationId}},
             (err, data) => {
                 if (err) {
                     logger.error(`failed to delete notification: ${notificationId} due to: ${err}`);
