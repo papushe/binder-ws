@@ -9,17 +9,6 @@ module.exports = (io) => {
 
     io.on('connection', (socket) => {
 
-        socket.on('disconnect', function () {
-
-            deleteUserFromAllUsers(socket.nickname);
-
-            io.emit('users-changed', {
-                user: socket.nickname,
-                event: 'left',
-                date: Utils.now()
-            });
-        });
-
         socket.on('set-nickname', (nickname) => {
 
             addUserToAllUsers(socket, nickname);
@@ -27,6 +16,17 @@ module.exports = (io) => {
             io.emit('users-changed', {
                 user: nickname,
                 event: 'joined',
+                date: Utils.now()
+            });
+        });
+
+        socket.on('disconnect', function () {
+
+            deleteUserFromAllUsers(socket.nickname);
+
+            io.emit('users-changed', {
+                user: socket.nickname,
+                event: 'left',
                 date: Utils.now()
             });
         });
@@ -70,6 +70,8 @@ module.exports = (io) => {
             let userName = params.user.firstName + ' ' + params.user.lastName;
             if (userName in allUsers) {
                 privateAddToCommunity(userName, params);
+            } else {
+                //update on notification mongo
             }
             addToCommunity(params);
         });
@@ -90,17 +92,40 @@ module.exports = (io) => {
 
                 deleteFromCommunity(params);
 
+                //add to notification mongo
+
             }
         });
 
-        socket.on('add-activity', (params) => {
-            io.to(params.room).emit('new-add-activity', {
-                activity: params.activity,
-                from: socket.nickname,
-                communityId: params.communityId,
-                room: params.communityId,
-                date: Utils.now()
-            });
+        socket.on('activities-change', (params) => {
+            if (params.event == 'create') {
+                io.to(params.room).emit('activities-change', {
+                    activity: params.activity,
+                    from: socket.nickname,
+                    communityId: params.communityId,
+                    room: params.communityId,
+                    date: Utils.now(),
+                    event: 'add-new-activity'
+                });
+            } else if (params.event == 'update') {
+                io.to(params.room).emit('activities-change', {
+                    activity: params.activity,
+                    from: socket.nickname,
+                    communityId: params.communityId,
+                    room: params.communityId,
+                    date: Utils.now(),
+                    event: 'update-activity'
+                });
+            } else {
+                io.to(params.room).emit('activities-change', {
+                    activity: params.activity,
+                    from: socket.nickname,
+                    communityId: params.communityId,
+                    room: params.communityId,
+                    date: Utils.now(),
+                    event: 'delete-activity'
+                });
+            }
         });
 
         socket.on('enter-to-chat-room', (params) => {
@@ -118,6 +143,7 @@ module.exports = (io) => {
                 });
             } else {
                 //user 'to' not connected to the app
+                //add to notification mongo
             }
         });
 
@@ -126,14 +152,16 @@ module.exports = (io) => {
 
             enterToPrivateChatRoom(params);
 
-            if (allUsers[params.to]) {
-                allUsers[params.to].emit('change-event-chat-room', {
+            if (allUsers[params.to.fullName]) {
+                allUsers[params.to.fullName].emit('change-event-chat-room', {
                     from: params.from,
                     to: params.to,
                     room: params.room,
                     event: 'joined',
                     date: Utils.now()
                 });
+            } else {
+                //add to notification mongo
             }
         });
 
@@ -156,15 +184,18 @@ module.exports = (io) => {
 
         socket.on('add-message', (params) => {
 
-            // io.emit('message', {
+            //if user is connected{
             io.to(params.room).emit('message', {
                 text: params.message,
                 from: socket.nickname,
                 room: params.room,
+                to: params.to,
                 date: Utils.now()
             });
+            // } else{
+            //add notification to mongo
+            // }
         });
-
 
 // socket functions
         function addUserToAllUsers(socket, nickname) {
@@ -251,6 +282,11 @@ module.exports = (io) => {
                 date: Utils.now()
             });
         }
+
+        function sendNotification(params) {
+
+        }
+
 
     });
 };
