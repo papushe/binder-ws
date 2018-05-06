@@ -1,5 +1,7 @@
 const Utils = require('../utils'),
-    logger = Utils.getLogger();
+    logger = Utils.getLogger(),
+    notificationService = require('../services/notificationService'),
+    NOTIFICATION = require('../models/Notification');
 
 module.exports = (io) => {
     let allUsers = {},
@@ -71,13 +73,14 @@ module.exports = (io) => {
             if (userName in allUsers) {
                 privateAddToCommunity(userName, params);
             } else {
-                //update on notification mongo
+                sendNotification(params, 'addByManager');
             }
             addToCommunity(params);
         });
 
         socket.on('delete-from-community', (params) => {
-            let userName = params.user.firstName + ' ' + params.user.lastName;
+            let userName = params.user.fullName;
+
             if (userName in connectedUserInSpecificCommunity[params.room]) {
 
                 deleteUserFromConnectedUserInSpecificCommunity(params, userName);
@@ -86,13 +89,16 @@ module.exports = (io) => {
 
                 socket.leave(params.room);
 
-            } else {
+            } else if (userName in allUsers) {
 
                 privateDeleteFromCommunity(userName, params);
 
                 deleteFromCommunity(params);
 
-                //add to notification mongo
+            } else {
+
+                deleteFromCommunity(params);
+                sendNotification(params, 'deleteByManager');
 
             }
         });
@@ -283,10 +289,43 @@ module.exports = (io) => {
             });
         }
 
-        function sendNotification(params) {
+        function sendNotification(params, type) {
+            let from = {
 
+                fullName: socket.nickname,
+                id: params.fromUserId,
+            };
+            let to = {
+
+                fullName: params.user.fullName,
+                id: params.user.keyForFirebase,
+            };
+
+            let notificationObj;
+            if (type === 'addByManager') {
+                notificationObj = new NOTIFICATION({
+                    from: from,
+                    to: to,
+                    room: '',
+                    status: 'unread',
+                    creation_date: Utils.now(),
+                    event: 'add-to-community-by-manager',
+                    content: `${socket.nickname} added you to ${params.roomName} community`,
+                });
+            } else if (type === 'deleteByManager') {
+                notificationObj = new NOTIFICATION({
+                    from: from,
+                    to: to,
+                    room: '',
+                    status: 'unread',
+                    creation_date: Utils.now(),
+                    event: 'deleted-by-manager',
+                    content: `${socket.nickname} deleted you from ${params.roomName} community`,
+                });
+            }
+
+            notificationService.saveNewNotification(notificationObj)
         }
-
 
     });
 };
