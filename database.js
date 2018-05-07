@@ -14,22 +14,24 @@ let options = {
     }
 };
 
-mongoose.connect(consts, options).then(() => {
-    const conn = mongoose.connection;//get default connection
-    // Event handlers for Mongoose
-    conn.on('error', (err) => {
-        logger.error('Mongoose: Error: ' + err);
+mongoose.connect(consts, options)
+    .then(() => {
+        const conn = mongoose.connection;//get default connection
+        // Event handlers for Mongoose
+        conn.on('error', (err) => {
+            logger.error('Mongoose: Error: ' + err);
+        });
+        conn.on('open', () => {
+            logger.info('Mongoose: Connection established');
+        });
+        conn.on('disconnected', () => {
+            logger.info('Mongoose: Connection stopped, reconnect');
+            mongoose.connect(consts, options);
+        });
+        conn.on('reconnected', () => {
+            logger.info('Mongoose reconnected!');
+        });
+    })
+    .catch(err => {
+        logger.error(`failed to connect DB  - reason:  ${err}`);
     });
-    conn.on('open', () => {
-        logger.info('Mongoose: Connection established');
-    });
-    conn.on('disconnected', () => {
-        logger.info('Mongoose: Connection stopped, reconnect');
-        mongoose.connect(consts, options);
-    });
-    conn.on('reconnected', () => {
-        logger.info('Mongoose reconnected!');
-    });
-}, (err) => {
-    logger.error(`failed to connect DB  - reason:  ${err}`);
-});
