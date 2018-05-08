@@ -21,7 +21,7 @@ exports.saveNewNotification = (notification) => {
 
 exports.updateNotification = (notificationObj) => {
     return new Promise((resolve, reject) => {
-        NOTIFICATION.findOne({"to.id": {$eq: notificationObj.id}},
+        NOTIFICATION.findOne({_id: {$eq: notificationObj.id}},
             (err, data) => {
                 if (err) {
                     logger.error(`failed to update notification: ${notificationObj.id} due to: ${err}`);
