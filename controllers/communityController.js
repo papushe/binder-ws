@@ -89,7 +89,7 @@ exports.delete = (req, res) => {
                 try {
                     if (user) {
                         actions.push(userService.removeCommunityFromUser(user.keyForFirebase, communityId));
-                        actions.push(activityService.deleteUserActivities(user.keyForFirebase,communityId, ['open']));
+                        actions.push(activityService.deleteUserActivities(user.keyForFirebase, communityId, ['open']));
                     }
                 } catch (e) {
                     logger.error(`failed to remove community ${communityId} from user ${user.keyForFirebase} due to: ${e}`);
@@ -124,7 +124,7 @@ exports.join = (req, res) => {
             //adding community to user
             userService.addCommunityToUser(uid, newCommunity)
                 .then(user => {
-                    communityService.removeFromWaitingList()
+                    communityService.removeFromWaitingList(uid, communityId)
                         .then(response => {
                             res.json(response);
                         })
