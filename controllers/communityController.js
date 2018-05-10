@@ -116,8 +116,14 @@ exports.join = (req, res) => {
             }
             //adding community to user
             userService.addCommunityToUser(uid, newCommunity)
-                .then(response => {
-                    res.json(response);
+                .then(user => {
+                    communityService.removeFromWaitingList()
+                        .then(response => {
+                            res.json(response);
+                        })
+                        .catch(err => {
+                            res.json(err);
+                        });
                 })
                 .catch(err => {
                     res.json(err);
