@@ -142,9 +142,9 @@ app.post(`/${notificationContext}/delete/`, notificationController.deleteById);
 
 
 //Message
-app.post(`/${messageContext}/create`, messageController.createNewMessage);
+app.post(`/${messageContext}/create`, messageController.create);
 
-app.get(`/${messageContext}/get/:key`, messageController.getMessagesByRoomId);
+app.get(`/${messageContext}/get/:key`, messageController.getByRoomId);
 
 
 

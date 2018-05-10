@@ -3,12 +3,17 @@ let MESSAGE = require('../models/Message'),
     messageService = require('../services/messageService'),
     logger = Utils.getLogger();
 
-exports.createNewMessage = (req, res) => {
+exports.create = (req, res) => {
     let msgObj = new MESSAGE({
-        from: req.body.from,
         room: req.body.room,
-        date: req.body.date,
-        text: req.body.text,
+        massages: [
+            {
+                from: req.body.from,
+                date: Utils.now(),
+                roomId: req.body.room,
+                content: req.body.content
+            }
+        ]
     });
     messageService.saveNewMessage(msgObj)
         .then(response => {
@@ -19,7 +24,7 @@ exports.createNewMessage = (req, res) => {
         });
 };
 
-exports.getMessagesByRoomId = (req, res) => {
+exports.getByRoomId = (req, res) => {
     let roomId = req.params.key;
     messageService.getRoomMessages(roomId)
         .then(response => {
