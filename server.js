@@ -120,7 +120,7 @@ app.get(`/${activityContext}/user/get/:key`, activityController.getByUserId);
 
 app.get(`/${activityContext}/community/get/:key`, activityController.getByCommunityId);
 
-app.post(`/${activityContext}/delete/`, activityController.deleteById);
+app.post(`/${activityContext}/delete`, activityController.deleteById);
 
 app.post(`/${activityContext}/update`, activityController.update);
 

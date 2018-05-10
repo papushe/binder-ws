@@ -15,6 +15,7 @@ exports.create = (req, res) => {
         provider: req.body.provider,
         community_id: req.body.communityId,
         source: req.body.source,
+        status: {value: 'open', user_id: null, fullName: null},
         destination: req.body.destination,
         activity_date: Utils.normalizeDate(req.body.activity_date),
         notes: req.body.notes
