@@ -3,11 +3,9 @@ const mongoose = require('mongoose'),
 
     message = new schema({
         from: String,
-        to: String,
         room: String,
-        status: String,
-        creation_date: String,
-        content: String
+        date: String,
+        text: String
     }, {strict: true});
 
 

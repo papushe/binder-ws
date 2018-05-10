@@ -6,11 +6,9 @@ let MESSAGE = require('../models/Message'),
 exports.createNewMessage = (req, res) => {
     let msgObj = new MESSAGE({
         from: req.body.from,
-        to: req.body.to,
         room: req.body.room,
-        status: req.body.status || 'unread',
-        creation_date: Utils.now(),
-        content: req.body.content || '',
+        date: req.body.date,
+        text: req.body.text,
     });
     messageService.saveNewMessage(msgObj)
         .then(response => {
