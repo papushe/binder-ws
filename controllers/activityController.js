@@ -42,7 +42,10 @@ exports.getByUserId = (req, res) => {
 
 exports.getByCommunityId = (req, res) => {
     let {communityId, filters} = req.body;
-    filters = filters || ['open', 'claimed', 'approved'];
+
+    if (!filters || filters.length === 0) {
+        filters = ['open', 'claimed', 'approved'];
+    }
 
     activityService.getCommunityActivities(communityId, filters)
         .then(response => {
