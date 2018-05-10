@@ -243,7 +243,7 @@ exports.leaveCommunity = (userId, communityId) => {
                     reject(false);
                 }
                 //remove community if no members left but this user
-                if (data.members && data.members.length == 0) {
+                if (data.members && data.members.length === 0) {
                     shouldBeDeleted = true;
                     this.deleteCommunityById(communityId)
                         .then(response => {
@@ -325,7 +325,7 @@ exports.addToWaitingList = (userId, communityId) => {
 exports.removeFromWaitingList = (userId, communityId) => {
     return new Promise((resolve, reject) => {
         COMMUNITY.findOneAndUpdate({_id: {$eq: communityId}},
-            {$pull: {waiting_list: userId}},
+            {$pullAll: {waiting_list: [userId]}},
             (err, data) => {
                 if (err || !data) {
                     logger.error(`failed to remove user ${userId} from community waiting list: ${communityId} due to: ${err}`);

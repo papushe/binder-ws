@@ -6,6 +6,7 @@ let USER = require('../models/User'),
     Utils = require('../utils'),
     userService = require('./../services/userService'),
     communityService = require('./../services/communityService'),
+    activityService = require('./../services/activityService'),
     Promise = require('promise'),
     logger = Utils.getLogger();
 
@@ -59,7 +60,12 @@ exports.leave = (req, res) => {
 
     communityService.leaveCommunity(userId, communityId)
         .then(response => {
-            res.json(response);
+            activityService.deleteUserActivities(userId, ['open'])
+                .then(activity => {
+                    res.json(response);
+                }).catch(err => {
+                res.json(err);
+            });
         })
         .catch(err => {
             res.json(err);
@@ -83,6 +89,7 @@ exports.delete = (req, res) => {
                 try {
                     if (user) {
                         actions.push(userService.removeCommunityFromUser(user.keyForFirebase, communityId));
+                        actions.push(activityService.deleteUserActivities(user.keyForFirebase, ['open']));
                     }
                 } catch (e) {
                     logger.error(`failed to remove community ${communityId} from user ${user.keyForFirebase} due to: ${e}`);

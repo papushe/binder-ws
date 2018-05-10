@@ -46,7 +46,7 @@ exports.getCommunityActivities = (communityId, filters) => {
                     logger.error(`failed to get community: ${communityId} activities due to: ${err}`);
                     reject(false);
                 }
-                logger.info(`got community: ${communityId} activities`);
+                logger.info(`got community: ${communityId} activities with statuses: ${filters}`);
                 resolve(data);
             });
     });
@@ -155,6 +155,24 @@ exports.setProvider = (activityId) => {
                         resolve(data);
                     });
                 }
+            });
+    });
+};
+
+exports.deleteUserActivities = (userId, filters) => {
+    return new Promise((resolve, reject) => {
+        ACTIVITY.remove(
+            {$and:[
+                    {"consumer.id": {$eq: userId}},
+                    {"status.value": {$in: filters}}
+                ]},
+            (err, data) => {
+                if (err) {
+                    logger.error(`failed to delete user: ${userId} activities due to: ${err}`);
+                    reject(false);
+                }
+                logger.info(`deleted user: ${userId} activities with statuses: ${filters}`);
+                resolve(data);
             });
     });
 };
