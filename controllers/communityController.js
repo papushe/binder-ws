@@ -126,7 +126,7 @@ exports.join = (req, res) => {
                 .then(user => {
                     communityService.removeFromWaitingList(uid, communityId)
                         .then(response => {
-                            res.json(response);
+                            res.json(user);
                         })
                         .catch(err => {
                             res.json(err);

@@ -213,12 +213,32 @@ module.exports = (io) => {
                     room: params.user._id, // == community _id
                     event: 'user-ask-to-join-private-room',
                     communityName: params.user.communityName,
-                    content: `Community name: ${params.user.communityName}`,
+                    content: `Community name ${params.user.communityName}`,
                     date: Utils.now()
                 });
             } else {
 
                 sendNotification(params, 'askToJoinPrivateRoom');
+
+            }
+
+        });
+
+        socket.on('decline-user-join-private-room', (params) => {
+
+            if (params.from.fullName in allUsers) {
+
+                allUsers[params.from.fullName].emit('user-ask-to-join-private-room', {
+                    communityName: params.communityName,
+                    to: params.to,
+                    from: params.from,
+                    event: 'manager-decline-user-join-private-room',
+                    content: `Community name ${params.communityName}`,
+                    date: Utils.now()
+                });
+            } else {
+
+                sendNotification(params, 'declineUserJoinPrivateRoom');
 
             }
 
@@ -331,7 +351,7 @@ module.exports = (io) => {
             let to = {
 
                 fullName: params.user.fullName,
-                id: params.user.keyForFirebase,
+                id: params.user.keyForFirebase ||params.user.id,
             };
 
             let notificationObj;
@@ -339,7 +359,7 @@ module.exports = (io) => {
                 notificationObj = new NOTIFICATION({
                     from: from,
                     to: to,
-                    room: '',
+                    room: params.roomId,
                     status: 'unread',
                     creation_date: Utils.now(),
                     event: 'add-to-community-by-manager',
@@ -349,7 +369,7 @@ module.exports = (io) => {
                 notificationObj = new NOTIFICATION({
                     from: from,
                     to: to,
-                    room: '',
+                    room: params.roomId,
                     status: 'unread',
                     creation_date: Utils.now(),
                     event: 'deleted-by-manager',
@@ -359,14 +379,13 @@ module.exports = (io) => {
                 notificationObj = new NOTIFICATION({
                     from: from,
                     to: to,
-                    room: '',
+                    room: params.roomId,
                     status: 'unread',
                     creation_date: Utils.now(),
                     event: 'enter-to-chat-room',
                     content: `${socket.nickname} enter to ${params.roomName} community`,
                 });
 
-                //TODO continue from here
             } else if (type === 'askToJoinPrivateRoom') {
 
                 from.id = params.from.keyForFirebase;
@@ -382,6 +401,16 @@ module.exports = (io) => {
                     event: 'user-ask-to-join-private-room',
                     communityName: params.user.communityName,
                     content: `Community ${params.user.communityName}`,
+                });
+            } else if (type === 'declineUserJoinPrivateRoom') {
+                notificationObj = new NOTIFICATION({
+                    from: from,
+                    to: to,
+                    status: 'unread',
+                    creation_date: Utils.now(),
+                    event: 'manager-decline-user-join-private-room',
+                    communityName: params.communityName,
+                    content: `Community ${params.communityName}`,
                 });
             }
 
