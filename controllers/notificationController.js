@@ -7,6 +7,7 @@ exports.createNewNotification = (req, res) => {
         from: req.body.from,
         to: req.body.to,
         room: req.body.room,
+        communityName: req.body.communityName || '',
         status: req.body.status || 'unread',
         creation_date: Utils.now(),
         event: req.body.event,

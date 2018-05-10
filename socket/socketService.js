@@ -74,9 +74,8 @@ module.exports = (io) => {
             let userName = params.user.fullName;
             if (userName in allUsers) {
                 privateAddToCommunity(userName, params);
-            } else {
-                sendNotification(params, 'addByManager');
             }
+            sendNotification(params, 'addByManager');
             addToCommunity(params);
         });
 
@@ -205,12 +204,16 @@ module.exports = (io) => {
 
         socket.on('ask-to-join-private-room', (params) => {
 
-            if (params.toManager.fullName in allUsers) {
+            if (params.user.managerName in allUsers) {
 
-                allUsers[params.toManager.fullName].emit('user-ask-to-join-private-room', {
-                    community: params.community,
-                    from: socket.fromUser,
+                allUsers[params.user.managerName].emit('user-ask-to-join-private-room', {
+                    community: params.user, // == community obj
+                    to: params.user.managerName,
+                    from: params.from,
+                    room: params.user._id, // == community _id
                     event: 'user-ask-to-join-private-room',
+                    communityName: params.user.communityName,
+                    content: `Community name: ${params.user.communityName}`,
                     date: Utils.now()
                 });
             } else {
@@ -323,7 +326,7 @@ module.exports = (io) => {
             let from = {
 
                 fullName: socket.nickname,
-                id: params.fromUserId,
+                id: params.fromUserId || '',
             };
             let to = {
 
@@ -340,7 +343,7 @@ module.exports = (io) => {
                     status: 'unread',
                     creation_date: Utils.now(),
                     event: 'add-to-community-by-manager',
-                    content: `${socket.nickname} added you to ${params.roomName} community`,
+                    content: `${socket.nickname} added you to ${params.communityName} community`,
                 });
             } else if (type === 'deleteByManager') {
                 notificationObj = new NOTIFICATION({
@@ -365,14 +368,20 @@ module.exports = (io) => {
 
                 //TODO continue from here
             } else if (type === 'askToJoinPrivateRoom') {
+
+                from.id = params.from.keyForFirebase;
+                to.fullName = params.user.managerName;
+                to.id = params.user.managerId;
+
                 notificationObj = new NOTIFICATION({
                     from: from,
                     to: to,
-                    room: '',
+                    room: params.user._id, // == community._id
                     status: 'unread',
                     creation_date: Utils.now(),
-                    event: 'enter-to-chat-room',
-                    content: `${socket.nickname} enter to ${params.roomName} community`,
+                    event: 'user-ask-to-join-private-room',
+                    communityName: params.user.communityName,
+                    content: `Community ${params.user.communityName}`,
                 });
             }
 

@@ -11,6 +11,7 @@ const mongoose = require('mongoose'),
             id: String
         },
         room: String,
+        communityName: String,
         status: String,
         creation_date: String,
         event: String,
