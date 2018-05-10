@@ -126,8 +126,6 @@ app.post(`/${activityContext}/update`, activityController.update);
 
 app.post(`/${activityContext}/claim`, activityController.claim);
 
-app.get(`/${activityContext}/delete/claims`, activityController.deleteClaims);
-
 app.post(`/${activityContext}/approve`, activityController.approve);
 
 

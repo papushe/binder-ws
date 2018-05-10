@@ -97,48 +97,26 @@ exports.saveExistingActivity = (newActivity, activityId) => {
     })
 };
 
-exports.addToWaitingList = (userId, activityId) => {
+exports.setClaimer = (userId,fullName, activityId) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.findOne({_id: {$eq: activityId}},
             (err, data) => {
                 if (err || !data) {
-                    logger.error(`failed to add user: ${userId} to activity waiting list: ${activityId} due to: ${err}`);
+                    logger.error(`failed to set user: ${userId} as claimer in activity: ${activityId} due to: ${err}`);
                     reject(false);
                 }
                 else {
-                    data.waiting_list.push(userId);
-                    data.save((err, data) => {
-                        if (err) {
-                            logger.error(`failed to add user: ${userId} to activity waiting list: ${activityId} due to: ${err}`);
-                            reject(false);
-                        }
-                        logger.info(`user: ${userId} was added to activity waiting list: ${activityId}`);
-                        resolve(data);
-                    });
-                }
-            });
-    });
-};
-
-exports.setProvider = (user, activityId) => {
-    return new Promise((resolve, reject) => {
-        ACTIVITY.findOne({_id: {$eq: activityId}},
-            (err, data) => {
-                if (err || !data) {
-                    logger.error(`failed to set provider: ${user.keyForFirebase} to activity: ${activityId} due to: ${err}`);
-                    reject(false);
-                }
-                else {
-                    data.provider = {
-                        name: user.fullName,
-                        id: user.keyForFirebase
+                    data.status = {
+                        value: 'claimed',
+                        user_id: userId,
+                        fullName: fullName
                     };
                     data.save((err, data) => {
                         if (err) {
-                            logger.error(`failed to set provider: ${user.keyForFirebase} to activity: ${activityId} due to: ${err}`);
+                            logger.error(`failed to set user: ${userId} as claimer in activity: ${activityId} due to: ${err}`);
                             reject(false);
                         }
-                        logger.info(`provider: ${user.keyForFirebase} was set to activity waiting list: ${activityId}`);
+                        logger.info(`user: ${userId} was set as claimer in activity: ${activityId}`);
                         resolve(data);
                     });
                 }
@@ -146,25 +124,34 @@ exports.setProvider = (user, activityId) => {
     });
 };
 
-exports.deleteAllClaims = (activityId) => {
+exports.setProvider = (activityId) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.findOne({_id: {$eq: activityId}},
             (err, data) => {
                 if (err || !data) {
-                    logger.error(`failed to remove activity waiting list: ${activityId} due to: ${err}`);
+                    logger.error(`failed to set provider in activity: ${activityId} due to: ${err}`);
+                    reject(false);
+                }
+                if (!data._doc.status.user_id) {
+                    logger.error(`failed to set provider in activity: ${activityId} due to: claimer is missing!`);
                     reject(false);
                 }
                 else {
-                    data.waiting_list = [];
+                    data.status.value = 'approved';
+                    data.provider = {
+                        name: data.status.fullName,
+                        id: data.status.user_id
+                    };
                     data.save((err, data) => {
                         if (err) {
-                            logger.error(`failed to remove activity waiting list: ${activityId} due to: ${err}`);
+                            logger.error(`failed to set provider in activity: ${activityId} due to: ${err}`);
                             reject(false);
                         }
-                        logger.info(`removed activity waiting list: ${activityId}`);
+                        logger.info(`${data._doc.status.user_id} was set as provider in activity: ${activityId}`);
                         resolve(data);
                     });
                 }
             });
     });
 };
+

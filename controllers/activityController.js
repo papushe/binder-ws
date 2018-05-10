@@ -87,8 +87,8 @@ exports.update = (req, res) => {
 };
 
 exports.claim = (req, res) => {
-    let {userId, activityId} = req.body;
-    activityService.addToWaitingList(userId, activityId)
+    let {userId,fullName, activityId} = req.body;
+    activityService.setClaimer(userId, fullName, activityId)
         .then(response => {
             res.json(response);
         })
@@ -99,37 +99,14 @@ exports.claim = (req, res) => {
 };
 
 exports.approve = (req, res) => {
-    let {userId, activityId} = req.body;
+    let {activityId} = req.body;
 
-    userService.getUserProfile(userId)
-        .then(user => {
-            activityService.setProvider(user, activityId)
-                .then(response => {
-                    activityService.deleteAllClaims(activityId)
-                        .then(response => {
-                            res.json(response);
-                        })
-                        .catch(err => {
-                            res.json(err);
-                        })
-                })
-                .catch(err => {
-                    res.json(err);
-                })
-        })
-        .catch(err => {
-            res.json(err);
-        })
-};
-
-exports.deleteClaims = (req, res) => {
-    let activityId = req.params.activityId;
-
-    activityService.deleteAllClaims(activityId)
+    activityService.setProvider(activityId)
         .then(response => {
             res.json(response);
         })
         .catch(err => {
             res.json(err);
-        })
+        });
+
 };
