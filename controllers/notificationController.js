@@ -2,7 +2,7 @@ let NOTIFICATION = require('../models/Notification'),
     Utils = require('../utils'),
     notificationService = require('../services/notificationService');
 
-exports.createNewNotification = (req, res) => {
+exports.create = (req, res) => {
     let notificationObj = new NOTIFICATION({
         from: req.body.from,
         to: req.body.to,
@@ -22,7 +22,7 @@ exports.createNewNotification = (req, res) => {
         });
 };
 
-exports.updateNotification = (req, res) => {
+exports.update = (req, res) => {
     let notificationObj = {
         status: req.body.status,
         id: req.body.id
@@ -36,7 +36,7 @@ exports.updateNotification = (req, res) => {
         });
 };
 
-exports.getNotificationsByUserId = (req, res) => {
+exports.getById = (req, res) => {
     let userId = req.params.key;
     notificationService.getUserNotifications(userId)
         .then(response => {
@@ -47,7 +47,7 @@ exports.getNotificationsByUserId = (req, res) => {
         });
 };
 
-exports.deleteNotificationById = (req, res) => {
+exports.deleteById = (req, res) => {
     let notificationId = req.body.id;
     notificationService.deleteNotificationById(notificationId)
         .then(response => {

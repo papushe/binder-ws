@@ -62,7 +62,6 @@ exports.deleteActivityById = (activityId) => {
     });
 };
 
-
 exports.saveExistingActivity = (newActivity, activityId) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.findOne({_id: activityId},
@@ -96,4 +95,76 @@ exports.saveExistingActivity = (newActivity, activityId) => {
                 );
             })
     })
+};
+
+exports.addToWaitingList = (userId, activityId) => {
+    return new Promise((resolve, reject) => {
+        ACTIVITY.findOne({_id: {$eq: activityId}},
+            (err, data) => {
+                if (err || !data) {
+                    logger.error(`failed to add user: ${userId} to activity waiting list: ${activityId} due to: ${err}`);
+                    reject(false);
+                }
+                else {
+                    data.waiting_list.push(userId);
+                    data.save((err, data) => {
+                        if (err) {
+                            logger.error(`failed to add user: ${userId} to activity waiting list: ${activityId} due to: ${err}`);
+                            reject(false);
+                        }
+                        logger.info(`user: ${userId} was added to activity waiting list: ${activityId}`);
+                        resolve(data);
+                    });
+                }
+            });
+    });
+};
+
+exports.setProvider = (user, activityId) => {
+    return new Promise((resolve, reject) => {
+        ACTIVITY.findOne({_id: {$eq: activityId}},
+            (err, data) => {
+                if (err || !data) {
+                    logger.error(`failed to set provider: ${user.keyForFirebase} to activity: ${activityId} due to: ${err}`);
+                    reject(false);
+                }
+                else {
+                    data.provider = {
+                        name: user.fullName,
+                        id: user.keyForFirebase
+                    };
+                    data.save((err, data) => {
+                        if (err) {
+                            logger.error(`failed to set provider: ${user.keyForFirebase} to activity: ${activityId} due to: ${err}`);
+                            reject(false);
+                        }
+                        logger.info(`provider: ${user.keyForFirebase} was set to activity waiting list: ${activityId}`);
+                        resolve(data);
+                    });
+                }
+            });
+    });
+};
+
+exports.deleteAllClaims = (activityId) => {
+    return new Promise((resolve, reject) => {
+        ACTIVITY.findOne({_id: {$eq: activityId}},
+            (err, data) => {
+                if (err || !data) {
+                    logger.error(`failed to remove activity waiting list: ${activityId} due to: ${err}`);
+                    reject(false);
+                }
+                else {
+                    data.waiting_list = [];
+                    data.save((err, data) => {
+                        if (err) {
+                            logger.error(`failed to remove activity waiting list: ${activityId} due to: ${err}`);
+                            reject(false);
+                        }
+                        logger.info(`removed activity waiting list: ${activityId}`);
+                        resolve(data);
+                    });
+                }
+            });
+    });
 };

@@ -15,6 +15,7 @@ const mongoose = require('mongoose'),
             id: String
         },
         community_id: String,
+        waiting_list: [],
         source: String,
         destination: String,
         activity_date: String,

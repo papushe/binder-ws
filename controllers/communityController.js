@@ -10,7 +10,7 @@ let USER = require('../models/User'),
     logger = Utils.getLogger();
 
 
-exports.createNewCommunity = (req, res) => {
+exports.create = (req, res) => {
     let newCommunity = new COMMUNITY({
         communityName: req.body.communityName,
         communityDescription: req.body.communityDescription,
@@ -31,7 +31,7 @@ exports.createNewCommunity = (req, res) => {
         });
 };
 
-exports.searchCommunity = (req, res) => {
+exports.search = (req, res) => {
     let query = req.params.query || '';
     communityService.searchCommunities(query)
         .then(response => {
@@ -42,7 +42,7 @@ exports.searchCommunity = (req, res) => {
         });
 };
 
-exports.getCommunities = (req, res) => {
+exports.getByUserId = (req, res) => {
     let userId = req.params.key;
     communityService.getUserCommunities(userId)
         .then(response => {
@@ -53,7 +53,7 @@ exports.getCommunities = (req, res) => {
         });
 };
 
-exports.leaveCommunity = (req, res) => {
+exports.leave = (req, res) => {
     let userId = req.body.uid;
     let communityId = req.body.communityId;
 
@@ -66,7 +66,7 @@ exports.leaveCommunity = (req, res) => {
         });
 };
 
-exports.deleteCommunity = (req, res) => {
+exports.delete = (req, res) => {
     let communityId = req.body.communityId;
     let userId = req.body.uid;
     let actions = [];
@@ -101,7 +101,7 @@ exports.deleteCommunity = (req, res) => {
         });
 };
 
-exports.joinCommunity = (req, res) => {
+exports.join = (req, res) => {
     let {uid, isPrivileged, communityId} = req.body;
     let newCommunity = {
         communityId: communityId,
@@ -128,7 +128,7 @@ exports.joinCommunity = (req, res) => {
         });
 };
 
-exports.getCommunityMembers = (req, res) => {
+exports.getMembers = (req, res) => {
     communityService.getCommunityMembers(req.body.communityId)
         .then((response) => {
             res.json(response);
@@ -138,7 +138,7 @@ exports.getCommunityMembers = (req, res) => {
         });
 };
 
-exports.updateCommunityUserRole = (req, res) => {
+exports.updateUserRole = (req, res) => {
     let userId = req.body.uid;
     let communityId = req.body.communityId;
     let role = userService.getRole(req.body.role);
@@ -177,6 +177,17 @@ exports.updateCommunityUserRole = (req, res) => {
 exports.addUserToWaitingList = (req, res) => {
     let {userId, communityId} = req.body;
     communityService.addToWaitingList(userId, communityId)
+        .then(response => {
+            res.json(response)
+        })
+        .catch(err => {
+            res.json(false);
+        });
+};
+
+exports.removeUserFromWaitingList = (req, res) => {
+    let {userId, communityId} = req.body;
+    communityService.removeFromWaitingList(userId, communityId)
         .then(response => {
             res.json(response)
         })
