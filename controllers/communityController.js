@@ -60,7 +60,7 @@ exports.leave = (req, res) => {
 
     communityService.leaveCommunity(userId, communityId)
         .then(response => {
-            activityService.deleteUserActivities(userId, ['open'])
+            activityService.deleteUserActivities(userId, communityId, ['open'])
                 .then(activity => {
                     res.json(response);
                 }).catch(err => {
@@ -89,7 +89,7 @@ exports.delete = (req, res) => {
                 try {
                     if (user) {
                         actions.push(userService.removeCommunityFromUser(user.keyForFirebase, communityId));
-                        actions.push(activityService.deleteUserActivities(user.keyForFirebase, ['open']));
+                        actions.push(activityService.deleteUserActivities(user.keyForFirebase,communityId, ['open']));
                     }
                 } catch (e) {
                     logger.error(`failed to remove community ${communityId} from user ${user.keyForFirebase} due to: ${e}`);

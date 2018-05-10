@@ -159,11 +159,12 @@ exports.setProvider = (activityId) => {
     });
 };
 
-exports.deleteUserActivities = (userId, filters) => {
+exports.deleteUserActivities = (userId, communityId, filters) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.remove(
             {$and:[
                     {"consumer.id": {$eq: userId}},
+                    {community_id: {$eq: communityId}},
                     {"status.value": {$in: filters}}
                 ]},
             (err, data) => {
