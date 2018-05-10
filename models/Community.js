@@ -13,7 +13,7 @@ const mongoose = require('mongoose'),
         members: [{
             memberId: String
         }],
-        wating_list: [],
+        waiting_list: [],
         type: String
     }, {strict: true});
 
