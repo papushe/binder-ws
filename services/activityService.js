@@ -132,7 +132,7 @@ exports.setProvider = (activityId) => {
                     logger.error(`failed to set provider in activity: ${activityId} due to: ${err}`);
                     reject(false);
                 }
-                if (!data._doc.status.user_id) {
+                if (!data.status.user_id) {
                     logger.error(`failed to set provider in activity: ${activityId} due to: claimer is missing!`);
                     reject(false);
                 }
