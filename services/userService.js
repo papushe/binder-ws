@@ -86,7 +86,6 @@ exports.updateUserProfile = (profileObj) => {
                     location: profileObj.location || '',
                     phoneNumber: profileObj.phoneNumber || '',
                     dateOfBirth: profileObj.dateOfBirth || '',
-                    type: profileObj.type || '',
                     skills: profileObj.skills || '',
                     description: profileObj.description || '',
                     profilePic: profileObj.profilePic || ''

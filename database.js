@@ -1,4 +1,4 @@
-const consts   = require('./config').MLAB_KEY,
+const consts = require('./config').MLAB_KEY,
     mongoose = require('mongoose'),
     logger = require('./utils').getLogger();
 
@@ -7,7 +7,7 @@ mongoose.Promise = global.Promise;
 //The server option auto_reconnect is defaulted to true
 let options = {
     server: {
-        auto_reconnect:true,
+        auto_reconnect: true,
         useMongoClient: false,
         keepAlive: 300000,
         connectTimeoutMS: 60000

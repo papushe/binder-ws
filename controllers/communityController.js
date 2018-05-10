@@ -16,6 +16,7 @@ exports.createNewCommunity = (req, res) => {
         communityDescription: req.body.communityDescription,
         creationDate: Utils.now(),
         managerId: req.body.managerId,
+        managerName: req.body.managerName,
         members: {
             memberId: req.body.managerId,
         },

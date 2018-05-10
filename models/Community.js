@@ -6,12 +6,14 @@ const mongoose = require('mongoose'),
         communityDescription: String,
         creationDate: String,
         managerId: String,
+        managerName: String,
         authorizedMembers: [{
             memberId: String
         }],
         members: [{
             memberId: String
         }],
+        wating_list: [],
         type: String
     }, {strict: true});
 

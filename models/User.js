@@ -8,7 +8,6 @@ const mongoose = require('mongoose'),
             phoneNumber: String,
             dateOfBirth: String,
             creationDate: String,
-            type: String,
             communities: [{
                 communityId: String,
                 role: String,

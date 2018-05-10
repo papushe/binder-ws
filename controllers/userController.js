@@ -29,7 +29,6 @@ exports.createNewUser = (req, res) => {
         phoneNumber: req.body.phoneNumber,
         dateOfBirth: req.body.dateOfBirth,
         creationDate: Utils.now(),
-        type: req.body.type,
         skills: req.body.skills,
         description: req.body.description,
         profilePic: req.body.profilePic,
@@ -63,7 +62,6 @@ exports.updateProfile = (req, res) => {
         location: req.body.location,
         phoneNumber: req.body.phoneNumber,
         dateOfBirth: req.body.dateOfBirth,
-        type: req.body.type,
         skills: req.body.skills,
         description: req.body.description,
         profilePic: req.body.profilePic

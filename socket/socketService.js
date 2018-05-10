@@ -1,7 +1,9 @@
 const Utils = require('../utils'),
     logger = Utils.getLogger(),
     notificationService = require('../services/notificationService'),
-    NOTIFICATION = require('../models/Notification');
+    messageService = require('../services/messageService'),
+    NOTIFICATION = require('../models/Notification'),
+    MESSAGE = require('../models/Message');
 
 module.exports = (io) => {
     let allUsers = {},
@@ -69,7 +71,7 @@ module.exports = (io) => {
         });
 
         socket.on('add-to-community-by-manager', (params) => {
-            let userName = params.user.firstName + ' ' + params.user.lastName;
+            let userName = params.user.fullName;
             if (userName in allUsers) {
                 privateAddToCommunity(userName, params);
             } else {
@@ -85,22 +87,17 @@ module.exports = (io) => {
 
                 deleteUserFromConnectedUserInSpecificCommunity(params, userName);
 
-                deleteFromCommunity(params);
-
-                socket.leave(params.room);
-
             } else if (userName in allUsers) {
 
                 privateDeleteFromCommunity(userName, params);
 
-                deleteFromCommunity(params);
-
             } else {
 
-                deleteFromCommunity(params);
                 sendNotification(params, 'deleteByManager');
 
             }
+            deleteFromCommunity(params);
+            socket.leave(params.room);
         });
 
         socket.on('activities-change', (params) => {
@@ -139,17 +136,18 @@ module.exports = (io) => {
 
             enterToPrivateChatRoom(params);
 
-            if (allUsers[params.to.fullName]) {
-                allUsers[params.to.fullName].emit('chat-room', {
+            if (allUsers[params.user.fullName]) {
+                allUsers[params.user.fullName].emit('chat-room', {
                     from: params.from,
-                    to: params.to,
+                    to: params.user,
                     room: params.room,
                     event: 'enter-to-chat-room',
                     date: Utils.now()
                 });
             } else {
-                //user 'to' not connected to the app
-                //add to notification mongo
+
+                sendNotification(params, 'enterToChatRoom')
+
             }
         });
 
@@ -161,13 +159,15 @@ module.exports = (io) => {
             if (allUsers[params.to.fullName]) {
                 allUsers[params.to.fullName].emit('change-event-chat-room', {
                     from: params.from,
-                    to: params.to,
+                    to: params.user,
                     room: params.room,
                     event: 'joined',
                     date: Utils.now()
                 });
             } else {
-                //add to notification mongo
+
+                // sendNotification(params, 'joined-to-chat-room')
+
             }
         });
 
@@ -175,11 +175,11 @@ module.exports = (io) => {
 
             deleteFromPrivateChatRoom(params);
 
-            if (params.to.fullName in connectedUserInSpecificChatRoom[params.room]) {
+            if (params.user.fullName in connectedUserInSpecificChatRoom[params.room]) {
 
                 allUsers[params.to.fullName].emit('change-event-chat-room', {
                     from: params.from,
-                    to: params.to,
+                    to: params.user,
                     room: params.room,
                     event: 'left',
                     date: Utils.now()
@@ -198,9 +198,27 @@ module.exports = (io) => {
                 to: params.to,
                 date: Utils.now()
             });
-            // } else{
-            //add notification to mongo
-            // }
+
+            saveMessage(params);
+
+        });
+
+        socket.on('ask-to-join-private-room', (params) => {
+
+            if (params.toManager.fullName in allUsers) {
+
+                allUsers[params.toManager.fullName].emit('user-ask-to-join-private-room', {
+                    community: params.community,
+                    from: socket.fromUser,
+                    event: 'user-ask-to-join-private-room',
+                    date: Utils.now()
+                });
+            } else {
+
+                sendNotification(params, 'askToJoinPrivateRoom');
+
+            }
+
         });
 
 // socket functions
@@ -289,6 +307,18 @@ module.exports = (io) => {
             });
         }
 
+        function saveMessage(params) {
+
+            let messageObj = new MESSAGE({
+                from: params.from.fullName,
+                room: params.room,
+                date: Utils.now(),
+                text: params.message
+            });
+
+            messageService.saveNewMessage(messageObj)
+        }
+
         function sendNotification(params, type) {
             let from = {
 
@@ -321,6 +351,28 @@ module.exports = (io) => {
                     creation_date: Utils.now(),
                     event: 'deleted-by-manager',
                     content: `${socket.nickname} deleted you from ${params.roomName} community`,
+                });
+            } else if (type === 'enterToChatRoom') {
+                notificationObj = new NOTIFICATION({
+                    from: from,
+                    to: to,
+                    room: '',
+                    status: 'unread',
+                    creation_date: Utils.now(),
+                    event: 'enter-to-chat-room',
+                    content: `${socket.nickname} enter to ${params.roomName} community`,
+                });
+
+                //TODO continue from here
+            } else if (type === 'askToJoinPrivateRoom') {
+                notificationObj = new NOTIFICATION({
+                    from: from,
+                    to: to,
+                    room: '',
+                    status: 'unread',
+                    creation_date: Utils.now(),
+                    event: 'enter-to-chat-room',
+                    content: `${socket.nickname} enter to ${params.roomName} community`,
                 });
             }
 
