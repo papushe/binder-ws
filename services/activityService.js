@@ -62,7 +62,6 @@ exports.deleteActivityById = (activityId) => {
     });
 };
 
-
 exports.saveExistingActivity = (newActivity, activityId) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.findOne({_id: activityId},
