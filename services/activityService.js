@@ -34,9 +34,13 @@ exports.getUserActivities = (userId) => {
     });
 };
 
-exports.getCommunityActivities = (communityId) => {
+exports.getCommunityActivities = (communityId, filters) => {
     return new Promise((resolve, reject) => {
-        ACTIVITY.find({community_id: {$eq: communityId}},
+        ACTIVITY.find(
+            {$and:[
+                {community_id: {$eq: communityId}},
+                {"status.value": {$in: filters}}
+            ]},
             (err, data) => {
                 if (err) {
                     logger.error(`failed to get community: ${communityId} activities due to: ${err}`);

@@ -118,7 +118,7 @@ app.post(`/${activityContext}/create/`, activityController.create);
 
 app.get(`/${activityContext}/user/get/:key`, activityController.getByUserId);
 
-app.get(`/${activityContext}/community/get/:key`, activityController.getByCommunityId);
+app.post(`/${activityContext}/community/get`, activityController.getByCommunityId);
 
 app.post(`/${activityContext}/delete`, activityController.deleteById);
 
