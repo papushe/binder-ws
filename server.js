@@ -77,36 +77,36 @@ app.get('/', (req, res) => {
 });
 
 //User
-app.post(`/${userContext}/create`, userController.createNewUser);
+app.post(`/${userContext}/create`, userController.create);
 
-app.post(`/${userContext}/update`, userController.updateProfile);
+app.post(`/${userContext}/update`, userController.update);
 
 app.get(`/${userContext}/get/:key`, userController.getProfile);
 
 app.get(`/${userContext}/delete/:key`, userController.deleteProfile);
 
-app.get(`/${userContext}/search/:query`, userController.searchUsers);
+app.get(`/${userContext}/search/:query`, userController.search);
 
-app.post(`/${userContext}/vote/`, userController.rankUser);
+app.post(`/${userContext}/vote/`, userController.rank);
 
 
 
 //Community
-app.post(`/${communityContext}/create`, communityController.createNewCommunity);
+app.post(`/${communityContext}/create`, communityController.create);
 
-app.post(`/${communityContext}/leave`, communityController.leaveCommunity);
+app.post(`/${communityContext}/leave`, communityController.leave);
 
-app.post(`/${communityContext}/delete`, communityController.deleteCommunity);
+app.post(`/${communityContext}/delete`, communityController.delete);
 
-app.post(`/${communityContext}/join`, communityController.joinCommunity);
+app.post(`/${communityContext}/join`, communityController.join);
 
-app.post(`/${communityContext}/members`, communityController.getCommunityMembers);
+app.post(`/${communityContext}/members`, communityController.getMembers);
 
-app.get(`/${communityContext}/get/:key`, communityController.getCommunities);
+app.get(`/${communityContext}/get/:key`, communityController.getByUserId);
 
-app.post(`/${communityContext}/update-role`, communityController.updateCommunityUserRole);
+app.post(`/${communityContext}/update-role`, communityController.updateUserRole);
 
-app.get(`/${communityContext}/search/:query`, communityController.searchCommunity);
+app.get(`/${communityContext}/search/:query`, communityController.search);
 
 app.post(`/${communityContext}/add-waiting-list`, communityController.addUserToWaitingList);
 
@@ -114,26 +114,32 @@ app.post(`/${communityContext}/remove-waiting-list`, communityController.removeU
 
 
 //Activity
-app.post(`/${activityContext}/create/`, activityController.createNewActivity);
+app.post(`/${activityContext}/create/`, activityController.create);
 
-app.get(`/${activityContext}/user/get/:key`, activityController.getActivitiesByUserId);
+app.get(`/${activityContext}/user/get/:key`, activityController.getByUserId);
 
-app.get(`/${activityContext}/community/get/:key`, activityController.getActivitiesByCommunityId);
+app.get(`/${activityContext}/community/get/:key`, activityController.getByCommunityId);
 
-app.post(`/${activityContext}/delete/`, activityController.deleteActivityById);
+app.post(`/${activityContext}/delete/`, activityController.deleteById);
 
-app.post(`/${activityContext}/update`, activityController.updateActivity);
+app.post(`/${activityContext}/update`, activityController.update);
+
+app.post(`/${activityContext}/claim`, activityController.claim);
+
+app.get(`/${activityContext}/delete/claims`, activityController.deleteClaims);
+
+app.post(`/${activityContext}/approve`, activityController.approve);
 
 
 
 //Notification
-app.post(`/${notificationContext}/create`, notificationController.createNewNotification);
+app.post(`/${notificationContext}/create`, notificationController.create);
 
-app.post(`/${notificationContext}/update`, notificationController.updateNotification);
+app.post(`/${notificationContext}/update`, notificationController.update);
 
-app.get(`/${notificationContext}/get/:key`, notificationController.getNotificationsByUserId);
+app.get(`/${notificationContext}/get/:key`, notificationController.getById);
 
-app.post(`/${notificationContext}/delete/`, notificationController.deleteNotificationById);
+app.post(`/${notificationContext}/delete/`, notificationController.deleteById);
 
 
 

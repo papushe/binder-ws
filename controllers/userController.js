@@ -5,7 +5,7 @@ let USER = require('../models/User'),
     communityService = require('./../services/communityService'),
     Promise = require('promise');
 
-exports.rankUser = (req, res) => {
+exports.rank = (req, res) => {
     let vote = {};
     vote.userId = req.body.userId;
     vote.up = req.body.up || false;
@@ -20,7 +20,7 @@ exports.rankUser = (req, res) => {
         })
 };
 
-exports.createNewUser = (req, res) => {
+exports.create = (req, res) => {
     let newUser = new USER({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -54,7 +54,7 @@ let userId = req.params.key;
         });
 };
 
-exports.updateProfile = (req, res) => {
+exports.update = (req, res) => {
     let profileObj = {
         userId:req.body.keyForFirebase,
         firstName: req.body.firstName,
@@ -111,7 +111,7 @@ exports.deleteProfile = (req, res) => {
         });
 };
 
-exports.searchUsers = (req, res) => {
+exports.search = (req, res) => {
     let query = req.params.query || '';
     userService.searchUsers(query)
         .then(response => {
