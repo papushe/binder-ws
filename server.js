@@ -108,6 +108,7 @@ app.post(`/${communityContext}/update-role`, communityController.updateCommunity
 
 app.get(`/${communityContext}/search/:query`, communityController.searchCommunity);
 
+app.post(`/${communityContext}/add-waiting-list`, communityController.addUserToWaitingList);
 
 
 //Activity
@@ -119,7 +120,7 @@ app.get(`/${activityContext}/community/get/:key`, activityController.getActiviti
 
 app.post(`/${activityContext}/delete/`, activityController.deleteActivityById);
 
-app.post(`/${activityContext}/updateActivity/`, activityController.updateActivity);
+app.post(`/${activityContext}/update`, activityController.updateActivity);
 
 
 

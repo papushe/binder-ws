@@ -298,3 +298,26 @@ exports.getCommunityById = (communityId) => {
         });
     });
 };
+
+exports.addToWaitingList = (userId, communityId) => {
+    return new Promise((resolve, reject) => {
+        COMMUNITY.findOne({_id: {$eq: communityId}},
+            (err, data) => {
+                if (err || !data || !data.members) {
+                    logger.error(`failed to add user: ${userId} to community waiting list: ${communityId} due to: ${err}`);
+                    reject(false);
+                }
+                else {
+                    data.waiting_list.push({userId: userId});
+                    data.save((err, data) => {
+                        if (err) {
+                            logger.error(`failed to add user: ${userId} to community waiting list: ${communityId} due to: ${err}`);
+                            reject(false);
+                        }
+                        logger.info(`user: ${userId} was added to community waiting list: ${communityId}`);
+                        resolve(data);
+                    });
+                }
+            });
+    });
+};

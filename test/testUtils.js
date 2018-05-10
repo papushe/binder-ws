@@ -6,5 +6,8 @@ module.exports = {
     USER_EMAIL:'test@test.com',
     USER_PASS:'Password1',
     BASE_URL:'localhost:4300',
-    STATUS_OK:200
+    STATUS_OK:200,
+    SERVER_URI: {
+
+    }
 };

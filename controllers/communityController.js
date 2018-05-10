@@ -156,7 +156,7 @@ exports.updateCommunityUserRole = (req, res) => {
                     res.json(false);
                 }
                 //update community
-                action = (role == 'authorizedMember') ? communityService.setAsAuthorizedMember : communityService.setAsMember;
+                action = (role === 'authorizedMember') ? communityService.setAsAuthorizedMember : communityService.setAsMember;
                 action(communityId, userId)
                     .then(result => {
                         res.json(result);
@@ -172,4 +172,15 @@ exports.updateCommunityUserRole = (req, res) => {
         logger.error(`failed to update user: ${userId} role to: ${role} in community ${communityId} due to: ${e}`);
         res.json(false);
     }
+};
+
+exports.addUserToWaitingList = (req, res) => {
+    let {userId, communityId} = req.body;
+    communityService.addToWaitingList(userId, communityId)
+        .then(response => {
+            res.json(response)
+        })
+        .catch(err => {
+            res.json(false);
+        });
 };
