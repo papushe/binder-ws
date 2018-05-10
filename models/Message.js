@@ -2,10 +2,15 @@ const mongoose = require('mongoose'),
     schema = mongoose.Schema,
 
     message = new schema({
-        from: String,
-        room: String,
-        date: String,
-        text: String
+            roomId: String,
+            massages: [
+                {
+                    from: String,
+                    date: String,
+                    roomId: String,
+                    content: String
+                }
+            ]
     }, {strict: true});
 
 
