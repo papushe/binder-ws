@@ -228,7 +228,7 @@ exports.removeUserFromCommunityMembers = (userId, communityId) => {
                     reject(false);
                 }
                 logger.info(`user: ${userId} was removed from community: ${communityId}`);
-                resolve(data.toObject());
+                resolve(data);
             });
     });
 };
@@ -321,3 +321,21 @@ exports.addToWaitingList = (userId, communityId) => {
             });
     });
 };
+
+exports.removeFromWaitingList = (userId, communityId) => {
+    return new Promise((resolve, reject) => {
+        COMMUNITY.findOneAndUpdate({_id: {$eq: communityId}},
+            {$pull: {waiting_list: userId}},
+            (err, data) => {
+                if (err || !data) {
+                    logger.error(`failed to remove user ${userId} from community waiting list: ${communityId} due to: ${err}`);
+                    reject(false);
+                }
+                logger.info(`user: ${userId} was removed from community waiting list: ${communityId}`);
+                resolve(data);
+            });
+    });
+};
+
+
+

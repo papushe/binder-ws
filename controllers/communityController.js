@@ -184,3 +184,14 @@ exports.addUserToWaitingList = (req, res) => {
             res.json(false);
         });
 };
+
+exports.removeUserFromWaitingList = (req, res) => {
+    let {userId, communityId} = req.body;
+    communityService.removeFromWaitingList(userId, communityId)
+        .then(response => {
+            res.json(response)
+        })
+        .catch(err => {
+            res.json(false);
+        });
+};

@@ -110,6 +110,8 @@ app.get(`/${communityContext}/search/:query`, communityController.searchCommunit
 
 app.post(`/${communityContext}/add-waiting-list`, communityController.addUserToWaitingList);
 
+app.post(`/${communityContext}/remove-waiting-list`, communityController.removeUserFromWaitingList);
+
 
 //Activity
 app.post(`/${activityContext}/create/`, activityController.createNewActivity);
