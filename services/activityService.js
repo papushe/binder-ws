@@ -12,7 +12,7 @@ exports.saveNewActivity = (newActivity) => {
                     reject(false);
                 }
                 else {
-                    logger.info(`Activity: ${data._id} was created`);
+                    logger.info(`activity: ${data._id} was created`);
                     resolve(data);
                 }
             }
