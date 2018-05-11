@@ -13,7 +13,7 @@ exports.saveNewMessage = (msg) => {
                     reject(false);
                 }
                 else {
-                    logger.info(`Message: ${data._id} was created`);
+                    logger.debug(`Message: ${data._id} was created`);
                     resolve(data);
                 }
             }
@@ -29,7 +29,7 @@ exports.getRoomMessages = (roomId) => {
                     logger.error(`failed to get room: ${roomId} messages due to: ${err}`);
                     reject(false);
                 }
-                logger.info(`got room: ${roomId} messages`);
+                logger.debug(`got room: ${roomId} messages`);
                 resolve(data);
             });
     });

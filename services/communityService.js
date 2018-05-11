@@ -185,7 +185,7 @@ exports.getCommunityMembers = (communityId) => {
                     logger.error(`failed to get community: ${communityId} members due to: ${err}`);
                     reject(false);
                 }
-                logger.info(`got community ${communityId} members`);
+                logger.debug(`got community ${communityId} members`);
                 resolve(data);
             });
     });

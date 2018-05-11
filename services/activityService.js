@@ -46,7 +46,7 @@ exports.getCommunityActivities = (communityId, filters) => {
                     logger.error(`failed to get community: ${communityId} activities due to: ${err}`);
                     reject(false);
                 }
-                logger.info(`got community: ${communityId} activities with statuses: ${filters}`);
+                logger.debug(`got community: ${communityId} activities with statuses: ${filters}`);
                 resolve(data);
             });
     });
