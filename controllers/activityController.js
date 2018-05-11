@@ -76,7 +76,6 @@ exports.update = (req, res) => {
         community_id: req.body.communityId,
         source: req.body.source,
         destination: req.body.destination,
-        activity_date: Utils.normalizeDate(req.body.activity_date),
         notes: req.body.notes
     });
     let activityId = req.body.activityId;

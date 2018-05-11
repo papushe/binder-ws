@@ -7,7 +7,7 @@ exports.saveNewActivity = (newActivity) => {
     return new Promise((resolve, reject) => {
         newActivity.save(
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to create activity: ${newActivity} due to: ${err}`);
                     reject(false);
                 }
@@ -24,7 +24,7 @@ exports.getUserActivities = (userId) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.find({$or: [{"consumer.id": {$eq: userId}}, {"provider.id": {$eq: userId}}]},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to get user: ${userId} activities due to: ${err}`);
                     reject(false);
                 }
@@ -42,7 +42,7 @@ exports.getCommunityActivities = (communityId, filters) => {
                 {"status.value": {$in: filters}}
             ]},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to get community: ${communityId} activities due to: ${err}`);
                     reject(false);
                 }
@@ -56,7 +56,7 @@ exports.deleteActivityById = (activityId) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.deleteOne({_id: {$eq: activityId}},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to delete activity: ${activityId} due to: ${err}`);
                     reject(false);
                 }
@@ -70,7 +70,7 @@ exports.saveExistingActivity = (newActivity, activityId) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.findOne({_id: activityId},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`Failed to updated activity #${newActivity.activity_name} due to ${err}`);
                     reject(false);
                 }
@@ -83,12 +83,11 @@ exports.saveExistingActivity = (newActivity, activityId) => {
                     community_id: newActivity.community_id,
                     source: newActivity.source,
                     destination: newActivity.destination,
-                    activity_date: Utils.normalizeDate(newActivity.activity_date),
                     notes: newActivity.notes
                 });
                 data.save(
                     (err, data) => {
-                        if (err) {
+                        if (err || !data) {
                             logger.error(`failed to update activity #${newActivity.activity_name} profile due to: ${err}`);
                             reject(false);
                         }
@@ -115,7 +114,7 @@ exports.setClaimer = (userId,fullName, activityId) => {
                         fullName: fullName
                     };
                     data.save((err, data) => {
-                        if (err) {
+                        if (err || !data) {
                             logger.error(`failed to set user: ${userId} as claimer in activity: ${activityId} due to: ${err}`);
                             reject(false);
                         }
@@ -146,7 +145,7 @@ exports.setProvider = (activityId) => {
                         id: data.status.user_id
                     };
                     data.save((err, data) => {
-                        if (err) {
+                        if (err || !data) {
                             logger.error(`failed to set provider in activity: ${activityId} due to: ${err}`);
                             reject(false);
                         }
@@ -167,7 +166,7 @@ exports.deleteUserActivities = (userId, communityId, filters) => {
                     {"status.value": {$in: filters}}
                 ]},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to delete user: ${userId} activities due to: ${err}`);
                     reject(false);
                 }

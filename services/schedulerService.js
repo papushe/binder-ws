@@ -12,7 +12,7 @@ exports.scheduleAction = (activityId, dateTimeUTC, action) => {
                 logger.info(`Job has been scheduled on ${dateTimeUTC} UTC for activity: ${activityId}`);
                 resolve(true);
             }catch (e) {
-                logger.info(`Failed to schedule a job for activity: ${activityId} due to: ${e}`);
+                logger.error(`Failed to schedule a job for activity: ${activityId} due to: ${e}`);
                 reject(false);
             }
         });

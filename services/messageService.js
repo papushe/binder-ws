@@ -1,14 +1,14 @@
 let MESSAGE = require('../models/Message'),
     USER = require('../models/User'),
     Promise = require('promise'),
-    logger = require('../utils').getLogger(),
-    Utils = require('../utils');
+    Utils = require('../utils'),
+    logger = Utils.getLogger();
 
 exports.saveNewMessage = (msg) => {
     return new Promise((resolve, reject) => {
         msg.save(
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to create message: ${msg} due to: ${err}`);
                     reject(false);
                 }
@@ -25,7 +25,7 @@ exports.getRoomMessages = (roomId) => {
     return new Promise((resolve, reject) => {
         MESSAGE.find({room: {$eq: roomId}},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to get room: ${roomId} messages due to: ${err}`);
                     reject(false);
                 }

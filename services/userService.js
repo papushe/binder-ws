@@ -32,7 +32,7 @@ exports.rankUser = (vote) => {
                 });
                 data.save(
                     (err, data) => {
-                        if (err) {
+                        if (err || !data) {
                             logger.error(`failed to rank user: ${vote.userId} due to: ${err}`);
                             reject(false);
                         }
@@ -76,7 +76,7 @@ exports.updateUserProfile = (profileObj) => {
     return new Promise((resolve, reject) => {
         USER.findOne({keyForFirebase: {$eq: profileObj.userId}},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
                     reject(false);
                 }
@@ -92,7 +92,7 @@ exports.updateUserProfile = (profileObj) => {
                 });
                 data.save(
                     (err, data) => {
-                        if (err) {
+                        if (err || !data) {
                             logger.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
                             reject(false);
                         }
@@ -113,10 +113,11 @@ exports.updateUserRole = (userId, communityId, role) => {
             },
             {$set: {"communities.$.role": role}},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.info(err);
                     reject(err);
                 }
+                logger.info(`role was updated to: ${role} to user: ${userId} in community: ${communityId}`);
                 resolve(true);
             })
     });
@@ -129,7 +130,7 @@ exports.removeCommunityFromUser = (userId, communityId) => {
             {$pull: {communities: {communityId: communityId}}},
             {new: true},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to remove user community: ${communityId} from user: ${userId} communities list due to: ${err}`);
                     reject(false);
                 }
@@ -143,13 +144,13 @@ exports.addCommunityToUser = (userId, newCommunity) => {
     return new Promise((resolve, reject) => {
         USER.findOne({keyForFirebase: {$eq: userId}},
             (err, data) => {
-                if (err || data == null || data.communities == null) {
+                if (err || !data) {
                     logger.error(`failed to add user community: ${newCommunity.communityId} to communities list due to: ${err}`);
                     reject(false);
                 }
                 data.communities.push(newCommunity);
                 data.save((err, data) => {
-                    if (err) {
+                    if (err || !data) {
                         logger.info(`error occurred while trying add user community: ${newCommunity.communityId} to communities list: ${err}`);
                         reject(false);
                     }
@@ -164,7 +165,7 @@ exports.deleteUser = (userId) => {
     return new Promise((resolve, reject) => {
         USER.findOneAndRemove({keyForFirebase: {$eq: userId}},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to delete user: ${userId} due to: ${err}`);
                     reject(false);
                 }
@@ -185,11 +186,11 @@ exports.searchUsers = (query) => {
                     ]
             },
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`err occurred when running search: ${err}`);
                     reject(false);
                 }
-                logger.info(`search found ${data.length} results for query: '${query}'`);
+                logger.debug(`search found ${data.length} results for query: '${query}'`);
                 resolve(data);
             });
     });

@@ -36,7 +36,7 @@ exports.saveNewCommunity = (community) => {
 
     return new Promise((resolve, reject) => {
         community.save((err, data) => {
-            if (err) {
+            if (err || !data) {
                 logger.error(`failed to create a new community: ${community} due to: ${err}`);
                 reject(false);
             }
@@ -57,7 +57,7 @@ exports.getUserCommunities = (userId) => {
     return new Promise((resolve, reject) => {
         COMMUNITY.find({members: {$elemMatch: {memberId: userId}}},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to get user: ${userId} communities due to: ${err}`);
                     reject(false);
                 }
@@ -71,7 +71,7 @@ exports.searchCommunities = (query) => {
         COMMUNITY.find(
             {communityName: {$regex: query, $options: "i"}, type: {$ne: 'Secured'}},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`err occurred when running search: ${err}`);
                     reject(false);
                 }
@@ -84,7 +84,7 @@ exports.searchCommunities = (query) => {
 exports.deleteCommunityById = (communityId) => {
     return new Promise((resolve, reject) => {
         COMMUNITY.findOneAndRemove({_id: {$eq: communityId}}, (err) => {
-            if (err) {
+            if (err || !data) {
                 logger.error(`failed to delete community: ${communityId} due to: ${err}`);
                 reject(false);
             }
@@ -105,8 +105,8 @@ exports.setAsAuthorizedMember = (communityId, userId) => {
                     reject(false);
                 }
                     data.authorizedMembers.push({memberId: userId});
-                    data.save((err) => {
-                        if (err) {
+                    data.save((err, data) => {
+                        if (err || !data) {
                             logger.error(`failed to set user: ${userId} as authorized member in community: ${communityId} due to: ${err}`);
                             reject(false);
                         }
@@ -139,11 +139,11 @@ exports.setNewManager = (communityId) => {
     return new Promise((resolve, reject) => {
         COMMUNITY.findOne({_id: {$eq: communityId}},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to set a new manager in community: ${communityId} due to: ${err}`);
                     reject(false);
                 }
-                if (data) {
+                else {
                     getNextNewManagerId(data)
                         .then(newManager => {
                             if (newManager == null) {
@@ -158,8 +158,8 @@ exports.setNewManager = (communityId) => {
                             data.authorizedMembers.splice(index,1);
 
                             //save community after all updates
-                            data.save((err) => {
-                                if (err) {
+                            data.save((err, data) => {
+                                if (err || !data) {
                                     logger.error(`failed to set a new manager in community: ${communityId} due to: ${err}`);
                                     reject(false);
                                 }
@@ -181,7 +181,7 @@ exports.getCommunityMembers = (communityId) => {
     return new Promise((resolve, reject) => {
         USER.find({communities: {$elemMatch: {communityId: communityId}}},
             (err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to get community: ${communityId} members due to: ${err}`);
                     reject(false);
                 }
@@ -206,7 +206,7 @@ exports.addUserToCommunityMembers = (userId, communityId, isPrivileged) => {
                 else {
                     data.members.push({memberId: userId});
                     data.save((err, data) => {
-                        if (err) {
+                        if (err || !data) {
                             logger.error(`failed to add user: ${userId} to community: ${communityId} due to: ${err}`);
                             reject(false);
                         }
@@ -262,7 +262,7 @@ exports.leaveCommunity = (userId, communityId) => {
                             reject(false);
                         }
                         //if the deleted member was the manager set a new one
-                        if (data.managerId == userId && !shouldBeDeleted) {
+                        if (data.managerId === userId && !shouldBeDeleted) {
                             this.setNewManager(communityId)
                                 .then(response => {
                                     resolve(updatedUser);
@@ -292,9 +292,9 @@ exports.getCommunityById = (communityId) => {
                 if (err || !data) {
                     reject(false);
                 }
-                else {
-                    resolve(data);
-                }
+                logger.debug(`found this data by given community id: ${communityId}:\n ${data}`);
+                resolve(data);
+
         });
     });
 };
@@ -310,7 +310,7 @@ exports.addToWaitingList = (userId, communityId) => {
                 else {
                     data.waiting_list.push(userId);
                     data.save((err, data) => {
-                        if (err) {
+                        if (err || !data) {
                             logger.error(`failed to add user: ${userId} to community waiting list: ${communityId} due to: ${err}`);
                             reject(false);
                         }
