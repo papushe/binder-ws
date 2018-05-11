@@ -13,7 +13,6 @@ exports.saveNewActivity = (newActivity) => {
                 }
                 else {
                     logger.info(`Activity: ${data._id} was created`);
-                    logger.debug(`\n${data}`);
                     resolve(data);
                 }
             }
