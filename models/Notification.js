@@ -4,11 +4,13 @@ const mongoose = require('mongoose'),
     notification = new schema({
         from: {
             fullName: String,
-            id: String
+            id: String,
+            profilePic: String
         },
         to: {
             fullName: String,
-            id: String
+            id: String,
+            profilePic: String
         },
         room: String,
         communityName: String,

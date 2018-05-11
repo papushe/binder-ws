@@ -19,7 +19,14 @@ const mongoose = require('mongoose'),
             skills: [String],
             description: String,
             profilePic: String,
-            keyForFirebase: String
+            keyForFirebase: String,
+            chats: [{
+                chatRoomId: String,
+                talkedToId: String,
+                talkedToName: String,
+                talkedFromName: String,
+                profilePic: String,
+            }]
         },
         {toObject: {virtuals: true}},
         {toJSON: {virtuals: true}},
