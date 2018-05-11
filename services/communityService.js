@@ -75,7 +75,7 @@ exports.searchCommunities = (query) => {
                     logger.error(`err occurred when running search: ${err}`);
                     reject(false);
                 }
-                logger.info(`search found ${data.length} results for query: '${query}'`);
+                logger.debug(`search found ${data.length} results for query: '${query}'`);
                 resolve(data);
             });
     });
