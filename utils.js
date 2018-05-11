@@ -33,7 +33,6 @@ function initLogger () {
             new (transports.File) ({
                 filename: `${logDir}/logs.log`,
                 format: format.combine(
-                    format.colorize(),
                     formatMessage(),
                     format.simple()
                 )
@@ -41,6 +40,11 @@ function initLogger () {
         ]
     });
 }
+
+exports.getLogger = () => {
+    initLogger();
+    return logger;
+};
 
 exports.now = () => {
     return moment().format(DATE_FORMAT);
@@ -60,8 +64,12 @@ exports.normalizeDate = (date) => {
     return moment(date).format(DATE_FORMAT);
 };
 
-exports.getLogger = () => {
-    initLogger();
-    return logger;
+exports.currentDateTimeInUTC = () => {
+    return moment.utc().format(DATE_FORMAT);
+};
+
+exports.UTCTimeToLocalDateTime = (date) => {
+    let stillUtc = moment.utc(date).toDate();
+    return moment(stillUtc).local().format(DATE_FORMAT);
 };
 
