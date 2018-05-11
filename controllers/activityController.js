@@ -101,6 +101,18 @@ exports.claim = (req, res) => {
 
 };
 
+exports.decline = (req, res) => {
+    let {activityId} = req.body;
+    activityService.declineClaimer(activityId)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(err => {
+            res.json(err);
+        })
+
+};
+
 exports.approve = (req, res) => {
     let {activityId} = req.body;
 

@@ -87,7 +87,7 @@ app.get(`/${userContext}/delete/:key`, userController.deleteProfile);
 
 app.get(`/${userContext}/search/:query`, userController.search);
 
-app.post(`/${userContext}/vote/`, userController.rank);
+app.post(`/${userContext}/vote`, userController.rank);
 
 
 
@@ -127,6 +127,8 @@ app.post(`/${activityContext}/update`, activityController.update);
 app.post(`/${activityContext}/claim`, activityController.claim);
 
 app.post(`/${activityContext}/approve`, activityController.approve);
+
+app.post(`/${activityContext}/decline`, activityController.decline);
 
 
 

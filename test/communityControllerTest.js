@@ -1,15 +1,14 @@
-let mongoose = require("mongoose");
-let Community = require('../models/Community');
-let testUtils = require('./testUtils');
-let utils = require('../utils');
-
-let chai = require('chai');
-let chaiHttp = require('chai-http');
-let should = chai.should();
-
-let communitiesDictionary = [];
-
-let testUniqueId;
+let mongoose = require("mongoose"),
+    testUtils = require('./testUtils'),
+    SERVER_URI = testUtils.SERVER_URI,
+    utils = require('../utils'),
+    chai = require('chai'),
+    chaiHttp = require('chai-http'),
+    should = chai.should(),
+    communitiesDictionary = [],
+    communities = [],
+    user,
+    testUniqueId;
 
 chai.use(chaiHttp);
 
@@ -44,13 +43,12 @@ function storeTestCommunities(communities) {
 describe(`Community Controller Tests`, () => {
 
     before((done) => {
-        testUniqueId = utils.getRandomString(5) + new Date().getTime();
         chai.request(testUtils.BASE_URL)
             .get(`/deleteCommunities/${testUtils.USER_KEY}`)
             .end((err, res) => {
                 res.should.have.status(testUtils.STATUS_OK);
                 done()
-            });
+        });
     });
 
 

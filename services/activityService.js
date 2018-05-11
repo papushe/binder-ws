@@ -157,6 +157,38 @@ exports.setProvider = (activityId) => {
     });
 };
 
+exports.declineClaimer = (activityId) => {
+    return new Promise((resolve, reject) => {
+        ACTIVITY.findOne({_id: {$eq: activityId}},
+            (err, data) => {
+                if (err || !data) {
+                    logger.error(`failed to decline claimer in activity: ${activityId} due to: ${err}`);
+                    reject(false);
+                }
+                if (!data.status.user_id) {
+                    logger.error(`failed to decline claimer in activity: ${activityId} due to: claimer is missing!`);
+                    reject(false);
+                }
+                else {
+                    let claimer = data.status.user_id;
+                    data.status.value = 'open';
+                    data.provider = {
+                        name: '',
+                        id: ''
+                    };
+                    data.save((err, data) => {
+                        if (err || !data) {
+                            logger.error(`failed to decline claimer in activity: ${activityId} due to: ${err}`);
+                            reject(false);
+                        }
+                        logger.info(`claimer: ${claimer} was declined in activity: ${activityId}`);
+                        resolve(data);
+                    });
+                }
+            });
+    });
+};
+
 exports.deleteUserActivities = (userId, communityId, filters) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.remove(
