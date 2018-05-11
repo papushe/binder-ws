@@ -114,7 +114,9 @@ exports.approve = (req, res) => {
              *
              * e.g send an update notification to all activity participants
              * */
-            schedulerService.scheduleAction(activityId, response.activity_date, function () {})
+            schedulerService.scheduleAction(activityId, response.activity_date, function () {
+                console.log(`Hi I am the action which suppose to run at ${response.activity_date}`);
+            })
                 .then(result => {
                     res.json(response);
 
