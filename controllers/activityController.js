@@ -5,7 +5,6 @@ let Activity = require('../models/Activity'),
     logger = Utils.getLogger();
 
 exports.create = (req, res) => {
-    logger.info(`COMMUNITY ID: ${req.body.communityId}`);
     let activityObj = new Activity({
         activity_name: req.body.activityName,
         activity_description: req.body.activityDescription,
