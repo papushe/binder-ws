@@ -1,7 +1,7 @@
 let Activity = require('../models/Activity'),
     Utils = require('../utils'),
     activityService = require('../services/activityService'),
-    userService = require('../services/userService'),
+    schedulerService = require('../services/schedulerService'),
     logger = Utils.getLogger();
 
 exports.create = (req, res) => {
@@ -10,7 +10,7 @@ exports.create = (req, res) => {
         activity_name: req.body.activityName,
         activity_description: req.body.activityDescription,
         type: req.body.type,
-        created_at: Utils.now(),
+        created_at: Utils.currentDateTimeInUTC(),
         consumer: req.body.consumer,
         provider: req.body.provider,
         community_id: req.body.communityId,
@@ -72,7 +72,6 @@ exports.update = (req, res) => {
         activity_name: req.body.activityName,
         activity_description: req.body.activityDescription,
         type: req.body.type,
-        created_at: Utils.now(),
         consumer: req.body.consumer,
         provider: req.body.provider,
         community_id: req.body.communityId,
@@ -109,7 +108,20 @@ exports.approve = (req, res) => {
 
     activityService.setProvider(activityId)
         .then(response => {
-            res.json(response);
+            /***
+             * we should replace third argument of empty function with a reference of
+             * function we actually want to run when activity time arrives.
+             *
+             * e.g send an update notification to all activity participants
+             * */
+            schedulerService.scheduleAction(activityId, response.activity_date, function () {})
+                .then(result => {
+                    res.json(response);
+
+                })
+                .catch(err => {
+                    res.json(err);
+                });
         })
         .catch(err => {
             res.json(err);
