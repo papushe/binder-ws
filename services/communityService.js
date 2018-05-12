@@ -89,7 +89,7 @@ exports.deleteCommunityById = (communityId) => {
                 reject(false);
             }
             if (!data) {
-                logger.error(`cant delete community: ${communityId} due to: not existed!`);
+                logger.warn(`cant delete community: ${communityId} due to: not existed!`);
                 resolve(true);
             }
             else {
