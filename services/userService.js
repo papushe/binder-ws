@@ -1,6 +1,7 @@
 let USER = require('../models/User'),
     Promise = require('promise'),
-    logger = require('../utils').getLogger();
+    Utils = require('../utils'),
+    logger = Utils.getLogger();
 
 
 const ROLE_MANAGER = 'Manager',
@@ -47,7 +48,7 @@ exports.rankUser = (vote) => {
 exports.saveNewUser = (newUser) => {
     return new Promise((resolve, reject) => {
         newUser.save((err, data) => {
-                if (err) {
+                if (err || !data) {
                     logger.error(`failed to create user: ${newUser} due to: ${err}`);
                     reject(false);
                 }
@@ -74,32 +75,59 @@ exports.getUserProfile = (userId) => {
 
 exports.updateUserProfile = (profileObj) => {
     return new Promise((resolve, reject) => {
-        USER.findOne({keyForFirebase: {$eq: profileObj.userId}},
+        USER.findOne({keyForFirebase: {$eq: profileObj.keyForFirebase}},
             (err, data) => {
-                if (err || !data) {
-                    logger.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
+                if (err) {
+                    logger.error(`failed to find user: ${profileObj.keyForFirebase} profile due to: ${err}`);
                     reject(false);
                 }
-                data.set({
-                    firstName: profileObj.firstName || '',
-                    lastName: profileObj.lastName || '',
-                    location: profileObj.location || '',
-                    phoneNumber: profileObj.phoneNumber || '',
-                    dateOfBirth: profileObj.dateOfBirth || '',
-                    skills: profileObj.skills || '',
-                    description: profileObj.description || '',
-                    profilePic: profileObj.profilePic || ''
-                });
-                data.save(
-                    (err, data) => {
-                        if (err || !data) {
-                            logger.error(`failed to save user: ${profileObj.userId} profile due to: ${err}`);
+                else if (!data) {
+                    logger.info(`user: ${profileObj.keyForFirebase} profile not exist! creating new one...`);
+                    let newUser = new USER({
+                        firstName: profileObj.firstName,
+                        lastName: profileObj.lastName,
+                        location: profileObj.location,
+                        email: profileObj.email,
+                        phoneNumber: profileObj.phoneNumber || '',
+                        dateOfBirth: profileObj.dateOfBirth || '',
+                        creationDate: Utils.now(),
+                        skills: profileObj.skills || '',
+                        description: profileObj.description || '',
+                        profilePic: profileObj.profilePic || '',
+                        keyForFirebase: profileObj.keyForFirebase,
+                    });
+
+                    this.saveNewUser(newUser)
+                        .then(response => {
+                            resolve(response);
+                        })
+                        .catch(err => {
                             reject(false);
+                        });
+                 }
+                else if (data) {
+                    data.set({
+                        keyForFirebase: profileObj.keyForFirebase,
+                        firstName: profileObj.firstName || '',
+                        lastName: profileObj.lastName || '',
+                        location: profileObj.location || '',
+                        phoneNumber: profileObj.phoneNumber || '',
+                        dateOfBirth: profileObj.dateOfBirth || '',
+                        skills: profileObj.skills || '',
+                        description: profileObj.description || '',
+                        profilePic: profileObj.profilePic || ''
+                    });
+                    data.save(
+                        (err, data) => {
+                            if (err || !data) {
+                                logger.error(`failed to save user: ${profileObj.keyForFirebase} profile due to: ${err}`);
+                                reject(false);
+                            }
+                            logger.info(`user: ${profileObj.keyForFirebase} profile was updated`);
+                            resolve(data);
                         }
-                        logger.info(`user: ${profileObj.userId} profile was updated`);
-                        resolve(data);
-                    }
-                );
+                    );
+                }
             })
     });
 };

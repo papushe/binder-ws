@@ -139,7 +139,7 @@ app.post(`/${notificationContext}/update`, notificationController.update);
 
 app.get(`/${notificationContext}/get/:key`, notificationController.getById);
 
-app.post(`/${notificationContext}/delete/`, notificationController.deleteById);
+app.post(`/${notificationContext}/delete`, notificationController.deleteById);
 
 
 

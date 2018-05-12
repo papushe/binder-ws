@@ -10,7 +10,7 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 
-describe(`Activity Controller Tests`, () => {
+describe(`Activity Service Tests`, () => {
 
     //before ALL tests do that.
     before((done) => {

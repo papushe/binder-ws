@@ -56,7 +56,7 @@ let userId = req.params.key;
 
 exports.update = (req, res) => {
     let profileObj = {
-        userId:req.body.keyForFirebase,
+        keyForFirebase:req.body.keyForFirebase,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         location: req.body.location,
@@ -81,7 +81,7 @@ exports.deleteProfile = (req, res) => {
     let actions = [];
     communityService.getUserCommunities(userId)
         .then(communities => {
-            if (communities.length == 0) {
+            if (communities.length === 0) {
                 userService.deleteUser(userId)
                     .then(response => {
                          res.json(response);

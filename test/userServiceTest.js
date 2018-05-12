@@ -10,7 +10,7 @@ let should = chai.should();
 
 chai.use(chaiHttp);
 
-describe(`User Controller Tests`, () => {
+describe(`User Service Tests`, () => {
 
     //before ALL tests do that.
     before((done) => {
