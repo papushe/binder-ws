@@ -46,7 +46,8 @@ exports.saveNewCommunity = (community) => {
                     resolve(response);
                 })
                 .catch(err => {
-                    reject(err);
+                    logger.error(`failed to create a new community: ${community} due to: ${err}`);
+                    reject(false);
                 });
             }
         );
