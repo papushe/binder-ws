@@ -83,7 +83,7 @@ exports.searchCommunities = (query) => {
 
 exports.deleteCommunityById = (communityId) => {
     return new Promise((resolve, reject) => {
-        COMMUNITY.findOneAndRemove({_id: {$eq: communityId}}, (err) => {
+        COMMUNITY.findOneAndRemove({_id: {$eq: communityId}}, (err, data) => {
             if (err || !data) {
                 logger.error(`failed to delete community: ${communityId} due to: ${err}`);
                 reject(false);
