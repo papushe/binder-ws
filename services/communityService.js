@@ -184,22 +184,14 @@ exports.setNewManager = (communityId) => {
 };
 
 exports.getCommunityMembers = (communityId) => {
-    let promises = [];
+    let membersId = [];
     return new Promise((resolve, reject) => {
         this.getCommunityById(communityId)
             .then(community => {
                 community.members.forEach(member => {
-                    promises.push(userService.getUserProfile(member.memberId));
+                    membersId.push(member.memberId);
                 });
-                Promise.all(promises)
-                    .then(response => {
-                        logger.debug(`got community ${communityId} members`);
-                        resolve(response);
-                    })
-                    .catch(err => {
-                        logger.error(`failed to get community: ${communityId} members due to: ${err}`);
-                        reject(false)
-                    })
+                resolve(membersId);
             })
             .catch(err => {
                 logger.error(`failed to get community: ${communityId} members due to: ${err}`);

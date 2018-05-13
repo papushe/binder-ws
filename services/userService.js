@@ -4,13 +4,11 @@ let USER = require('../models/User'),
     logger = Utils.getLogger();
 
 
-const ROLE_MANAGER = 'Manager',
-      ROLE_AUTHORIZED = 'authorizedMember',
+const ROLE_AUTHORIZED = 'authorizedMember',
       ROLE_MEMBER = 'Member';
 
-
 exports.getRole = (role) => {
-    return (role.match(new RegExp('authorized', "ig"))) ? ROLE_AUTHORIZED : ROLE_MEMBER;
+    return (role.match(new RegExp('auth', "ig"))) ? ROLE_AUTHORIZED : ROLE_MEMBER;
 };
 
 exports.rankUser = (vote) => {
@@ -68,7 +66,13 @@ exports.getUserProfile = (userId) => {
                     logger.error(`failed to get user: ${userId} profile due to: ${err}`);
                     reject(false);
                 }
-                resolve(data);
+                if (!data) {
+                    logger.warn(`cannot find user: ${userId} profile due to: not exist!`);
+                    resolve([]);
+                }
+                else {
+                    resolve(data);
+                }
             });
     });
 };
@@ -193,9 +197,13 @@ exports.deleteUser = (userId) => {
     return new Promise((resolve, reject) => {
         USER.findOneAndRemove({keyForFirebase: {$eq: userId}},
             (err, data) => {
-                if (err || !data) {
+                if (err) {
                     logger.error(`failed to delete user: ${userId} due to: ${err}`);
                     reject(false);
+                }
+                if (!data) {
+                    logger.warn(`cannot delete user: ${userId} due to: not existed!`);
+                    resolve(true);
                 }
                 logger.info(`user: ${userId} was deleted!`);
                 resolve(true);

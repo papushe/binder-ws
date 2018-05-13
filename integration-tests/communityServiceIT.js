@@ -17,12 +17,12 @@ let testUtils = require('./testUtils'),
         keyForFirebase: 'RJKAEPE0Cog4oZRIiSGtHus2X0g1'
     };
 
-describe(`Community Service Tests`, () => {
+describe(`Community Service Integration Tests`, () => {
 
     before(async () => {
         let promises = [];
         //clean old tests communities and references
-        logger.info(`communityServiceTest started at: ${utils.now()}`);
+        logger.info(`communityServiceIT started at: ${utils.now()}`);
         testUniqueId = `test ${new Date().getTime()}`;
         let result = await testedService.getUserCommunities(testUser.USER_KEY);
 
@@ -46,7 +46,7 @@ describe(`Community Service Tests`, () => {
         let result = await Promise.all(promises);
 
             logger.info(`removed all test communities? ${!!result}`);
-            logger.info(`communityServiceTest ended at: ${utils.now()}`);
+            logger.info(`communityServiceIT ended at: ${utils.now()}`);
     });
 
     it(`should create new communities`, async () => {
@@ -119,13 +119,23 @@ describe(`Community Service Tests`, () => {
 
     });
 
-    it(`should set as authorized member in community`, async () => {
+    it(`should set a member as authorized member`, async () => {
         let result = await testedService.setAsAuthorizedMember(communities[0]._id, member.keyForFirebase);
         expect(result).equal(true);
 
         result = await testedService.getCommunityById(communities[0]._id);
         result.authorizedMembers.should.be.an('array').with.lengthOf(1);
         expect(result.authorizedMembers[0].memberId).equal(member.keyForFirebase);
+    });
+
+    it(`should set an authorized member as a member`, async () => {
+        let result = await testedService.setAsMember(communities[0]._id, member.keyForFirebase);
+        expect(result).equal(true);
+
+        result = await testedService.getCommunityById(communities[0]._id);
+        result.authorizedMembers.should.be.an('array').with.lengthOf(0);
+        result.members.should.be.an('array').with.lengthOf(2);
+        expect(result.members[1].memberId).equal(member.keyForFirebase);
     });
 
     it(`should leave community`, async () => {

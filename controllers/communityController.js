@@ -142,9 +142,25 @@ exports.join = (req, res) => {
 };
 
 exports.getMembers = (req, res) => {
+    let promises = [];
     communityService.getCommunityMembers(req.body.communityId)
         .then((response) => {
-            res.json(response);
+            if (!response)
+            {
+                res.json(response);
+            }
+            else {
+                response.forEach(memberId => {
+                    promises.push(userService.getUserProfile(memberId));
+                });
+
+                Promise.all(promises)
+                    .then(response => {
+                        res.json(response);
+                    }).catch(err => {
+                    res.json(err);
+                });
+            }
         })
         .catch(err => {
             res.json(err);
