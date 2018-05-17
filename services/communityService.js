@@ -220,6 +220,7 @@ exports.addUserToCommunityMembers = (userId, communityId, isPrivileged) => {
                             reject(false);
                         }
                         logger.info(`user: ${userId} was added as member to community: ${communityId}`);
+                        // resolve(data);
                         resolve(true);
                     });
                 }

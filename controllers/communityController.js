@@ -117,16 +117,17 @@ exports.join = (req, res) => {
 
     //adding user to community members
     communityService.addUserToCommunityMembers(uid, communityId, isPrivileged)
-        .then(response => {
-            if (!response) {
-                res.json(response);
+        .then(community => {
+            if (!community) {
+                res.json(community);
             }
             //adding community to user
             userService.addCommunityToUser(uid, newCommunity)
                 .then(user => {
                     communityService.removeFromWaitingList(uid, communityId)
-                        .then(response => {
+                        .then(community => {
                             res.json(user);
+                            // res.json(community);
                         })
                         .catch(err => {
                             res.json(err);
