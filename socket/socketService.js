@@ -300,6 +300,7 @@ module.exports = (io) => {
                     delete connectedUserInSpecificCommunity[params.room][userName];
                 }
             }
+
             //
             // function updateUserRole(params) {
             //     io.to(params.community._id).emit('on-update-user-role', {
@@ -433,11 +434,11 @@ module.exports = (io) => {
                     notificationObj = new NOTIFICATION({
                         from: from,
                         to: to,
-                        room: params.roomId,
+                        room: params.room,
                         status: 'unread',
                         creation_date: Utils.now(),
                         event: 'enter-to-chat-room',
-                        content: `${socket.nickname} enter to ${params.roomName} community`,
+                        content: `Chat invitation received from ${socket.nickname}`,
                     });
 
                 } else if (type === 'askToJoinPrivateRoom') {
