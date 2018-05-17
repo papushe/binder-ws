@@ -7,9 +7,9 @@ const mongoose = require('mongoose'),
         creationDate: String,
         managerId: String,
         managerName: String,
-        authorizedMembers: [{
-            memberId: String
-        }],
+        // authorizedMembers: [{
+        //     memberId: String
+        // }],
         members: [{
             memberId: String
         }],
