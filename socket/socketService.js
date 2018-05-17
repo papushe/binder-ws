@@ -96,7 +96,7 @@ module.exports = (io) => {
 
                 }
                 deleteFromCommunity(params);
-                socket.leave(params.room);
+                // socket.leave(params.room);
             });
 
             // socket.on('update-user-role', (params) => {
@@ -418,7 +418,7 @@ module.exports = (io) => {
                         status: 'unread',
                         creation_date: Utils.now(),
                         event: 'add-to-community-by-manager',
-                        content: `${socket.nickname} added you to ${params.communityName} community`,
+                        content: `${socket.nickname} added you to ${params.roomName} community`,
                     });
                 } else if (type === 'deleteByManager') {
                     notificationObj = new NOTIFICATION({
