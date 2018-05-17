@@ -66,11 +66,11 @@ describe(`User Service Integration Tests`, () => {
         expect(result.rank).equal(-1);
     });
 
-    it(`should check that getRole returns the correct role`, async () => {
-        expect(testedService.getRole('MemBER')).equal('Member');
-        expect(testedService.getRole('AUTH')).equal('authorizedMember');
-        expect(testedService.getRole('invalid role')).equal('Member');
-    });
+    // it(`should check that getRole returns the correct role`, async () => {
+    //     expect(testedService.getRole('MemBER')).equal('Member');
+    //     // expect(testedService.getRole('AUTH')).equal('authorizedMember');
+    //     expect(testedService.getRole('invalid role')).equal('Member');
+    // });
 
     it(`should vote for an user and check user rank`, async () => {
         let voteUp  = {userId: testKey, up: true};
@@ -141,18 +141,18 @@ describe(`User Service Integration Tests`, () => {
         expect(result.communities[0].role).equal('Member');
     });
 
-    it(`should update user role`, async () => {
-        let result = await testedService.updateUserRole(testKey, communityId, 'authorizedMember');
-
-        expect(result).not.equal(false);
-        expect(result).not.equal(null);
-        expect(result).equal(true);
-
-        result = await testedService.getUserProfile(testKey);
-        result.communities.should.be.an('array').with.lengthOf(1);
-        expect(result.communities[0].communityId).equal(communityId);
-        expect(result.communities[0].role).equal('authorizedMember');
-    });
+    // it(`should update user role`, async () => {
+    //     let result = await testedService.updateUserRole(testKey, communityId, 'authorizedMember');
+    //
+    //     expect(result).not.equal(false);
+    //     expect(result).not.equal(null);
+    //     expect(result).equal(true);
+    //
+    //     result = await testedService.getUserProfile(testKey);
+    //     result.communities.should.be.an('array').with.lengthOf(1);
+    //     expect(result.communities[0].communityId).equal(communityId);
+    //     expect(result.communities[0].role).equal('authorizedMember');
+    // });
 
     it(`should remove community from user`, async () => {
 

@@ -167,41 +167,41 @@ exports.getMembers = (req, res) => {
         });
 };
 
-exports.updateUserRole = (req, res) => {
-    let userId = req.body.uid;
-    let communityId = req.body.communityId;
-    let role = userService.getRole(req.body.role);
-    let action;
-
-    try {
-        if (role == null) {
-            logger.info(`${role} role is invalid`);
-            res.json(false);
-        }
-        //update user
-        userService.updateUserRole(userId, communityId, role)
-            .then(response => {
-                if (!response) {
-                    res.json(false);
-                }
-                //update community
-                action = (role === 'authorizedMember') ? communityService.setAsAuthorizedMember : communityService.setAsMember;
-                action(communityId, userId)
-                    .then(result => {
-                        res.json(result);
-                    })
-                    .catch(err => {
-                        res.json(err);
-                    });
-            })
-            .catch(err => {
-                res.json(err);
-            });
-    } catch (e) {
-        logger.error(`failed to update user: ${userId} role to: ${role} in community ${communityId} due to: ${e}`);
-        res.json(false);
-    }
-};
+// exports.updateUserRole = (req, res) => {
+//     let userId = req.body.uid;
+//     let communityId = req.body.communityId;
+//     let role = userService.getRole(req.body.role);
+//     let action;
+//
+//     try {
+//         if (role == null) {
+//             logger.info(`${role} role is invalid`);
+//             res.json(false);
+//         }
+//         //update user
+//         userService.updateUserRole(userId, communityId, role)
+//             .then(response => {
+//                 if (!response) {
+//                     res.json(false);
+//                 }
+//                 //update community
+//                 action = (role === 'authorizedMember') ? communityService.setAsAuthorizedMember : communityService.setAsMember;
+//                 action(communityId, userId)
+//                     .then(result => {
+//                         res.json(result);
+//                     })
+//                     .catch(err => {
+//                         res.json(err);
+//                     });
+//             })
+//             .catch(err => {
+//                 res.json(err);
+//             });
+//     } catch (e) {
+//         logger.error(`failed to update user: ${userId} role to: ${role} in community ${communityId} due to: ${e}`);
+//         res.json(false);
+//     }
+// };
 
 exports.addUserToWaitingList = (req, res) => {
     let {userId, communityId} = req.body;

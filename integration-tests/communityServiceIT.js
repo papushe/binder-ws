@@ -119,37 +119,37 @@ describe(`Community Service Integration Tests`, () => {
 
     });
 
-    it(`should set a member as authorized member`, async () => {
-        let result = await testedService.setAsAuthorizedMember(communities[0]._id, member.keyForFirebase);
-        expect(result).equal(true);
+    // it(`should set a member as authorized member`, async () => {
+    //     let result = await testedService.setAsAuthorizedMember(communities[0]._id, member.keyForFirebase);
+    //     expect(result).equal(true);
+    //
+    //     result = await testedService.getCommunityById(communities[0]._id);
+    //     result.authorizedMembers.should.be.an('array').with.lengthOf(1);
+    //     expect(result.authorizedMembers[0].memberId).equal(member.keyForFirebase);
+    // });
 
-        result = await testedService.getCommunityById(communities[0]._id);
-        result.authorizedMembers.should.be.an('array').with.lengthOf(1);
-        expect(result.authorizedMembers[0].memberId).equal(member.keyForFirebase);
-    });
+    // it(`should set an authorized member as a member`, async () => {
+    //     let result = await testedService.setAsMember(communities[0]._id, member.keyForFirebase);
+    //     expect(result).equal(true);
+    //
+    //     result = await testedService.getCommunityById(communities[0]._id);
+    //     result.authorizedMembers.should.be.an('array').with.lengthOf(0);
+    //     result.members.should.be.an('array').with.lengthOf(2);
+    //     expect(result.members[1].memberId).equal(member.keyForFirebase);
+    // });
 
-    it(`should set an authorized member as a member`, async () => {
-        let result = await testedService.setAsMember(communities[0]._id, member.keyForFirebase);
-        expect(result).equal(true);
-
-        result = await testedService.getCommunityById(communities[0]._id);
-        result.authorizedMembers.should.be.an('array').with.lengthOf(0);
-        result.members.should.be.an('array').with.lengthOf(2);
-        expect(result.members[1].memberId).equal(member.keyForFirebase);
-    });
-
-    it(`should leave community`, async () => {
-        let result = await testedService.removeUserFromCommunityMembers(member.keyForFirebase, communities[0]._id, false);
-        expect(result).not.equal(false);
-        expect(result).not.equal(null);
-
-        result = await testedService.getCommunityById(communities[0]._id);
-        expect(result).not.equal(false);
-        expect(result).not.equal(null);
-        result.authorizedMembers.should.be.an('array').with.lengthOf(0);
-        result.members.should.be.an('array').with.lengthOf(1);
-        expect(result.members[0].memberId).equal(testUser.USER_KEY);
-    });
+    // it(`should leave community`, async () => {
+    //     let result = await testedService.removeUserFromCommunityMembers(member.keyForFirebase, communities[0]._id, false);
+    //     expect(result).not.equal(false);
+    //     expect(result).not.equal(null);
+    //
+    //     result = await testedService.getCommunityById(communities[0]._id);
+    //     expect(result).not.equal(false);
+    //     expect(result).not.equal(null);
+    //     result.authorizedMembers.should.be.an('array').with.lengthOf(0);
+    //     result.members.should.be.an('array').with.lengthOf(1);
+    //     expect(result.members[0].memberId).equal(testUser.USER_KEY);
+    // });
 
     it(`should leave community and set a new manager`, async () => {
         let result = await testedService.addUserToCommunityMembers(member.keyForFirebase, communities[0]._id, false);
