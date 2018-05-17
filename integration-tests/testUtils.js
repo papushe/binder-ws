@@ -31,7 +31,6 @@ module.exports = {
             delete: `/${communityContext}/delete`,
             members: `/${communityContext}/members`,
             get: `/${communityContext}/get/:key`,
-            update_role: `/${communityContext}/update-role`,
             search: `/${communityContext}/search/:query`,
             add_waiting_list: `/${communityContext}/add-waiting-list`,
             remove_waiting_list: `/${communityContext}/remove-waiting-list`,

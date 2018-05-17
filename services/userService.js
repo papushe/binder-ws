@@ -3,14 +3,6 @@ let USER = require('../models/User'),
     Utils = require('../utils'),
     logger = Utils.getLogger();
 
-
-// const ROLE_AUTHORIZED = 'authorizedMember',
-      const ROLE_MEMBER = 'Member';
-
-// exports.getRole = (role) => {
-//     return (role.match(new RegExp('auth', "ig"))) ? ROLE_AUTHORIZED : ROLE_MEMBER;
-// };
-
 exports.rankUser = (vote) => {
     return new Promise((resolve, reject) => {
         USER.findOne({keyForFirebase: {$eq: vote.userId}},
@@ -132,25 +124,6 @@ exports.updateUserProfile = (profileObj) => {
                         }
                     );
                 }
-            })
-    });
-};
-
-exports.updateUserRole = (userId, communityId, role) => {
-    return new Promise((resolve, reject) => {
-        USER.updateOne(
-            {
-                keyForFirebase: userId,
-                communities: {$elemMatch: {communityId: {$eq: communityId}}}
-            },
-            {$set: {"communities.$.role": role}},
-            (err, data) => {
-                if (err || !data) {
-                    logger.info(err);
-                    reject(err);
-                }
-                logger.info(`role was updated to: ${role} to user: ${userId} in community: ${communityId}`);
-                resolve(true);
             })
     });
 };

@@ -6,10 +6,6 @@ let COMMUNITY = require('../models/Community'),
 
 function getNextNewManagerId (community) {
     return new Promise((resolve, reject) => {
-        // if (community.authorizedMembers.length > 0) {
-        //     logger.info(`user: ${community.authorizedMembers[0].memberId} has been chosen as new manager of community: ${community._id}`);
-        //     resolve(community.authorizedMembers[0].memberId);
-        // }
         if (community.members.length > 0){
             logger.info(`user: ${community.members[0].memberId} has been chosen as new manager of community: ${community._id}`);
             resolve(community.members[0].memberId);
@@ -99,45 +95,6 @@ exports.deleteCommunityById = (communityId) => {
         });
     });
 };
-
-// exports.setAsAuthorizedMember = (communityId, userId) => {
-//     return new Promise((resolve, reject) => {
-//         COMMUNITY.findOne({_id: {$eq: communityId}},
-//             (err, data) => {
-//                 if (err || !data) {
-//                     logger.error(`failed to set user: ${userId} as authorized member in community: ${communityId} due to: ${err}`);
-//                     reject(false);
-//                 }
-//                     data.authorizedMembers.push({memberId: userId});
-//                     data.save((err, data) => {
-//                         if (err || !data) {
-//                             logger.error(`failed to set user: ${userId} as authorized member in community: ${communityId} due to: ${err}`);
-//                             reject(false);
-//                         }
-//                         logger.info(`user ${userId} is now an authorized member in community: ${communityId}`);
-//                         resolve(true);
-//                     });
-//             });
-//     });
-// };
-
-// exports.setAsMember = (communityId, userId) => {
-//     return new Promise((resolve, reject) => {
-//         COMMUNITY.findOneAndUpdate({_id: {$eq: communityId}},
-//             {$pull: {authorizedMembers: {memberId: userId}}},
-//             {new: true},
-//             (err, data) => {
-//                 if (err || !data || !data._doc) {
-//                     logger.error(`failed to set user: ${userId} as a member in community: ${communityId} due to: ${err}`);
-//                     reject(false);
-//                 }
-//                 else {
-//                     logger.info(`user ${userId} is now a member in ${communityId}`);
-//                     resolve(true);
-//                 }
-//             });
-//     });
-// };
 
 exports.setNewManager = (communityId) => {
     return new Promise((resolve, reject) => {
