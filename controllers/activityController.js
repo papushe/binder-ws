@@ -1,6 +1,7 @@
 let Activity = require('../models/Activity'),
     Utils = require('../utils'),
     activityService = require('../services/activityService'),
+    userService = require('../services/userService'),
     schedulerService = require('../services/schedulerService'),
     logger = Utils.getLogger();
 
@@ -114,10 +115,12 @@ exports.decline = (req, res) => {
 };
 
 exports.approve = (req, res) => {
-    let {activityId} = req.body;
+    let {activityId, userId} = req.body;
 
     activityService.setProvider(activityId)
         .then(response => {
+            userService.addApprovedActivity(activityId, userId)
+                .then()
             /***
              * we should replace third argument of empty function with a reference of
              * function we actually want to run when activity time arrives.

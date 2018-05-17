@@ -231,3 +231,8 @@ exports.searchUsers = (query) => {
             });
     });
 };
+
+exports.addApprovedActivity = (activityId, userId) => {
+
+};
+

@@ -16,6 +16,9 @@ const mongoose = require('mongoose'),
                 up: {type: Number, default: 0},
                 down: {type: Number, default: 0}
             },
+            activities: [{
+               activityId: String
+            }],
             skills: [String],
             description: String,
             profilePic: String,
