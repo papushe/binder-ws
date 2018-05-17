@@ -4,12 +4,12 @@ let USER = require('../models/User'),
     logger = Utils.getLogger();
 
 
-const ROLE_AUTHORIZED = 'authorizedMember',
-      ROLE_MEMBER = 'Member';
+// const ROLE_AUTHORIZED = 'authorizedMember',
+      const ROLE_MEMBER = 'Member';
 
-exports.getRole = (role) => {
-    return (role.match(new RegExp('auth', "ig"))) ? ROLE_AUTHORIZED : ROLE_MEMBER;
-};
+// exports.getRole = (role) => {
+//     return (role.match(new RegExp('auth', "ig"))) ? ROLE_AUTHORIZED : ROLE_MEMBER;
+// };
 
 exports.rankUser = (vote) => {
     return new Promise((resolve, reject) => {
