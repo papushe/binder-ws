@@ -17,7 +17,8 @@ const mongoose = require('mongoose'),
         status: String,
         creation_date: String,
         event: String,
-        content: String
+        content: String,
+        user: String
     }, {strict: true});
 
 

@@ -99,6 +99,29 @@ module.exports = (io) => {
                 socket.leave(params.room);
             });
 
+            // socket.on('update-user-role', (params) => {
+            //     let userName = params.user.fullName;
+            //
+            //     if (userName in allUsers) {
+            //
+            //         if (userName in connectedUserInSpecificCommunity[params.community._id]) {
+            //
+            //         } else {
+            //
+            //             updateUserRolePrivate(params, userName);
+            //
+            //         }
+            //
+            //     } else {
+            //
+            //         sendNotification(params, 'updateUserRole')
+            //
+            //     }
+            //
+            //     updateUserRole(params);
+            //
+            // });
+
             socket.on('activities-change', (params) => {
                 if (params.event == 'create') {
                     io.to(params.room).emit('activities-change', {
@@ -272,6 +295,29 @@ module.exports = (io) => {
                     delete connectedUserInSpecificCommunity[params.room][userName];
                 }
             }
+            //
+            // function updateUserRole(params) {
+            //     io.to(params.community._id).emit('on-update-user-role', {
+            //         from: params.from,
+            //         community: params.community,
+            //         user: params.user,
+            //         event: 'update-user-role',
+            //         role: params.role,
+            //         date: Utils.now()
+            //     });
+            // }
+            //
+            // function updateUserRolePrivate(params, userName) {
+            //     allUsers[params.user.fullName].emit('on-update-user-role-private', {
+            //         from: params.from,
+            //         community: params.community,
+            //         user: params.user,
+            //         event: 'update-user-role',
+            //         role: params.role,
+            //         date: Utils.now()
+            //     });
+            // }
+
 
             function enterToPrivateChatRoom(params) {
                 roomKey[socket.nickname] = socket;
@@ -416,6 +462,23 @@ module.exports = (io) => {
                         content: `Community ${params.communityName}`,
                     });
                 }
+                // else if (type === 'updateUserRole') {
+                //
+                //     from.id = params.from.keyForFirebase;
+                //     to.fullName = params.user.fullName;
+                //     to.id = params.user.keyForFirebase;
+                //
+                //     notificationObj = new NOTIFICATION({
+                //         from: from,
+                //         to: to,
+                //         status: 'unread',
+                //         creation_date: Utils.now(),
+                //         event: 'update-user-role',
+                //         user: params.user,
+                //         communityName: params.community.communityName,
+                //         content: `You are now ${params.role} in ${params.community.communityName} community`,
+                //     });
+                // }
 
                 notificationService.saveNewNotification(notificationObj)
             }
