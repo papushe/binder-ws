@@ -197,16 +197,21 @@ module.exports = (io) => {
 
                 deleteFromPrivateChatRoom(params);
 
-                if (params.user.fullName in connectedUserInSpecificChatRoom[params.room]) {
 
-                    allUsers[params.user.fullName].emit('change-event-chat-room', {
-                        from: params.from,
-                        to: params.user,
-                        room: params.room,
-                        event: 'left',
-                        date: Utils.now()
-                    });
-                    socket.leave(params.room);
+                if (connectedUserInSpecificChatRoom[params.room]) {
+
+                    if (params.user.fullName in connectedUserInSpecificChatRoom[params.room]) {
+
+                        allUsers[params.user.fullName].emit('change-event-chat-room', {
+                            from: params.from,
+                            to: params.user,
+                            room: params.room,
+                            event: 'left',
+                            date: Utils.now()
+                        });
+                        socket.leave(params.room);
+                    }
+
                 }
             });
 
