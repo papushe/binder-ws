@@ -46,6 +46,15 @@ exports.getLogger = () => {
     return logger;
 };
 
+exports.getUnixTime = (dateStr) => {
+    let localDateWithOffset = new Date(dateStr);
+    return localDateWithOffset.getTime() - (localDateWithOffset.getTimezoneOffset() * 60 * 1000);
+};
+
+exports.unixToLocal = (epoch) => {
+   return moment.utc(epoch).local().format(DATE_FORMAT);
+};
+
 exports.now = () => {
     return moment().format(DATE_FORMAT);
 };

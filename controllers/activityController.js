@@ -121,11 +121,8 @@ exports.approve = (req, res) => {
         .then(updatedActivity => {
             userService.addApprovedActivity(activityId, updatedActivity.provider.id)
                 .then(updatedUser => {
-                    /***
-                     * scheduleAction is ready yet
-                     * */
                     if (updatedUser) {
-                        schedulerService.scheduleAction(updatedActivity, demoFunc)
+                        schedulerService.scheduleAction(updatedActivity, activityService.execute)
                             .then(result => {
                                 res.json(result);
 
@@ -145,8 +142,4 @@ exports.approve = (req, res) => {
         .catch(err => {
             res.json(err);
         });
-};
-
-demoFunc = () =>  {
-    logger.warn(`Hi Im your func!!!`);
 };

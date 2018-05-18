@@ -1,4 +1,5 @@
 let ACTIVITY = require('../models/Activity'),
+    schedulerService = require('../services/schedulerService'),
     Promise = require('promise'),
     Utils = require('../utils'),
     logger = Utils.getLogger();
@@ -17,6 +18,20 @@ exports.saveNewActivity = (newActivity) => {
                 }
             }
         );
+    });
+};
+
+exports.getActivityById = (activityId) => {
+    return new Promise((resolve, reject) => {
+        ACTIVITY.find({id: {$eq: activityId}},
+            (err, data) => {
+                if (err || !data) {
+                    logger.error(`failed to get activity: ${activityId} due to: ${err}`);
+                    reject(false);
+                }
+                logger.debug(`got activity ${activityId}`);
+                resolve(data);
+            });
     });
 };
 
@@ -210,3 +225,31 @@ exports.deleteUserActivities = (userId, communityId, filters) => {
     });
 };
 
+exports.execute = () => {
+    let promises = [];
+    schedulerService.getJobsToExecute()
+        .then(data => {
+            if (!data && data.length === 0) {
+                resolve([]);
+            }
+            else {
+                data.forEach(job =>{
+                    promises.push(this.getActivityById(job.activity_id));
+                });
+
+                Promise.all(promises)
+                    .then(data => {
+                        resolve(data);
+                    })
+                    .catch(err => {
+                        logger.error(`failed to get all activities which associated to upcoming jobs due to: ${err}`);
+                        reject(err);
+                });
+            }
+        })
+        .catch(err => {
+            logger.error(`failed to get jobs since 5 min ago till the next 5 min due to: ${err}`);
+            reject(err);
+        });
+
+};

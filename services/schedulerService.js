@@ -5,6 +5,35 @@ let schedule = require('node-schedule'),
     logger = Utils.getLogger(),
     RETRIES_COUNT = 3;
 
+exports.getJobsToExecute = () => {
+    let activities = [];
+    let currentUnixTime = new Date().getTime();
+    let unixTime5MinAgo =  currentUnixTime - (300 * 1000);
+    let unixNext5Min = currentUnixTime + (300 * 1000);
+
+    /**
+     *
+     * I should filter jobs which have already executed!
+     * */
+    JOB.find({execution_date: {$gt: unixTime5MinAgo, $lt:unixNext5Min}},
+        (err, data) => {
+            if (err) {
+                logger.error(`failed to fetch jobs from: ${Utils.unixToLocal(unixTime5MinAgo)} to: ${Utils.unixToLocal(unixTime5MinAgo)}`)
+                reject(err);
+            }
+            if (!data) {
+                logger.warn(`cant find jobs to execute from: ${Utils.unixToLocal(unixTime5MinAgo)} to: ${Utils.unixToLocal(unixTime5MinAgo)}`);
+                resolve(activities);
+            }
+            else {
+                data.forEach(job => {
+                    activities.push(job.activity_id);
+                });
+                resolve(activities)
+            }
+        });
+};
+
 exports.scheduleAction = (updatedActivity, action) => {
     let activity = updatedActivity;
     let activityLocalDateTime;
@@ -42,13 +71,14 @@ exports.scheduleAction = (updatedActivity, action) => {
 };
 
 storeScheduledActivityInDB = (activity) => {
+
     let job = new JOB( {
         activity_id: activity._id,
         status: 'pending',
         created_at: Utils.currentDateTimeInUTC(),
         consumer: activity.consumer,
         provider: activity.provider,
-        execution_date: activity.activity_date,
+        execution_date: Utils.getUnixTime(activity.activity_date),
     });
 
     return new Promise((resolve, reject) => {
@@ -64,4 +94,5 @@ storeScheduledActivityInDB = (activity) => {
         })
     });
 };
+
 
