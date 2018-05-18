@@ -50,6 +50,10 @@ exports.now = () => {
     return moment().format(DATE_FORMAT);
 };
 
+exports.isAfterUTC = (date) => {
+    return moment.utc().isAfter(date);
+};
+
 exports.getRandomString = (length) => {
     length = 10;
     let text = "";

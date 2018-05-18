@@ -7,7 +7,8 @@ let schedule = require('node-schedule'),
 
 exports.scheduleAction = (updatedActivity, action) => {
     let activity = updatedActivity;
-    let localDateTime;
+    let activityLocalDateTime;
+    let job;
 
     return new Promise((resolve, reject) => {
             try {
@@ -15,9 +16,15 @@ exports.scheduleAction = (updatedActivity, action) => {
                     logger.error(`Failed to create a new job because Activity obj is undefined!`);
                     reject(false);
                 }
+
+                activityLocalDateTime = Utils.UTCTimeToLocalDateTime(activity.activity_date);
+
+                if (Utils.isAfterUTC(activityLocalDateTime)) {
+                    logger.warn(`activity execution time: ${activityLocalDateTime} UTC! \n now the time is: ${Utils.currentDateTimeInUTC()}`);
+                    resolve(null);
+                }
                 else {
-                    localDateTime = Utils.UTCTimeToLocalDateTime(activity.activity_date);
-                    schedule.scheduleJob(localDateTime, action());
+                    job = schedule.scheduleJob(activityLocalDateTime, action);
                     storeScheduledActivityInDB(activity)
                         .then(job => {
                             logger.info(`Job has been scheduled on ${activity.activity_date} UTC for activity: ${activity._id}`);
@@ -34,7 +41,7 @@ exports.scheduleAction = (updatedActivity, action) => {
         });
 };
 
-scheduleAction = (activity) => {
+storeScheduledActivityInDB = (activity) => {
     let job = new JOB( {
         activity_id: activity._id,
         status: 'pending',
