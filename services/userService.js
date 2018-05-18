@@ -206,6 +206,30 @@ exports.searchUsers = (query) => {
 };
 
 exports.addApprovedActivity = (activityId, userId) => {
-
+    return new Promise((resolve, reject) => {
+        USER.findOne({keyForFirebase: {$eq: userId}},
+            (err, data) => {
+            if (err) {
+                logger.error(`failed to update activity to user: ${userId} due to : ${err}`);
+                reject(false);
+            }
+            if (!data) {
+                logger.warn(`failed to update activity to user: ${userId} due to : user not exist!`);
+                resolve(null);
+            }
+            else {
+                data.activities.push(activityId);
+                data.save((err) => {
+                    if (err) {
+                        logger.error(`failed to update activity to user: ${userId} due to : ${err}`);
+                        reject(false);
+                    }
+                    else {
+                        resolve(data);
+                    }
+                })
+            }
+        });
+    });
 };
 

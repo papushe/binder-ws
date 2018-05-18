@@ -118,28 +118,36 @@ exports.approve = (req, res) => {
     let {activityId, userId} = req.body;
 
     activityService.setProvider(activityId)
-        .then(response => {
+        .then(updatedActivity => {
             userService.addApprovedActivity(activityId, userId)
-                .then()
-            /***
-             * we should replace third argument of empty function with a reference of
-             * function we actually want to run when activity time arrives.
-             *
-             * e.g send an update notification to all activity participants
-             * */
-            schedulerService.scheduleAction(activityId, response.activity_date, function () {
-                console.log(`Hi I am the action which suppose to run at ${response.activity_date}`);
-            })
-                .then(result => {
-                    res.json(response);
+                .then(updatedUser => {
+                    /***
+                     * we should replace third argument of empty function with a reference of
+                     * function we actually want to run when activity time arrives.
+                     *
+                     * e.g send an update notification to all activity participants
+                     * */
+                    if (updatedUser) {
+                        schedulerService.scheduleAction(activityId, updatedActivity.activity_date, () => {
+                            console.log(`Hi I am the action which suppose to run at ${response.activity_date}`);
+                        })
+                            .then(result => {
+                                res.json(response);
 
-                })
-                .catch(err => {
-                    res.json(err);
-                });
+                            })
+                            .catch(err => {
+                                res.json(err);
+                            });
+                    }
+                    else {
+                        res.json(false);
+                    }
+
+                }).catch(err => {
+                res.json(err);
+            });
         })
         .catch(err => {
             res.json(err);
         });
-
 };

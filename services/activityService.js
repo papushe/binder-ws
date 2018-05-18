@@ -127,6 +127,7 @@ exports.setClaimer = (userId,fullName, activityId) => {
 };
 
 exports.setProvider = (activityId) => {
+    let newStatus = 'approved';
     return new Promise((resolve, reject) => {
         ACTIVITY.findOne({_id: {$eq: activityId}},
             (err, data) => {
@@ -134,15 +135,16 @@ exports.setProvider = (activityId) => {
                     logger.error(`failed to set provider in activity: ${activityId} due to: ${err}`);
                     reject(false);
                 }
-                if (!data.status.user_id) {
-                    logger.error(`failed to set provider in activity: ${activityId} due to: claimer is missing!`);
-                    reject(false);
-                }
                 else {
-                    data.status.value = 'approved';
+                    if (!data.status.user_id) {
+                        newStatus = 'open';
+                        logger.warn(`cant set provider in activity: ${activityId} due to: claimer is missing!`);
+                        logger.info(`changed activity: ${activityId} to status: ${newStatus}`);
+                    }
+                    data.status.value = newStatus;
                     data.provider = {
-                        name: data.status.fullName,
-                        id: data.status.user_id
+                        name: data.status.fullName || '',
+                        id: data.status.user_id || ''
                     };
                     data.save((err, data) => {
                         if (err || !data) {
