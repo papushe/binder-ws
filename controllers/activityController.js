@@ -115,20 +115,17 @@ exports.decline = (req, res) => {
 };
 
 exports.approve = (req, res) => {
-    let {activityId, userId} = req.body;
+    let {activityId} = req.body;
 
     activityService.setProvider(activityId)
         .then(updatedActivity => {
-            userService.addApprovedActivity(activityId, userId)
+            userService.addApprovedActivity(activityId, updatedActivity.provider.id)
                 .then(updatedUser => {
                     /***
-                     * we should replace third argument of empty function with a reference of
-                     * function we actually want to run when activity time arrives.
-                     *
-                     * e.g send an update notification to all activity participants
+                     * scheduleAction is ready yet
                      * */
                     if (updatedUser) {
-                        schedulerService.scheduleAction(activityId, updatedActivity.activity_date, () => {
+                        schedulerService.scheduleAction(updatedActivity, () => {
                             console.log(`Hi I am the action which suppose to run at ${response.activity_date}`);
                         })
                             .then(result => {

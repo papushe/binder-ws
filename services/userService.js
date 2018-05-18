@@ -225,6 +225,7 @@ exports.addApprovedActivity = (activityId, userId) => {
                         reject(false);
                     }
                     else {
+                        logger.info(`Activity: ${activityId} was added to user: ${userId}`);
                         resolve(data);
                     }
                 })
