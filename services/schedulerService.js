@@ -20,7 +20,7 @@ exports.scheduleAction = (updatedActivity, action) => {
                 activityLocalDateTime = Utils.UTCTimeToLocalDateTime(activity.activity_date);
 
                 if (Utils.isAfterUTC(activityLocalDateTime)) {
-                    logger.warn(`activity execution time: ${activityLocalDateTime} UTC! \n now the time is: ${Utils.currentDateTimeInUTC()}`);
+                    logger.warn(`Activity execution time: ${activityLocalDateTime} UTC! now the time is: ${Utils.currentDateTimeInUTC()} UTC`);
                     resolve(null);
                 }
                 else {
