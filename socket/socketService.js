@@ -16,14 +16,14 @@ module.exports = (io) => {
             socket.on('set-nickname', (nickname) => {
 
                 addUserToAllUsers(socket, nickname);
-                logger.info(`Socket: ${nickname} entered to binder`)
+                logger.debug(`Socket: ${nickname} entered to binder`)
 
             });
 
             socket.on('disconnect', function () {
 
                 deleteUserFromAllUsers(socket.nickname);
-                logger.info(`Socket: ${socket.nickname || 'user'} left binder`)
+                logger.debug(`Socket: ${socket.nickname || 'user'} left binder`)
 
             });
 
@@ -31,7 +31,7 @@ module.exports = (io) => {
 
                 addUserToConnectedUserInSpecificCommunity(params, socket);
                 socket.join(params.room);
-                logger.info(`Socket: ${socket.nickname} entered to ${params.room} community`)
+                logger.debug(`Socket: ${socket.nickname} entered to ${params.room} community`)
 
             });
 
@@ -39,14 +39,14 @@ module.exports = (io) => {
 
                 deleteUserFromConnectedUserInSpecificCommunity(params, socket.nickname);
                 socket.leave(params.room);
-                logger.info(`Socket: ${socket.nickname} left ${params.room} community`)
+                logger.debug(`Socket: ${socket.nickname} left ${params.room} community`)
 
             });
 
             socket.on('join-to-community', (params) => {
 
                 addToCommunity(params);
-                logger.info(`Socket: ${socket.nickname} joined to ${params.roomName} community`)
+                logger.debug(`Socket: ${socket.nickname} joined to ${params.roomName} community`)
 
             });
 
@@ -57,15 +57,15 @@ module.exports = (io) => {
                 }
                 sendNotification(params, 'addByManager');
                 addToCommunity(params);
-                logger.info(`Socket: ${userName} added to ${params.roomName} community by `);
+                logger.debug(`Socket: ${userName} added to ${params.roomName} community by `);
             });
 
             socket.on('delete-from-community', (params) => {
                 let userName = params.user.fullName;
                 if (socket.nickname === userName) {
-                    logger.info(`Socket: ${userName} left ${params.roomName} permanently`)
+                    logger.debug(`Socket: ${userName} left ${params.roomName} permanently`)
                 } else {
-                    logger.info(`Socket: ${socket.nickname} deleted ${userName} from ${params.roomName} permanently`)
+                    logger.debug(`Socket: ${socket.nickname} deleted ${userName} from ${params.roomName} permanently`)
                 }
 
                 if (userName in connectedUserInSpecificCommunity[params.room]) {
@@ -86,7 +86,7 @@ module.exports = (io) => {
 
             socket.on('activities-change', (params) => {
                 if (params.event === 'create') {
-                    logger.info(`Socket: ${params.activity.activity_name} was created by ${socket.nickname}`);
+                    logger.debug(`Socket: ${params.activity.activity_name} was created by ${socket.nickname}`);
                     io.to(params.room).emit('activities-change', {
                         activity: params.activity,
                         from: socket.nickname,
@@ -96,7 +96,7 @@ module.exports = (io) => {
                         event: 'add-new-activity'
                     });
                 } else if (params.event === 'update') {
-                    logger.info(`Socket: ${params.activity.activity_name} was updated by ${socket.nickname}`);
+                    logger.debug(`Socket: ${params.activity.activity_name} was updated by ${socket.nickname}`);
                     io.to(params.room).emit('activities-change', {
                         activity: params.activity,
                         from: socket.nickname,
@@ -106,7 +106,7 @@ module.exports = (io) => {
                         event: 'update-activity'
                     });
                 } else {
-                    logger.info(`Socket: ${params.activity.activity_name} was deleted by ${socket.nickname}`);
+                    logger.debug(`Socket: ${params.activity.activity_name} was deleted by ${socket.nickname}`);
                     io.to(params.room).emit('activities-change', {
                         activity: params.activity,
                         from: socket.nickname,
@@ -119,7 +119,7 @@ module.exports = (io) => {
             });
 
             socket.on('enter-to-chat-room', (params) => {
-                logger.info(`Socket: ${socket.nickname} entered to ${params.room} chat room`);
+                logger.debug(`Socket: ${socket.nickname} entered to ${params.room} chat room`);
                 socket.join(params.room);
 
                 enterToPrivateChatRoom(params);
@@ -140,7 +140,7 @@ module.exports = (io) => {
             });
 
             socket.on('join-to-chat-room', (params) => {
-                logger.info(`Socket: ${socket.nickname} joined to ${params.room} chat room`);
+                logger.debug(`Socket: ${socket.nickname} joined to ${params.room} chat room`);
                 socket.join(params.room);
 
                 enterToPrivateChatRoom(params);
@@ -157,7 +157,7 @@ module.exports = (io) => {
             });
 
             socket.on('left-from-chat-room', (params) => {
-                logger.info(`Socket: ${socket.nickname} left ${params.room} chat room`);
+                logger.debug(`Socket: ${socket.nickname} left ${params.room} chat room`);
                 deleteFromPrivateChatRoom(params);
 
                 if (connectedUserInSpecificChatRoom[params.room]) {
@@ -178,7 +178,7 @@ module.exports = (io) => {
             });
 
             socket.on('add-message', (params) => {
-                logger.info(`Socket: ${socket.nickname} add message to ${params.room} chat room`);
+                logger.debug(`Socket: ${socket.nickname} add message to ${params.room} chat room`);
                 io.to(params.room).emit('message', {
                     text: params.message,
                     from: socket.nickname,
@@ -192,7 +192,7 @@ module.exports = (io) => {
             });
 
             socket.on('ask-to-join-private-room', (params) => {
-                logger.info(`Socket: ${socket.nickname} ask to join to ${params.user.communityName} community`);
+                logger.debug(`Socket: ${socket.nickname} ask to join to ${params.user.communityName} community`);
                 if (params.user.managerName in allUsers) {
 
                     allUsers[params.user.managerName].emit('user-ask-to-join-private-room', {
@@ -217,7 +217,7 @@ module.exports = (io) => {
 
                 if (params.from.fullName in allUsers) {
 
-                    logger.info(`Socket: ${socket.nickname} decline ${params.from.fullName} user to join to ${params.communityName} community`);
+                    logger.debug(`Socket: ${socket.nickname} decline ${params.from.fullName} user to join to ${params.communityName} community`);
 
                     allUsers[params.from.fullName].emit('user-ask-to-join-private-room', {
                         communityName: params.communityName,
