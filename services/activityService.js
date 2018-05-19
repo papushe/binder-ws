@@ -98,6 +98,7 @@ exports.saveExistingActivity = (newActivity, activityId) => {
                     consumer: newActivity.consumer,
                     provider: newActivity.provider,
                     community_id: newActivity.community_id,
+                    activity_date: newActivity.activity_date,
                     source: newActivity.source,
                     destination: newActivity.destination,
                     notes: newActivity.notes
