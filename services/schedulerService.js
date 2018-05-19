@@ -17,7 +17,7 @@ exports.getJobsToExecute = () => {
      *
      * I should filter jobs which have already executed!
      * */
-    JOB.find({$and: [{execution_date: {$gt: unixTime5MinAgo, $lt:unixNext5Min}}, {status: {$ne: DONE_STATE}}]},
+    JOB.find({$and: [{execution_date: {$gt: unixTime2MinAgo, $lt:unixNext2Min}}, {status: {$ne: DONE_STATE}}]},
         (err, data) => {
             if (err) {
                 logger.error(`failed to fetch jobs from: ${Utils.unixToLocal(unixTime2MinAgo)} to: ${Utils.unixToLocal(unixNext2Min)} due to : ${err}`);
@@ -69,7 +69,7 @@ exports.scheduleAction = (updatedActivity, action) => {
                     job = schedule.scheduleJob(activityLocalDateTime, action);
                     storeScheduledActivityInDB(activity)
                         .then(job => {
-                            logger.info(`Job has been scheduled on ${activity.activity_date} UTC for activity: ${activity._id}`);
+                            logger.info(`Job has been scheduled on ${activityLocalDateTime} UTC for activity: ${activity._id}`);
                             resolve(job);
                         }).catch(err => {
                         logger.error(`Failed to store activity: ${activity._id} in DB after ${RETRIES_COUNT} times due to: ${err}`);
