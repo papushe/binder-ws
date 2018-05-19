@@ -16,8 +16,10 @@ exports.create = (req, res) => {
         communityName: req.body.communityName,
         communityDescription: req.body.communityDescription,
         creationDate: Utils.now(),
-        managerId: req.body.managerId,
-        managerName: req.body.managerName,
+        manager: {
+            id: req.body.managerId,
+            name: req.body.managerName,
+        },
         members: {
             memberId: req.body.managerId,
         },
@@ -146,8 +148,7 @@ exports.getMembers = (req, res) => {
     let promises = [];
     communityService.getCommunityMembers(req.body.communityId)
         .then((response) => {
-            if (!response)
-            {
+            if (!response) {
                 res.json(response);
             }
             else {
