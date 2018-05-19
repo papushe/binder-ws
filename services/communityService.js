@@ -212,7 +212,7 @@ exports.leaveCommunity = (userId, communityId) => {
                     reject(false);
                 }
                 //remove community if no members left but this user
-                if (data.members && data.members.length === 0) {
+                if (data.members && data.members.length === 1) {
                     shouldBeDeleted = true;
                     this.deleteCommunityById(communityId)
                         .then(response => {

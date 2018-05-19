@@ -82,6 +82,7 @@ module.exports = (io) => {
                         logger.debug(`Socket: ${userName} left ${params.roomName} permanently`)
                     } else {
                         logger.debug(`Socket: ${socket.nickname} deleted ${userName} from ${params.roomName} permanently`)
+                        sendNotification(params, 'deleteByManager');
                     }
 
                     if (userName in connectedUserInSpecificCommunity[params.room]) {
@@ -93,7 +94,7 @@ module.exports = (io) => {
                         privateDeleteFromCommunity(userName, params);
 
                     }
-                    sendNotification(params, 'deleteByManager');
+
                     deleteFromCommunity(params);
                 }
 
@@ -229,11 +230,11 @@ module.exports = (io) => {
 
                 if (params && socket) {
                     logger.debug(`Socket: ${socket.nickname} ask to join to ${params.user.communityName} community`);
-                    if (params.user.managerName in allUsers) {
+                    if (params.user.manager.name in allUsers) {
 
-                        allUsers[params.user.managerName].emit('user-ask-to-join-private-room', {
+                        allUsers[params.user.manager.name].emit('user-ask-to-join-private-room', {
                             community: params.user, // == community obj
-                            to: params.user.managerName,
+                            to: params.user.manager.name,
                             from: params.from,
                             room: params.user._id, // == community _id
                             event: 'user-ask-to-join-private-room',
@@ -422,8 +423,8 @@ module.exports = (io) => {
                 } else if (type === 'askToJoinPrivateRoom') {
 
                     from.keyForFirebase = params.from.keyForFirebase;
-                    to.fullName = params.user.managerName;
-                    to.keyForFirebase = params.user.managerId;
+                    to.fullName = params.user.manager.name;
+                    to.keyForFirebase = params.user.manager.id;
 
                     notificationObj = new NOTIFICATION({
                         from: from,
