@@ -77,25 +77,48 @@ module.exports = (io) => {
             socket.on('delete-from-community', (params) => {
 
                 if (params && socket) {
-                    let userName = params.user.fullName;
-                    if (socket.nickname === userName) {
-                        logger.debug(`Socket: ${userName} left ${params.roomName} permanently`)
-                    } else {
-                        logger.debug(`Socket: ${socket.nickname} deleted ${userName} from ${params.roomName} permanently`)
-                        sendNotification(params, 'deleteByManager');
-                    }
+                    let event = '';
 
-                    if (userName in connectedUserInSpecificCommunity[params.room]) {
+                    let userName = params.user.fullName;
+                    if (socket.nickname === userName) { //if you left community
+
+                        event = 'left';
+
+                        logger.debug(`Socket: ${userName} left ${params.roomName} permanently`);
 
                         deleteUserFromConnectedUserInSpecificCommunity(params, userName);
+                        // socket.leave(params.room)
 
-                    } else if (userName in allUsers) {
 
-                        privateDeleteFromCommunity(userName, params);
+                    } else { //if manager deleted you
+                        event = 'deleted';
+
+                        if (userName in allUsers) {
+                            privateDeleteFromCommunity(userName, params);
+                        }
+
+
+                        logger.debug(`Socket: ${socket.nickname} deleted ${userName} from ${params.roomName} permanently`);
+
+                        sendNotification(params, 'deleteByManager');
+
 
                     }
 
-                    deleteFromCommunity(params);
+                    deleteFromCommunity(params, event);
+
+
+                    // if (userName in connectedUserInSpecificCommunity[params.room]) {
+
+                    // deleteUserFromConnectedUserInSpecificCommunity(params, userName);
+
+                    // } else if (userName in allUsers) {
+
+                    // privateDeleteFromCommunity(userName, params);
+
+                    // }
+
+
                 }
 
             });
@@ -328,13 +351,13 @@ module.exports = (io) => {
                 });
             }
 
-            function deleteFromCommunity(params) {
+            function deleteFromCommunity(params, event) {
                 io.to(params.room).emit('members-changed', {
                     from: socket.nickname,
                     communityName: params.roomName,
                     user: params.user,
                     communityId: params.roomId,
-                    event: 'deleted',
+                    event: event,
                     date: Utils.now()
                 });
             }
