@@ -1,7 +1,7 @@
 let testUtils = require('./testUtils'),
-    testedService  = require('../services/communityService'),
-    userService  = require('../services/userService'),
-    Community  = require('../models/Community'),
+    testedService = require('../services/communityService'),
+    userService = require('../services/userService'),
+    Community = require('../models/Community'),
     testUser = testUtils.user,
     utils = require('../utils'),
     logger = utils.getLogger(),
@@ -27,9 +27,9 @@ describe(`Community Service Integration Tests`, () => {
         let result = await testedService.getUserCommunities(testUser.USER_KEY);
 
         if (result) {
-           result.forEach(community => {
-               promises.push(testedService.deleteCommunityById(community._id));
-           });
+            result.forEach(community => {
+                promises.push(testedService.deleteCommunityById(community._id));
+            });
             result = await Promise.all(promises);
             logger.info(`deleted old test communities success? ${!!result}`);
         }
@@ -39,37 +39,43 @@ describe(`Community Service Integration Tests`, () => {
         let promises = [];
         //clean test communities and references
         communities.forEach(community => {
-            promises.push(userService.removeCommunityFromUser(testUser.USER_KEY,community._id));
-            promises.push(userService.removeCommunityFromUser(member.keyForFirebase,community._id));
+            promises.push(userService.removeCommunityFromUser(testUser.USER_KEY, community._id));
+            promises.push(userService.removeCommunityFromUser(member.keyForFirebase, community._id));
             promises.push(testedService.deleteCommunityById(community._id));
         });
         let result = await Promise.all(promises);
 
-            logger.info(`removed all test communities? ${!!result}`);
-            logger.info(`communityServiceIT ended at: ${utils.now()}`);
+        logger.info(`removed all test communities? ${!!result}`);
+        logger.info(`communityServiceIT ended at: ${utils.now()}`);
     });
 
     it(`should create new communities`, async () => {
-        let publicCommunity = new Community ({
-            communityName: `${testUniqueId} public` ,
-            communityDescription: 'community-test-desc',
-            managerId: testUser.USER_KEY,
-            creationDate: utils.now(),
-            members: {
-                memberId: testUser.USER_KEY
-            },
-            type: 'Public'
-        }),
-            securedCommunity = new Community ({
-            communityName: `${testUniqueId} secured` ,
-            communityDescription: 'community-test-desc',
-            managerId: testUser.USER_KEY,
-            creationDate: utils.now(),
-            members: {
-                memberId: testUser.USER_KEY
-            },
-            type: 'Secured'
-        }),
+        let publicCommunity = new Community({
+                communityName: `${testUniqueId} public`,
+                communityDescription: 'community-test-desc',
+                manager: {
+                    id: testUser.USER_KEY,
+                    name: testUser.USER_NAME
+                },
+                creationDate: utils.now(),
+                members: {
+                    memberId: testUser.USER_KEY
+                },
+                type: 'Public'
+            }),
+            securedCommunity = new Community({
+                communityName: `${testUniqueId} secured`,
+                communityDescription: 'community-test-desc',
+                manager: {
+                    id: testUser.USER_KEY,
+                    name: testUser.USER_NAME
+                },
+                creationDate: utils.now(),
+                members: {
+                    memberId: testUser.USER_KEY
+                },
+                type: 'Secured'
+            }),
             promises = [];
 
         promises.push(testedService.saveNewCommunity(publicCommunity));
@@ -123,14 +129,14 @@ describe(`Community Service Integration Tests`, () => {
         let result = await testedService.addUserToCommunityMembers(member.keyForFirebase, communities[0]._id, false);
         expect(result).equal(true);
 
-        result = await testedService.leaveCommunity(testUser.USER_KEY,communities[0]._id);
+        result = await testedService.leaveCommunity(testUser.USER_KEY, communities[0]._id);
         expect(result).not.equal(false);
         expect(result).not.equal(null);
         expect(result.keyForFirebase).equal(testUser.USER_KEY);
-        result.communities.should.be.an('array').with.lengthOf(1);
+        result.communities.should.be.an('array').with.lengthOf(3);
 
         result = await testedService.getCommunityById(communities[0]);
-        expect(result.managerId).equal(member.keyForFirebase);
+        expect(result.manager.id).equal(member.keyForFirebase);
     });
 
     it(`should add user to community waiting list`, async () => {

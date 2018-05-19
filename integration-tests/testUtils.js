@@ -13,6 +13,7 @@ module.exports = {
     BASE_URL:`localhost:${port}`,
     user: {
         USER_KEY: `xmDN30sOAqgngu79CkEom1i2ZGD3`,
+        USER_NAME:`Moshe`,
         USER_EMAIL:`binderTestUser@mailinator.com`,
         USER_PASS:`Aa123456`,
         TOKEN:``
