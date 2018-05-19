@@ -137,7 +137,7 @@ app.post(`/${notificationContext}/create`, notificationController.create);
 
 app.post(`/${notificationContext}/update`, notificationController.update);
 
-app.get(`/${notificationContext}/get/:key`, notificationController.getById);
+app.get(`/${notificationContext}/get/:keyForFirebase`, notificationController.getById);
 
 app.post(`/${notificationContext}/delete`, notificationController.deleteById);
 

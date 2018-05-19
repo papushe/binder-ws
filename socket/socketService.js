@@ -13,224 +13,263 @@ module.exports = (io) => {
 
     io.on('connection', (socket) => {
 
-            socket.on('set-nickname', (nickname) => {
+            socket.on('set-nickname', (params) => {
 
-                addUserToAllUsers(socket, nickname);
-                logger.debug(`Socket: ${nickname} entered to binder`)
+                if (params && socket) {
+                    addUserToAllUsers(socket, params);
+                    logger.debug(`Socket: ${params} entered to binder`)
+                }
 
             });
 
             socket.on('disconnect', function () {
 
-                deleteUserFromAllUsers(socket.nickname);
-                logger.debug(`Socket: ${socket.nickname || 'user'} left binder`)
+                if (socket) {
+                    deleteUserFromAllUsers(socket.nickname);
+                    logger.debug(`Socket: ${socket.nickname || 'user'} left binder`)
+                }
 
             });
 
             socket.on('entered-to-community', (params) => {
 
-                addUserToConnectedUserInSpecificCommunity(params, socket);
-                socket.join(params.room);
-                logger.debug(`Socket: ${socket.nickname} entered to ${params.room} community`)
+                if (params && socket) {
+                    addUserToConnectedUserInSpecificCommunity(params, socket);
+                    socket.join(params.room);
+                    logger.debug(`Socket: ${socket.nickname} entered to ${params.room} community`)
+                }
 
             });
 
             socket.on('left-community', (params) => {
 
-                deleteUserFromConnectedUserInSpecificCommunity(params, socket.nickname);
-                socket.leave(params.room);
-                logger.debug(`Socket: ${socket.nickname} left ${params.room} community`)
+                if (params && socket) {
+                    deleteUserFromConnectedUserInSpecificCommunity(params, socket.nickname);
+                    socket.leave(params.room);
+                    logger.debug(`Socket: ${socket.nickname} left ${params.room} community`)
+                }
 
             });
 
             socket.on('join-to-community', (params) => {
 
-                addToCommunity(params);
-                logger.debug(`Socket: ${socket.nickname} joined to ${params.roomName} community`)
+                if (params && socket) {
+                    addToCommunity(params);
+                    logger.debug(`Socket: ${socket.nickname} joined to ${params.roomName} community`);
+                }
 
             });
 
             socket.on('add-to-community-by-manager', (params) => {
-                let userName = params.user.fullName;
-                if (userName in allUsers) {
-                    privateAddToCommunity(userName, params);
+
+                if (params && socket) {
+                    let userName = params.user.fullName;
+                    if (userName in allUsers) {
+                        privateAddToCommunity(userName, params);
+                    }
+                    sendNotification(params, 'addByManager');
+                    addToCommunity(params);
+                    logger.debug(`Socket: ${userName} added to ${params.roomName} community by `);
                 }
-                sendNotification(params, 'addByManager');
-                addToCommunity(params);
-                logger.debug(`Socket: ${userName} added to ${params.roomName} community by `);
+
             });
 
             socket.on('delete-from-community', (params) => {
-                let userName = params.user.fullName;
-                if (socket.nickname === userName) {
-                    logger.debug(`Socket: ${userName} left ${params.roomName} permanently`)
-                } else {
-                    logger.debug(`Socket: ${socket.nickname} deleted ${userName} from ${params.roomName} permanently`)
-                }
 
-                if (userName in connectedUserInSpecificCommunity[params.room]) {
+                if (params && socket) {
+                    let userName = params.user.fullName;
+                    if (socket.nickname === userName) {
+                        logger.debug(`Socket: ${userName} left ${params.roomName} permanently`)
+                    } else {
+                        logger.debug(`Socket: ${socket.nickname} deleted ${userName} from ${params.roomName} permanently`)
+                    }
 
-                    deleteUserFromConnectedUserInSpecificCommunity(params, userName);
+                    if (userName in connectedUserInSpecificCommunity[params.room]) {
 
-                } else if (userName in allUsers) {
+                        deleteUserFromConnectedUserInSpecificCommunity(params, userName);
 
-                    privateDeleteFromCommunity(userName, params);
+                    } else if (userName in allUsers) {
 
-                } else {
+                        privateDeleteFromCommunity(userName, params);
 
+                    }
                     sendNotification(params, 'deleteByManager');
-
+                    deleteFromCommunity(params);
                 }
-                deleteFromCommunity(params);
+
             });
 
             socket.on('activities-change', (params) => {
-                if (params.event === 'create') {
-                    logger.debug(`Socket: ${params.activity.activity_name} was created by ${socket.nickname}`);
-                    io.to(params.room).emit('activities-change', {
-                        activity: params.activity,
-                        from: socket.nickname,
-                        communityId: params.communityId,
-                        room: params.communityId,
-                        date: Utils.now(),
-                        event: 'add-new-activity'
-                    });
-                } else if (params.event === 'update') {
-                    logger.debug(`Socket: ${params.activity.activity_name} was updated by ${socket.nickname}`);
-                    io.to(params.room).emit('activities-change', {
-                        activity: params.activity,
-                        from: socket.nickname,
-                        communityId: params.communityId,
-                        room: params.communityId,
-                        date: Utils.now(),
-                        event: 'update-activity'
-                    });
-                } else {
-                    logger.debug(`Socket: ${params.activity.activity_name} was deleted by ${socket.nickname}`);
-                    io.to(params.room).emit('activities-change', {
-                        activity: params.activity,
-                        from: socket.nickname,
-                        communityId: params.communityId,
-                        room: params.communityId,
-                        date: Utils.now(),
-                        event: 'delete-activity'
-                    });
+
+                if (params && socket) {
+                    if (params.event === 'create') {
+                        logger.debug(`Socket: ${params.activity.activity_name} was created by ${socket.nickname}`);
+                        io.to(params.room).emit('activities-change', {
+                            activity: params.activity,
+                            from: socket.nickname,
+                            communityId: params.communityId,
+                            room: params.communityId,
+                            date: Utils.now(),
+                            event: 'add-new-activity'
+                        });
+                    } else if (params.event === 'update') {
+                        logger.debug(`Socket: ${params.activity.activity_name} was updated by ${socket.nickname}`);
+                        io.to(params.room).emit('activities-change', {
+                            activity: params.activity,
+                            from: socket.nickname,
+                            communityId: params.communityId,
+                            room: params.communityId,
+                            date: Utils.now(),
+                            event: 'update-activity'
+                        });
+                    } else {
+                        logger.debug(`Socket: ${params.activity.activity_name} was deleted by ${socket.nickname}`);
+                        io.to(params.room).emit('activities-change', {
+                            activity: params.activity,
+                            from: socket.nickname,
+                            communityId: params.communityId,
+                            room: params.communityId,
+                            date: Utils.now(),
+                            event: 'delete-activity'
+                        });
+                    }
                 }
+
             });
 
             socket.on('enter-to-chat-room', (params) => {
-                logger.debug(`Socket: ${socket.nickname} entered to ${params.room} chat room`);
-                socket.join(params.room);
 
-                enterToPrivateChatRoom(params);
+                if (params && socket) {
+                    logger.debug(`Socket: ${socket.nickname} entered to ${params.room} chat room`);
+                    socket.join(params.room);
 
-                if (allUsers[params.user.fullName]) {
-                    allUsers[params.user.fullName].emit('chat-room', {
-                        from: params.from,
-                        to: params.user,
-                        room: params.room,
-                        event: 'enter-to-chat-room',
-                        date: Utils.now()
-                    });
-                } else {
+                    enterToPrivateChatRoom(params);
 
-                    sendNotification(params, 'enterToChatRoom')
+                    if (allUsers[params.user.fullName]) {
+                        allUsers[params.user.fullName].emit('chat-room', {
+                            from: params.from,
+                            to: params.user,
+                            room: params.room,
+                            event: 'enter-to-chat-room',
+                            date: Utils.now()
+                        });
+                    } else {
 
+                        sendNotification(params, 'enterToChatRoom')
+
+                    }
                 }
+
             });
 
             socket.on('join-to-chat-room', (params) => {
-                logger.debug(`Socket: ${socket.nickname} joined to ${params.room} chat room`);
-                socket.join(params.room);
 
-                enterToPrivateChatRoom(params);
+                if (params && socket) {
+                    logger.debug(`Socket: ${socket.nickname} joined to ${params.room} chat room`);
+                    socket.join(params.room);
 
-                if (allUsers[params.user.fullName]) {
-                    allUsers[params.user.fullName].emit('change-event-chat-room', {
-                        from: params.from,
-                        to: params.user,
-                        room: params.room,
-                        event: 'joined',
-                        date: Utils.now()
-                    });
-                }
-            });
+                    enterToPrivateChatRoom(params);
 
-            socket.on('left-from-chat-room', (params) => {
-                logger.debug(`Socket: ${socket.nickname} left ${params.room} chat room`);
-                deleteFromPrivateChatRoom(params);
-
-                if (connectedUserInSpecificChatRoom[params.room]) {
-
-                    if (params.user.fullName in connectedUserInSpecificChatRoom[params.room]) {
-
+                    if (allUsers[params.user.fullName]) {
                         allUsers[params.user.fullName].emit('change-event-chat-room', {
                             from: params.from,
                             to: params.user,
                             room: params.room,
-                            event: 'left',
+                            event: 'joined',
                             date: Utils.now()
                         });
-                        socket.leave(params.room);
                     }
-
                 }
+
+            });
+
+            socket.on('left-from-chat-room', (params) => {
+
+                if (params && socket) {
+                    logger.debug(`Socket: ${socket.nickname} left ${params.room} chat room`);
+                    deleteFromPrivateChatRoom(params);
+
+                    if (connectedUserInSpecificChatRoom[params.room]) {
+
+                        if (params.user.fullName in connectedUserInSpecificChatRoom[params.room]) {
+
+                            allUsers[params.user.fullName].emit('change-event-chat-room', {
+                                from: params.from,
+                                to: params.user,
+                                room: params.room,
+                                event: 'left',
+                                date: Utils.now()
+                            });
+                            socket.leave(params.room);
+                        }
+
+                    }
+                }
+
             });
 
             socket.on('add-message', (params) => {
-                logger.debug(`Socket: ${socket.nickname} add message to ${params.room} chat room`);
-                io.to(params.room).emit('message', {
-                    text: params.message,
-                    from: socket.nickname,
-                    room: params.room,
-                    to: params.to,
-                    date: Utils.now()
-                });
 
-                saveMessage(params);
+                if (params && socket) {
+                    logger.debug(`Socket: ${socket.nickname} add message to ${params.room} chat room`);
+                    io.to(params.room).emit('message', {
+                        text: params.message,
+                        from: socket.nickname,
+                        room: params.room,
+                        to: params.to,
+                        date: Utils.now()
+                    });
+
+                    saveMessage(params);
+                }
 
             });
 
             socket.on('ask-to-join-private-room', (params) => {
-                logger.debug(`Socket: ${socket.nickname} ask to join to ${params.user.communityName} community`);
-                if (params.user.managerName in allUsers) {
 
-                    allUsers[params.user.managerName].emit('user-ask-to-join-private-room', {
-                        community: params.user, // == community obj
-                        to: params.user.managerName,
-                        from: params.from,
-                        room: params.user._id, // == community _id
-                        event: 'user-ask-to-join-private-room',
-                        communityName: params.user.communityName,
-                        content: `Community name ${params.user.communityName}`,
-                        date: Utils.now()
-                    });
-                } else {
+                if (params && socket) {
+                    logger.debug(`Socket: ${socket.nickname} ask to join to ${params.user.communityName} community`);
+                    if (params.user.managerName in allUsers) {
 
-                    sendNotification(params, 'askToJoinPrivateRoom');
+                        allUsers[params.user.managerName].emit('user-ask-to-join-private-room', {
+                            community: params.user, // == community obj
+                            to: params.user.managerName,
+                            from: params.from,
+                            room: params.user._id, // == community _id
+                            event: 'user-ask-to-join-private-room',
+                            communityName: params.user.communityName,
+                            content: `Community name ${params.user.communityName}`,
+                            date: Utils.now()
+                        });
+                    } else {
 
+                        sendNotification(params, 'askToJoinPrivateRoom');
+
+                    }
                 }
 
             });
 
             socket.on('decline-user-join-private-room', (params) => {
 
-                if (params.from.fullName in allUsers) {
+                if (params && socket) {
+                    if (params.from.fullName in allUsers) {
 
-                    logger.debug(`Socket: ${socket.nickname} decline ${params.from.fullName} user to join to ${params.communityName} community`);
+                        logger.debug(`Socket: ${socket.nickname} decline ${params.from.fullName} user to join to ${params.communityName} community`);
 
-                    allUsers[params.from.fullName].emit('user-ask-to-join-private-room', {
-                        communityName: params.communityName,
-                        to: params.to,
-                        from: params.from,
-                        event: 'manager-decline-user-join-private-room',
-                        content: `Community name ${params.communityName}`,
-                        date: Utils.now()
-                    });
-                } else {
+                        allUsers[params.from.fullName].emit('user-ask-to-join-private-room', {
+                            communityName: params.communityName,
+                            to: params.to,
+                            from: params.from,
+                            event: 'manager-decline-user-join-private-room',
+                            content: `Community name ${params.communityName}`,
+                            date: Utils.now()
+                        });
+                    } else {
 
-                    sendNotification(params, 'declineUserJoinPrivateRoom');
+                        sendNotification(params, 'declineUserJoinPrivateRoom');
 
+                    }
                 }
 
             });
@@ -338,13 +377,13 @@ module.exports = (io) => {
                 let from = {
 
                     fullName: socket.nickname,
-                    id: params.fromUserId || '',
+                    keyForFirebase: params.fromUserId || '',
                     profilePic: params.user.profilePic
                 };
                 let to = {
 
                     fullName: params.user.fullName,
-                    id: params.user.keyForFirebase || params.user.id,
+                    keyForFirebase: params.user.keyForFirebase || params.user.keyForFirebase,
                     profilePic: params.user.profilePic
                 };
 
@@ -382,9 +421,9 @@ module.exports = (io) => {
 
                 } else if (type === 'askToJoinPrivateRoom') {
 
-                    from.id = params.from.keyForFirebase;
+                    from.keyForFirebase = params.from.keyForFirebase;
                     to.fullName = params.user.managerName;
-                    to.id = params.user.managerId;
+                    to.keyForFirebase = params.user.managerId;
 
                     notificationObj = new NOTIFICATION({
                         from: from,
