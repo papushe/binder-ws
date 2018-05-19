@@ -115,12 +115,6 @@ exports.setNewManager = (communityId) => {
                                 //set the new managerId
                                 data.managerId = newManager;
 
-                                //delete the new manager from authorized members
-                                // let index = data.authorizedMembers.map(o => {
-                                //     return o.memberId;
-                                // }).indexOf(newManager);
-                                // data.authorizedMembers.splice(index, 1);
-
                                 //save community after all updates
                                 data.save((err, data) => {
                                     if (err || !data) {

@@ -104,8 +104,6 @@ app.post(`/${communityContext}/members`, communityController.getMembers);
 
 app.get(`/${communityContext}/get/:key`, communityController.getByUserId);
 
-// app.post(`/${communityContext}/update-role`, communityController.updateUserRole);
-
 app.get(`/${communityContext}/search/:query`, communityController.search);
 
 app.post(`/${communityContext}/add-waiting-list`, communityController.addUserToWaitingList);
