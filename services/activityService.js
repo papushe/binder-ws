@@ -108,7 +108,7 @@ exports.saveExistingActivity = (newActivity, activityId) => {
                             logger.error(`failed to update activity #${newActivity.activity_name} profile due to: ${err}`);
                             reject(false);
                         }
-                        logger.info(`user: #${newActivity.activity_name} profile was updated`);
+                        logger.debug(`activity: ${newActivity.activity_name} was updated`);
                         resolve(data);
                     }
                 );
