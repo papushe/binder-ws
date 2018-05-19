@@ -17,7 +17,7 @@ exports.create = (req, res) => {
         source: req.body.source,
         status: {value: 'open', user_id: null, fullName: null},
         destination: req.body.destination,
-        activity_date: Utils.getUnixTime(req.body.activity_date),
+        activity_date: req.body.activity_date,
         notes: req.body.notes
     });
     activityService.saveNewActivity(activityObj)
