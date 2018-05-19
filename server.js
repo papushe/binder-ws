@@ -104,8 +104,6 @@ app.post(`/${communityContext}/members`, communityController.getMembers);
 
 app.get(`/${communityContext}/get/:key`, communityController.getByUserId);
 
-// app.post(`/${communityContext}/update-role`, communityController.updateUserRole);
-
 app.get(`/${communityContext}/search/:query`, communityController.search);
 
 app.post(`/${communityContext}/add-waiting-list`, communityController.addUserToWaitingList);
@@ -137,7 +135,7 @@ app.post(`/${notificationContext}/create`, notificationController.create);
 
 app.post(`/${notificationContext}/update`, notificationController.update);
 
-app.get(`/${notificationContext}/get/:key`, notificationController.getById);
+app.get(`/${notificationContext}/get/:keyForFirebase`, notificationController.getById);
 
 app.post(`/${notificationContext}/delete`, notificationController.deleteById);
 

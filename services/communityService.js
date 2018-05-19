@@ -4,15 +4,21 @@ let COMMUNITY = require('../models/Community'),
     logger = require('../utils').getLogger();
 
 
-function getNextNewManagerId (community) {
+function getNextNewManagerId(community) {
     return new Promise((resolve, reject) => {
-        if (community.members.length > 0){
+        if (community.members.length > 0) {
             logger.info(`user: ${community.members[0].memberId} has been chosen as new manager of community: ${community._id}`);
-            resolve(community.members[0].memberId);
+            userService.getUserProfile(community.members[0].memberId)
+                .then((member) => {
+                    resolve(member)
+                })
+                .catch(err => {
+                    reject(err);
+                });
         }
         else {
             this.deleteCommunityById(community._id)
-                .then(function () {
+                .then(() => {
                     logger.info(`community: ${community._id} was empty so it was deleted!`);
                     resolve(null);
                 })
@@ -31,19 +37,19 @@ exports.saveNewCommunity = (community) => {
 
     return new Promise((resolve, reject) => {
         community.save((err, data) => {
-            if (err || !data) {
-                logger.error(`failed to create a new community: ${community} due to: ${err}`);
-                reject(false);
-            }
-            logger.info(`user ${community.managerId} created a new community: ${community._id}`);
-            userService.addCommunityToUser(community.managerId, communityObj)
-                .then(response => {
-                    resolve(response);
-                })
-                .catch(err => {
+                if (err || !data) {
                     logger.error(`failed to create a new community: ${community} due to: ${err}`);
                     reject(false);
-                });
+                }
+                logger.info(`user ${community.manager.id} created a new community: ${community._id}`);
+                userService.addCommunityToUser(community.manager.id, communityObj)
+                    .then(response => {
+                        resolve(response);
+                    })
+                    .catch(err => {
+                        logger.error(`failed to create a new community: ${community} due to: ${err}`);
+                        reject(false);
+                    });
             }
         );
     });
@@ -113,13 +119,8 @@ exports.setNewManager = (communityId) => {
                             }
                             else {
                                 //set the new managerId
-                                data.managerId = newManager;
-
-                                //delete the new manager from authorized members
-                                // let index = data.authorizedMembers.map(o => {
-                                //     return o.memberId;
-                                // }).indexOf(newManager);
-                                // data.authorizedMembers.splice(index, 1);
+                                data.manager.id = newManager.keyForFirebase;
+                                data.manager.name = newManager.fullName;
 
                                 //save community after all updates
                                 data.save((err, data) => {
@@ -211,7 +212,7 @@ exports.leaveCommunity = (userId, communityId) => {
                     reject(false);
                 }
                 //remove community if no members left but this user
-                if (data.members && data.members.length === 0) {
+                if (data.members && data.members.length === 1) {
                     shouldBeDeleted = true;
                     this.deleteCommunityById(communityId)
                         .then(response => {
@@ -235,18 +236,18 @@ exports.leaveCommunity = (userId, communityId) => {
                                 .then(response => {
                                     resolve(updatedUser);
                                 })
-                        .       catch(err => {
+                                .catch(err => {
                                     reject(err);
-                                 });
+                                });
                         }
-                        else  {
+                        else {
                             resolve(updatedUser);
                         }
                     })
                     .catch(err => {
                         reject(err);
                     });
-             })
+            })
             .catch(err => {
                 reject(err);
             });
@@ -254,16 +255,16 @@ exports.leaveCommunity = (userId, communityId) => {
 };
 
 exports.getCommunityById = (communityId) => {
-        return new Promise((resolve, reject) => {
-            COMMUNITY.findOne({_id: {$eq: communityId}},
-                (err, data) => {
+    return new Promise((resolve, reject) => {
+        COMMUNITY.findOne({_id: {$eq: communityId}},
+            (err, data) => {
                 if (err || !data) {
                     reject(false);
                 }
                 logger.debug(`found this data by given community id: ${communityId}:\n ${data}`);
                 resolve(data);
 
-        });
+            });
     });
 };
 

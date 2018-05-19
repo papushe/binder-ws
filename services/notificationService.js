@@ -21,10 +21,10 @@ exports.saveNewNotification = (notification) => {
 
 exports.updateNotification = (notificationObj) => {
     return new Promise((resolve, reject) => {
-        NOTIFICATION.findOne({_id: {$eq: notificationObj.id}},
+        NOTIFICATION.findOne({_id: {$eq: notificationObj.keyForFirebase}},
             (err, data) => {
                 if (err || !data) {
-                    logger.error(`failed to update notification: ${notificationObj.id} due to: ${err}`);
+                    logger.error(`failed to update notification: ${notificationObj.keyForFirebase} due to: ${err}`);
                     reject(false);
                 }
                 data.set({
@@ -33,10 +33,10 @@ exports.updateNotification = (notificationObj) => {
                 data.save(
                     (err, data) => {
                         if (err || !data) {
-                            logger.error(`failed to save notification: ${notificationObj.to.id} due to: ${err}`);
+                            logger.error(`failed to save notification: ${notificationObj.to.keyForFirebase} due to: ${err}`);
                             reject(false);
                         }
-                        logger.debug(`notification: ${notificationObj.id} was updated`);
+                        logger.debug(`notification: ${notificationObj.keyForFirebase} was updated`);
                         resolve(data);
                     }
                 );
@@ -46,7 +46,7 @@ exports.updateNotification = (notificationObj) => {
 
 exports.getUserNotifications = (userId) => {
     return new Promise((resolve, reject) => {
-        NOTIFICATION.find({"to.id": {$eq: userId}},
+        NOTIFICATION.find({"to.keyForFirebase": {$eq: userId}},
             (err, data) => {
                 if (err || !data) {
                     logger.error(`failed to get user: ${userId} notifications due to: ${err}`);

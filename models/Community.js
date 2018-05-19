@@ -5,8 +5,10 @@ const mongoose = require('mongoose'),
         communityName: String,
         communityDescription: String,
         creationDate: String,
-        managerId: String,
-        managerName: String,
+        manager: {
+            id: String,
+            name: String,
+        },
         members: [{
             memberId: String
         }],

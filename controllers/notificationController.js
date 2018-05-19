@@ -25,7 +25,7 @@ exports.create = (req, res) => {
 exports.update = (req, res) => {
     let notificationObj = {
         status: req.body.status,
-        id: req.body.id
+        keyForFirebase: req.body.keyForFirebase
     };
     notificationService.updateNotification(notificationObj)
         .then(response => {
@@ -37,7 +37,7 @@ exports.update = (req, res) => {
 };
 
 exports.getById = (req, res) => {
-    let userId = req.params.key;
+    let userId = req.params.keyForFirebase;
     notificationService.getUserNotifications(userId)
         .then(response => {
             res.json(response);
@@ -48,7 +48,7 @@ exports.getById = (req, res) => {
 };
 
 exports.deleteById = (req, res) => {
-    let notificationId = req.body.id;
+    let notificationId = req.body.keyForFirebase;
     notificationService.deleteNotificationById(notificationId)
         .then(response => {
             res.json(response);
