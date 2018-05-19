@@ -22,7 +22,7 @@ const mongoose = require('mongoose'),
         },
         source: String,
         destination: String,
-        activity_date: String,
+        activity_date: Number,
         notes: String
     },{strict: true});
 

@@ -55,6 +55,11 @@ exports.unixToLocal = (epoch) => {
    return moment.utc(epoch).local().format(DATE_FORMAT);
 };
 
+exports.unixToUTC = (epoch) => {
+   return moment.utc(epoch).format(DATE_FORMAT);
+};
+
+
 exports.now = () => {
     return moment().format(DATE_FORMAT);
 };
