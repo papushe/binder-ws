@@ -91,7 +91,7 @@ exports.update = (req, res) => {
 };
 
 exports.claim = (req, res) => {
-    let {userId,fullName, activityId} = req.body;
+    let {userId, fullName, activityId} = req.body;
     activityService.setClaimer(userId, fullName, activityId)
         .then(response => {
             res.json(response);

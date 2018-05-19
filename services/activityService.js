@@ -52,10 +52,12 @@ exports.getUserActivities = (userId) => {
 exports.getCommunityActivities = (communityId, filters) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.find(
-            {$and:[
-                {community_id: {$eq: communityId}},
-                {"status.value": {$in: filters}}
-            ]},
+            {
+                $and: [
+                    {community_id: {$eq: communityId}},
+                    {"status.value": {$in: filters}}
+                ]
+            },
             (err, data) => {
                 if (err || !data) {
                     logger.error(`failed to get community: ${communityId} activities due to: ${err}`);
@@ -114,7 +116,7 @@ exports.saveExistingActivity = (newActivity, activityId) => {
     })
 };
 
-exports.setClaimer = (userId,fullName, activityId) => {
+exports.setClaimer = (userId, fullName, activityId) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.findOne({_id: {$eq: activityId}},
             (err, data) => {
@@ -209,11 +211,13 @@ exports.declineClaimer = (activityId) => {
 exports.deleteUserActivities = (userId, communityId, filters) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.remove(
-            {$and:[
+            {
+                $and: [
                     {"consumer.id": {$eq: userId}},
                     {community_id: {$eq: communityId}},
                     {"status.value": {$in: filters}}
-                ]},
+                ]
+            },
             (err, data) => {
                 if (err || !data) {
                     logger.error(`failed to delete user: ${userId} activities due to: ${err}`);
@@ -233,18 +237,21 @@ exports.execute = () => {
                 resolve([]);
             }
             else {
-                data.forEach(job =>{
-                    promises.push(this.getActivityById(job.activity_id));
+                data.forEach(activityId => {
+                    promises.push(this.getActivityById(activityId));
                 });
 
                 Promise.all(promises)
-                    .then(data => {
-                        resolve(data);
+                    .then(activitiesObjList => {
+                        activitiesObjList.forEach(activity => {
+                            //TODO add socket emit and save notification
+                        });
+                        resolve(activitiesObjList);
                     })
                     .catch(err => {
                         logger.error(`failed to get all activities which associated to upcoming jobs due to: ${err}`);
                         reject(err);
-                });
+                    });
             }
         })
         .catch(err => {
