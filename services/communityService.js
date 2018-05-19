@@ -231,7 +231,7 @@ exports.leaveCommunity = (userId, communityId) => {
                             reject(false);
                         }
                         //if the deleted member was the manager set a new one
-                        if (data.managerId === userId && !shouldBeDeleted) {
+                        if (data.manager.id === userId && !shouldBeDeleted) {
                             this.setNewManager(communityId)
                                 .then(response => {
                                     resolve(updatedUser);
