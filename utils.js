@@ -4,7 +4,6 @@ let fs = require('fs'),
     { createLogger, format, transports } = winston,
     DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss',
     logDir = 'logs',
-    moduleName = '',
     logger;
 
 const formatMessage = format((info, opts) => {
