@@ -98,13 +98,9 @@ module.exports = (io) => {
                         logger.info(`Socket: ${socket.keyForFirebase} deleted ${keyForFirebase} from ${params.roomName} permanently`);
 
                         sendNotification(params, 'deleteByManager');
-
                     }
-
                     deleteFromCommunity(params, event);
-
                 }
-
             });
 
             socket.on('delete-community', (params) => {
@@ -113,7 +109,7 @@ module.exports = (io) => {
                     let keyForFirebase = params.from.keyForFirebase;
                     deleteUserFromConnectedUserInSpecificCommunity(params, keyForFirebase);
                     let members = params.community.members;
-
+                    logger.info(`Socket: ${socket.keyForFirebase} deleted ${params.community.communityName} permanently`);
 
                     if (members && members.length > 1) {
                         members.forEach(member => {
@@ -307,6 +303,30 @@ module.exports = (io) => {
 
             });
 
+            socket.on('claimed-activity', (params) => {
+                if (params && socket) {
+                    logger.info(`Socket: ${socket.keyForFirebase} claimed ${params.activity_name.activity_name}`);
+                    if (params.to.id in allUsers) {
+
+                        if (params.to.id in connectedUserInSpecificCommunity[params.community._id]) {
+
+                            onClaimedActivity(params, 'on-claimed-activity', params.community._id);
+
+                        } else {
+
+                            onClaimedActivity(params, 'on-claimed-activity', params.community._id);
+                            onClaimedActivity(params, 'on-claimed-activity-private', params.to.id);
+
+                        }
+
+                    } else {
+                        onClaimedActivity(params, 'on-claimed-activity', params.community._id);
+                        sendNotification(params, 'onClaimedActivity');
+                    }
+                }
+            });
+
+
 // socket functions
             function addUserToAllUsers(socket, params) {
                 socket.keyForFirebase = params.keyForFirebase;
@@ -406,19 +426,44 @@ module.exports = (io) => {
                 messageService.saveNewMessage(msgObj)
             }
 
+
+            function onClaimedActivity(params, type, to) {
+
+                if (type === 'on-claimed-activity') {
+
+                    io.to(to).emit(type, {
+                        activity: params.activity,
+                        to: params.to,
+                        from: params.from,
+                        event: 'user-ask-to-claimed-activity',
+                        content: `Activity name ${params.activity.activity_name}`,
+                        date: Utils.now()
+                    });
+                } else {
+                    allUsers[to].emit(type, {
+                        activity: params.activity,
+                        to: params.to,
+                        from: params.from,
+                        event: 'user-ask-to-claimed-activity',
+                        content: `Activity name ${params.activity.activity_name}`,
+                        date: Utils.now()
+                    });
+                }
+            }
+
             function sendNotification(params, type) {
                 let from = {
 
                     fullName: params.from.fullName,
                     keyForFirebase: socket.keyForFirebase,
-                    profilePic: params.user.profilePic
+                    profilePic: params.user ? params.user.profilePic : ''
                 };
 
                 let to = {
 
-                    fullName: params.user.fullName,
-                    keyForFirebase: params.user.keyForFirebase,
-                    profilePic: params.user.profilePic
+                    fullName: params.user ? params.user.fullName : '',
+                    keyForFirebase: params.user ? params.user.keyForFirebase : '',
+                    profilePic: params.user ? params.user.profilePic : ''
                 };
 
                 let notificationObj;
@@ -478,6 +523,20 @@ module.exports = (io) => {
                         event: 'manager-decline-user-join-private-room',
                         communityName: params.communityName,
                         content: `Community ${params.communityName}`,
+                    });
+                } else if (type === 'onClaimedActivity') {
+
+                    to.fullName = params.to.name;
+                    to.keyForFirebase = params.to.id;
+
+                    notificationObj = new NOTIFICATION({
+                        from: from,
+                        to: to,
+                        status: 'unread',
+                        creation_date: Utils.now(),
+                        event: 'user-ask-to-claimed-activity',
+                        communityName: params.activity,
+                        content: `Activity ${params.activity.activity_name}`,
                     });
                 }
 
