@@ -63,8 +63,9 @@ exports.now = () => {
     return moment().format(DATE_FORMAT);
 };
 
-exports.isAfterUTC = (date) => {
-    return moment.utc().isAfter(date);
+exports.isAfter = (date) => {
+    let nowBefore2Min = (new Date().getTime()) - (2 * 60 * 1000);
+    return moment(nowBefore2Min).isAfter(date);
 };
 
 exports.getRandomString = (length) => {

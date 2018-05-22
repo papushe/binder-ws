@@ -246,6 +246,7 @@ exports.execute = () => {
                     .then(activitiesObjList => {
                         activitiesObjList.forEach(activity => {
                             //TODO add socket emit and save notification
+                        logger.info(activity._id);
                         });
                         resolve(activitiesObjList);
                     })

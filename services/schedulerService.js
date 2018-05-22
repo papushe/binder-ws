@@ -61,11 +61,10 @@ exports.scheduleAction = (updatedActivity, action) => {
 
             activityLocalDateTime = Utils.unixToUTC(activity.activity_date);
 
-            if (Utils.isAfterUTC(activityLocalDateTime)) {
-                logger.warn(`Activity execution time: ${activityLocalDateTime} UTC! now the time is: ${Utils.currentDateTimeInUTC()} UTC`);
+            if (Utils.isAfter(activity.activity_date)) {
+                logger.error(`Job creation is ignored! Activity execution time is: ${activityLocalDateTime} UTC! while now the time is: ${Utils.currentDateTimeInUTC()} UTC`);
                 resolve(null);
             }
-
             else {
                 job = schedule.scheduleJob(activityLocalDateTime, action);
                 storeScheduledActivityInDB(activity)
