@@ -18,8 +18,8 @@ exports.rankUser = (vote) => {
                     data._doc.votes.down += 1;
                 }
                 data.set({
-                    "votes.up": (vote.up) ? data.votes.up ++ : data.votes.up,
-                    "votes.down": (vote.down) ? data.votes.down ++ : data.votes.down
+                    "votes.up": (vote.up) ? data.votes.up++ : data.votes.up,
+                    "votes.down": (vote.down) ? data.votes.down++ : data.votes.down
                 });
                 data.save(
                     (err, data) => {
@@ -42,7 +42,7 @@ exports.saveNewUser = (newUser) => {
                     logger.error(`failed to create user: ${newUser} due to: ${err}`);
                     reject(false);
                 }
-            logger.info(`new user: ${newUser._id} was created`);
+                logger.info(`new user: ${newUser._id} was created`);
                 resolve(true);
             }
         );
@@ -100,7 +100,7 @@ exports.updateUserProfile = (profileObj) => {
                         .catch(err => {
                             reject(false);
                         });
-                 }
+                }
                 else if (data) {
                     data.set({
                         keyForFirebase: profileObj.keyForFirebase,
@@ -209,28 +209,57 @@ exports.addApprovedActivity = (activityId, userId) => {
     return new Promise((resolve, reject) => {
         USER.findOne({keyForFirebase: {$eq: userId}},
             (err, data) => {
-            if (err) {
-                logger.error(`failed to update activity to user: ${userId} due to : ${err}`);
-                reject(false);
-            }
-            if (!data) {
-                logger.warn(`failed to update activity to user: ${userId} due to : user not exist!`);
-                resolve(null);
-            }
-            else {
-                data.activities.push(activityId);
-                data.save((err) => {
-                    if (err) {
-                        logger.error(`failed to update activity to user: ${userId} due to : ${err}`);
-                        reject(false);
-                    }
-                    else {
-                        logger.info(`Activity: ${activityId} was added to user: ${userId}`);
-                        resolve(data);
-                    }
-                })
-            }
-        });
+                if (err) {
+                    logger.error(`failed to update activity to user: ${userId} due to : ${err}`);
+                    reject(false);
+                }
+                if (!data) {
+                    logger.warn(`failed to update activity to user: ${userId} due to : user not exist!`);
+                    resolve(null);
+                }
+                else {
+                    data.activities.push(activityId);
+                    data.save((err) => {
+                        if (err) {
+                            logger.error(`failed to update activity to user: ${userId} due to : ${err}`);
+                            reject(false);
+                        }
+                        else {
+                            logger.info(`Activity: ${activityId} was added to user: ${userId}`);
+                            resolve(data);
+                        }
+                    })
+                }
+            });
+    });
+};
+
+exports.deleteActivityFromUser = (userId, activityId) => {
+    return new Promise((resolve, reject) => {
+        USER.findOne({keyForFirebase: {$eq: userId}},
+            (err, data) => {
+                if (err) {
+                    logger.error(`failed to delete activity from user: ${userId} due to : ${err}`);
+                    reject(false);
+                }
+                if (!data) {
+                    logger.warn(`failed to delete activity from user: ${userId} due to : user not exist!`);
+                    resolve(null);
+                }
+                else {
+                    data.activities = data.activities.filter(activity => activity !== activityId);
+                    data.save((err) => {
+                        if (err) {
+                            logger.error(`failed to delete activity from user: ${userId} due to : ${err}`);
+                            reject(false);
+                        }
+                        else {
+                            logger.info(`Activity: ${activityId} was removed from user: ${userId}`);
+                            resolve(data);
+                        }
+                    })
+                }
+            });
     });
 };
 

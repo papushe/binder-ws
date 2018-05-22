@@ -106,8 +106,14 @@ exports.claim = (req, res) => {
 exports.decline = (req, res) => {
     let {activityId} = req.body;
     activityService.declineClaimer(activityId)
-        .then(response => {
-            res.json(response);
+        .then(activity => {
+            userService.deleteActivityFromUser(activity.status.user_id, activity._id)
+                .then(user => {
+                    res.json(activity);
+                })
+                .catch(err => {
+                    res.json(err);
+                });
         })
         .catch(err => {
             res.json(err);
