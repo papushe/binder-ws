@@ -305,7 +305,7 @@ module.exports = (io) => {
 
             socket.on('claimed-activity', (params) => {
                 if (params && socket) {
-                    logger.info(`Socket: ${socket.keyForFirebase} claimed ${params.activity_name.activity_name}`);
+                    logger.info(`Socket: ${socket.keyForFirebase} claimed ${params.activity.activity_name}`);
                     if (params.to.id in allUsers) {
 
                         if (params.to.id in connectedUserInSpecificCommunity[params.community._id]) {
@@ -323,6 +323,29 @@ module.exports = (io) => {
                         onClaimedActivity(params, 'on-claimed-activity', params.community._id);
                         sendNotification(params, 'onClaimedActivity');
                     }
+                }
+            });
+
+            socket.on('approve-activity', (params) => {
+                if (params && socket) {
+                    logger.info(`Socket: ${socket.keyForFirebase} approve ${params.activity.activity_name} to ${params.to.name}`);
+                    if (params.to.user_id in allUsers) {
+
+                        if (params.to.user_id in connectedUserInSpecificCommunity[params.community._id]) {
+
+                            onApproveActivity(params, 'on-approve-activity', params.community._id);
+
+                        } else {
+
+                            onApproveActivity(params, 'on-approve-activity', params.community._id);
+                            onApproveActivity(params, 'on-approve-activity-private', params.to.id);
+
+                        }
+
+                    } else {
+                        onApproveActivity(params, 'on-approve-activity', params.community._id);
+                    }
+                        sendNotification(params, 'onApproveActivity');
                 }
             });
 
@@ -451,6 +474,30 @@ module.exports = (io) => {
                 }
             }
 
+            function onApproveActivity(params, type, to) {
+
+                if (type === 'on-approve-activity') {
+
+                    io.to(to).emit(type, {
+                        activity: params.activity,
+                        to: params.to,
+                        from: params.from,
+                        event: 'user-approve-activity',
+                        content: `Activity name ${params.activity.activity_name}`,
+                        date: Utils.now()
+                    });
+                } else {
+                    allUsers[to].emit(type, {
+                        activity: params.activity,
+                        to: params.to,
+                        from: params.from,
+                        event: 'user-approve-activity',
+                        content: `Activity name ${params.activity.activity_name}`,
+                        date: Utils.now()
+                    });
+                }
+            }
+
             function sendNotification(params, type) {
                 let from = {
 
@@ -528,6 +575,20 @@ module.exports = (io) => {
 
                     to.fullName = params.to.name;
                     to.keyForFirebase = params.to.id;
+
+                    notificationObj = new NOTIFICATION({
+                        from: from,
+                        to: to,
+                        status: 'unread',
+                        creation_date: Utils.now(),
+                        event: 'user-ask-to-claimed-activity',
+                        communityName: params.activity,
+                        content: `Activity ${params.activity.activity_name}`,
+                    });
+                } else if (type === 'onApproveActivity') {
+
+                    to.fullName = params.to.fullName;
+                    to.keyForFirebase = params.to.user_id;
 
                     notificationObj = new NOTIFICATION({
                         from: from,

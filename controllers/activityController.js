@@ -125,7 +125,7 @@ exports.approve = (req, res) => {
                     if (updatedUser) {
                         schedulerService.scheduleAction(updatedActivity, activityService.execute)
                             .then(result => {
-                                res.json(result);
+                                res.json(updatedActivity);
 
                             })
                             .catch(err => {
