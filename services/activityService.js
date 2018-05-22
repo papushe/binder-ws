@@ -232,32 +232,39 @@ exports.deleteUserActivities = (userId, communityId, filters) => {
 
 exports.execute = () => {
     let promises = [];
-    schedulerService.getJobsToExecute()
-        .then(data => {
-            if (!data && data.length === 0) {
-                resolve([]);
-            }
-            else {
-                data.forEach(activityId => {
-                    promises.push(this.getActivityById(activityId));
-                });
-
-                Promise.all(promises)
-                    .then(activitiesObjList => {
-                        activitiesObjList.forEach(activity => {
-                            //TODO add socket emit and save notification
-                        logger.info(activity._id);
+    schedulerService.handleCorruptedJobs()
+        .then(notExecutedActivities => {
+            schedulerService.getJobsToExecute()
+                .then(executedActivities => {
+                    if (!executedActivities && executedActivities.length === 0) {
+                        resolve([]);
+                    }
+                    else {
+                        executedActivities.forEach(activityId => {
+                            promises.push(this.getActivityById(activityId));
                         });
-                        resolve(activitiesObjList);
-                    })
-                    .catch(err => {
-                        logger.error(`failed to get all activities which associated to upcoming jobs due to: ${err}`);
-                        reject(err);
-                    });
-            }
+
+                        Promise.all(promises)
+                            .then(activitiesObjList => {
+                                activitiesObjList.forEach(activity => {
+                                    //TODO add socket emit and save notification
+                                    logger.info(activity._id);
+                                });
+                                resolve(activitiesObjList);
+                            })
+                            .catch(err => {
+                                logger.error(`failed to get all activities which associated to upcoming jobs due to: ${err}`);
+                                reject(err);
+                            });
+                    }
+                })
+                .catch(err => {
+                    logger.error(`failed to executed jobs and get related activities due to: ${err}`);
+                    reject(err);
+                });
         })
         .catch(err => {
-            logger.error(`failed to get jobs since 5 min ago till the next 5 min due to: ${err}`);
+            logger.error(`failed to clean corrupted jobs due to: ${err}`);
             reject(err);
         });
 

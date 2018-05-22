@@ -4,7 +4,7 @@ const mongoose = require('mongoose'),
     job = new schema({
         activity_id: String,
         status: String,
-        created_at: String,
+        created_at: Number,
         consumer: {
             name: String,
             id: String
@@ -13,7 +13,7 @@ const mongoose = require('mongoose'),
             name: String,
             id: String
         },
-        execution_date: String,
+        execution_date: Number,
     },{strict: true});
 
 

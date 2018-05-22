@@ -4,47 +4,53 @@ let schedule = require('node-schedule'),
     Utils = require('../utils'),
     logger = Utils.getLogger(),
     RETRIES_COUNT = 3,
+    NOT_EXECUTED_STATE = 'not_executed',
+    PENDING_STATE = 'pending',
     DONE_STATE = 'done';
 
 exports.getJobsToExecute = () => {
     let activities = [];
     let jobs = [];
     let currentUnixTime = new Date().getTime();
-    let unixTime2MinAgo = currentUnixTime - (120 * 1000);
-    let unixNext2Min = currentUnixTime + (120 * 1000);
+    let unix2MinAgo = currentUnixTime - (120 * 1000);
 
-    /**
-     *
-     * I should filter jobs which have already executed!
-     * */
-    JOB.find({$and: [{execution_date: {$gt: unixTime2MinAgo, $lt: unixNext2Min}}, {status: {$ne: DONE_STATE}}]},
-        (err, data) => {
-            if (err) {
-                logger.error(`failed to fetch jobs from: ${Utils.unixToLocal(unixTime2MinAgo)} to: ${Utils.unixToLocal(unixNext2Min)} due to : ${err}`);
-                reject(err);
-            }
-            if (!data) {
-                logger.warn(`cant find jobs to execute from: ${Utils.unixToLocal(unixTime2MinAgo)} to: ${Utils.unixToLocal(unixNext2Min)}`);
-                resolve(activities);
-            }
-            else {
-                data.forEach(job => {
-                    job.status = DONE_STATE;
-                    jobs.push(job._id);
-                    activities.push(job.activity_id);
-                });
-                data.save((err, data) => {
-                    if (err) {
-                        logger.error(`failed to save jobs new state: ${DONE_STATE} due to: ${err}`);
-                        reject(err);
-                    }
-                    else {
-                        logger.info(`Executing jobs: ${jobs}`);
-                        resolve(activities);
-                    }
-                })
-            }
-        });
+    return new Promise((resolve, reject) => {
+        JOB.find({
+                $and: [
+
+                    {execution_date: {$gt: unix2MinAgo}},
+                    {status: {$eq: PENDING_STATE}}
+
+                ]
+            },
+            (err, data) => {
+                if (err) {
+                    logger.error(`failed to fetch pending jobs from ${Utils.unixToLocal(unix2MinAgo)} due to : ${err}`);
+                    reject(err);
+                }
+                if (!data) {
+                    logger.warn(`cant find pending jobs to execute from: ${Utils.unixToLocal(unix2MinAgo)}`);
+                    resolve(activities);
+                }
+                else {
+                    data.forEach(job => {
+                        job.status = DONE_STATE;
+                        jobs.push(job._id);
+                        activities.push(job.activity_id);
+                    });
+                    data.save((err, data) => {
+                        if (err) {
+                            logger.error(`failed to save jobs: ${jobs} new state: ${DONE_STATE} due to: ${err}`);
+                            reject(err);
+                        }
+                        else {
+                            logger.info(`Executing jobs: ${jobs}`);
+                            resolve(activities);
+                        }
+                    })
+                }
+            });
+    })
 };
 
 exports.scheduleAction = (updatedActivity, action) => {
@@ -66,7 +72,8 @@ exports.scheduleAction = (updatedActivity, action) => {
                 resolve(null);
             }
             else {
-                job = schedule.scheduleJob(activityLocalDateTime, action);
+                job = schedule.scheduleJob(new Date(activity.activity_date), action);
+
                 storeScheduledActivityInDB(activity)
                     .then(job => {
                         logger.info(`Job has been scheduled on ${activityLocalDateTime} UTC for activity: ${activity._id}`);
@@ -84,12 +91,54 @@ exports.scheduleAction = (updatedActivity, action) => {
     });
 };
 
-storeScheduledActivityInDB = (activity) => {
+exports.handleCorruptedJobs = () => {
+    let unix2MinAgo = new Date().getTime() - (2 * 60 * 1000);
+    let activities = [];
+    let jobs = [];
 
+    return new Promise((resolve, reject) => {
+        JOB.find({
+                $and: [
+
+                    {execution_date: {$lt: unix2MinAgo}},
+                    {status: {$eq: PENDING_STATE}},
+                ]
+            },
+            (err, data) => {
+                if (err) {
+                    logger.error(`failed to find corrupted jobs to eliminate since ${Utils.unixToLocal(unix2MinAgo)} due to : ${err}`);
+                    reject(err);
+                }
+                if (!data) {
+                    logger.warn(`cant find corrupted jobs to eliminate since ${Utils.unixToLocal(unix2MinAgo)} `);
+                    resolve(activities);
+                }
+                else {
+                    data.forEach(job => {
+                        job.status = NOT_EXECUTED_STATE;
+                        jobs.push(job._id);
+                        activities.push(job.activity_id);
+                    });
+                    data.save((err, data) => {
+                        if (err) {
+                            logger.error(`failed to save jobs: ${jobs} new state: ${NOT_EXECUTED_STATE} due to: ${err}`);
+                            reject(err);
+                        }
+                        else {
+                            logger.warn(`Not executing and eliminating these jobs: ${jobs}`);
+                            resolve(activities);
+                        }
+                    })
+                }
+            });
+    });
+};
+
+storeScheduledActivityInDB = (activity) => {
     let job = new JOB({
         activity_id: activity._id,
         status: 'pending',
-        created_at: Utils.currentDateTimeInUTC(),
+        created_at: new Date().getTime(),
         consumer: activity.consumer,
         provider: activity.provider,
         execution_date: activity.activity_date,
