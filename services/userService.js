@@ -191,7 +191,8 @@ exports.searchUsers = (query) => {
                 $or:
                     [
                         {firstName: {$regex: query, $options: "i"}},
-                        {lastName: {$regex: query, $options: "i"}}
+                        {lastName: {$regex: query, $options: "i"}},
+                        {email: {$regex: query, $options: "i"}}
                     ]
             },
             (err, data) => {
