@@ -3,7 +3,7 @@ let schedule = require('node-schedule'),
     Promise = require('promise'),
     Utils = require('../utils'),
     logger = Utils.getLogger(),
-    activityService = require('../services/activityService');
+    activityService = require('../services/activityService'),
     RETRIES_COUNT = 3,
     NOT_EXECUTED_STATE = 'not_executed',
     PENDING_STATE = 'pending',
@@ -50,7 +50,7 @@ exports.getJobsToExecute = () => {
                         })
                     });
 
-                    logger.info(`Ready to execute these jobs: ${jobs}`);
+                    logger.info(`ready to execute these jobs: ${JSON.stringify(jobs)}`);
                     resolve(activities);
                 }
             });
@@ -130,9 +130,10 @@ exports.handleCorruptedJobs = () => {
                                 activities.push(job.activity_id);
                             }
                         });
-                        logger.warn(`Eliminating these corrupted jobs: ${jobs}`);
-                        resolve(activities);
                     });
+
+                    logger.warn(`eliminating these corrupted jobs: ${JSON.stringify(jobs)}`);
+                    resolve(activities);
                 }
             });
     });
@@ -164,41 +165,42 @@ storeScheduledActivityInDB = (activity) => {
 
 exports.execute = () => {
     let promises = [];
-    this.handleCorruptedJobs()
-        .then(notExecutedActivities => {
-            this.getJobsToExecute()
-                .then(executedActivities => {
-                    if (!executedActivities && executedActivities.length === 0) {
-                        resolve([]);
-                    }
-                    else {
-                        executedActivities.forEach(activityId => {
-                            promises.push(activityService.getActivityById(activityId));
-                        });
-
-                        Promise.all(promises)
-                            .then(activitiesObjList => {
-                                activitiesObjList.forEach(activity => {
-                                    //TODO add socket emit and save notification
-                                });
-                                resolve(activitiesObjList);
-                            })
-                            .catch(err => {
-                                logger.error(`failed to get all activities which associated to upcoming jobs due to: ${err}`);
-                                reject(err);
+    return new Promise((resolve, reject) => {
+        this.handleCorruptedJobs()
+            .then(notExecutedActivities => {
+                this.getJobsToExecute()
+                    .then(executedActivities => {
+                        if (!executedActivities && executedActivities.length === 0) {
+                            resolve([]);
+                        }
+                        else {
+                            executedActivities.forEach(activityId => {
+                                promises.push(activityService.getActivityById(activityId));
                             });
-                    }
-                })
-                .catch(err => {
-                    logger.error(`failed to executed jobs with related activities due to: ${err}`);
-                    reject(err);
-                });
-        })
-        .catch(err => {
-            logger.error(`failed to clean corrupted jobs due to: ${err}`);
-            reject(err);
-        });
 
+                            Promise.all(promises)
+                                .then(activitiesObjList => {
+                                    activitiesObjList.forEach(activity => {
+                                        //TODO add socket emit and save notification
+                                    });
+                                    resolve(activitiesObjList);
+                                })
+                                .catch(err => {
+                                    logger.error(`failed to get all activities which associated to upcoming jobs due to: ${err}`);
+                                    reject(err);
+                                });
+                        }
+                    })
+                    .catch(err => {
+                        logger.error(`failed to executed jobs with related activities due to: ${err}`);
+                        reject(err);
+                    });
+            })
+            .catch(err => {
+                logger.error(`failed to clean corrupted jobs due to: ${err}`);
+                reject(err);
+            });
+    });
 };
 
 

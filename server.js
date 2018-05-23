@@ -18,13 +18,14 @@ const express = require('express'),
     activityController = require('./controllers/activityController'),
     notificationController = require('./controllers/notificationController'),
     messageController = require('./controllers/messageController'),
+    schedulerService = require('./services/schedulerService'),
 
     port = process.env.PORT || require('./config').PORT,
     bodyParser = require('body-parser'),
     logger = require('./utils').getLogger(),
     socketIO = require('socket.io'),
     io = socketIO(server);
-    require('./socket/socketService')(io);
+require('./socket/socketService')(io);
 
 
 admin.initializeApp({
@@ -159,6 +160,11 @@ app.all('*', (req, res) => {
 server.listen(port, () => {
     logger.info(`listening on port ${port}`);
     logger.info(`looking for jobs to execute...`);
-
-
+    schedulerService.execute()
+        .then(data => {
+            logger.info(`running jobs on startup for activities: ${JSON.stringify(data)}`);
+        })
+        .catch(err => {
+            logger.error(`failed to execute jobs on startup due to: ${err}`);
+        });
 });
