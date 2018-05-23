@@ -123,7 +123,6 @@ exports.decline = (req, res) => {
 
 exports.approve = (req, res) => {
     let {activityId} = req.body;
-    let promises = [];
 
     activityService.setProvider(activityId)
         .then(updatedActivity => {
