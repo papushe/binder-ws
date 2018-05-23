@@ -321,14 +321,36 @@ module.exports = (io) => {
 
                     } else {
                         onClaimedActivity(params, 'on-claimed-activity', params.community._id);
-                        sendNotification(params, 'onClaimedActivity');
                     }
+                    sendNotification(params, 'onClaimedActivity');
+                }
+            });
+            socket.on('decline-activity', (params) => {
+                if (params && socket) {
+                    logger.debug(`Socket: ${socket.keyForFirebase} Decline ${params.activity.activity_name}`);
+                    if (params.to.id in allUsers) {
+
+                        if (params.to.id in connectedUserInSpecificCommunity[params.community._id]) {
+
+                            onDeclineActivity(params, 'on-decline-activity', params.community._id);
+
+                        } else {
+
+                            onDeclineActivity(params, 'on-decline-activity', params.community._id);
+                            onDeclineActivity(params, 'on-decline-activity-private', params.to.id);
+
+                        }
+
+                    } else {
+                        onDeclineActivity(params, 'on-decline-activity', params.community._id);
+                    }
+                    sendNotification(params, 'onDeclineActivity');
                 }
             });
 
             socket.on('approve-activity', (params) => {
                 if (params && socket) {
-                    logger.debug(`Socket: ${socket.keyForFirebase} approve ${params.activity.activity_name} to ${params.to.name}`);
+                    logger.debug(`Socket: ${socket.keyForFirebase} approve ${params.activity.activity_name} to ${params.to.fullName}`);
                     if (params.to.user_id in allUsers) {
 
                         if (params.to.user_id in connectedUserInSpecificCommunity[params.community._id]) {
@@ -345,7 +367,7 @@ module.exports = (io) => {
                     } else {
                         onApproveActivity(params, 'on-approve-activity', params.community._id);
                     }
-                        sendNotification(params, 'onApproveActivity');
+                    sendNotification(params, 'onApproveActivity');
                 }
             });
 
@@ -473,6 +495,29 @@ module.exports = (io) => {
                     });
                 }
             }
+            function onDeclineActivity(params, type, to) {
+
+                if (type === 'on-decline-activity') {
+
+                    io.to(to).emit(type, {
+                        activity: params.activity,
+                        to: params.to,
+                        from: params.from,
+                        event: 'user-decline-activity',
+                        content: `Activity name ${params.activity.activity_name}`,
+                        date: Utils.now()
+                    });
+                } else {
+                    allUsers[to].emit(type, {
+                        activity: params.activity,
+                        to: params.to,
+                        from: params.from,
+                        event: 'user-decline-activity',
+                        content: `Activity name ${params.activity.activity_name}`,
+                        date: Utils.now()
+                    });
+                }
+            }
 
             function onApproveActivity(params, type, to) {
 
@@ -496,6 +541,13 @@ module.exports = (io) => {
                         date: Utils.now()
                     });
                 }
+            }
+
+            function sendSocketNotification(notification) {
+
+                allUsers[notification.to.keyForFirebase].emit('notification',
+                    notification
+                );
             }
 
             function sendNotification(params, type) {
@@ -595,13 +647,34 @@ module.exports = (io) => {
                         to: to,
                         status: 'unread',
                         creation_date: Utils.now(),
-                        event: 'user-ask-to-claimed-activity',
+                        event: 'user-approve-activity',
+                        communityName: params.activity,
+                        content: `Activity ${params.activity.activity_name}`,
+                    });
+                } else if (type === 'onDeclineActivity') {
+
+                    to.fullName = params.to.fullName;
+                    to.keyForFirebase = params.to.user_id;
+
+                    notificationObj = new NOTIFICATION({
+                        from: from,
+                        to: to,
+                        status: 'unread',
+                        creation_date: Utils.now(),
+                        event: 'user-decline-activity',
                         communityName: params.activity,
                         content: `Activity ${params.activity.activity_name}`,
                     });
                 }
 
-                notificationService.saveNewNotification(notificationObj)
+                if (to.keyForFirebase in allUsers) {
+                    sendSocketNotification(notificationObj)
+                }
+                else {
+                    notificationService.saveNewNotification(notificationObj)
+                }
+
+
             }
 
         }
