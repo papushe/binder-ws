@@ -12,6 +12,7 @@ let schedule = require('node-schedule'),
 exports.getJobsToExecute = () => {
     let activities = [];
     let jobs = [];
+    let promises = [];
     let currentUnixTime = new Date().getTime();
     let unix5MinAgo = currentUnixTime - (5 * 60 * 1000);
     let unix5MinNext = currentUnixTime + (5 * 60 * 1000);
@@ -37,22 +38,20 @@ exports.getJobsToExecute = () => {
                 else {
                     data.forEach(job => {
                         job.status = DONE_STATE;
-
-                        job.save((err, data) => {
-                            if (err) {
-                                logger.error(`failed to save jobs: ${jobs} new state: ${DONE_STATE} due to: ${err}`);
-                                reject(err);
-                            }
-                            else {
-                                jobs.push(job._id);
-                                activities.push(job.activity_id);
-                            }
-                        })
+                        promises.push(job.save);
                     });
 
-                    logger.info(`ready to execute these jobs: ${JSON.stringify(jobs)}`);
-                    resolve(activities);
+                    Promise.all(promises)
+                        .then(data => {
+                            logger.info(`ready to execute these jobs: ${JSON.stringify(jobs)}`);
+                            resolve(activities);
+                        })
+                        .catch(err => {
+                            logger.error(`failed to execute these jobs: ${JSON.stringify(jobs)} due to: ${err}`);
+                            reject(err);
+                        });
                 }
+
             });
     })
 };
@@ -99,6 +98,7 @@ exports.handleCorruptedJobs = () => {
     let unix5MinAgo = new Date().getTime() - (5 * 60 * 1000);
     let activities = [];
     let jobs = [];
+    let promises = [];
 
     return new Promise((resolve, reject) => {
         JOB.find({
@@ -121,20 +121,21 @@ exports.handleCorruptedJobs = () => {
                     data.forEach(job => {
                         job.status = NOT_EXECUTED_STATE;
 
-                        job.save((err, data) => {
-                            if (err) {
-                                logger.warn(`failed to save job: ${job._id} new state: ${NOT_EXECUTED_STATE} due to: ${err}`);
-                            }
-                            else {
-                                jobs.push(job._id);
-                                activities.push(job.activity_id);
-                            }
-                        });
-                    });
+                        jobs.push(job._id);
+                        activities.push(job.activity_id);
 
-                    logger.warn(`eliminating these corrupted jobs: ${JSON.stringify(jobs)}`);
-                    resolve(activities);
+                        promises.push(job.save);
+                    });
                 }
+                Promise.all(promises)
+                    .then(data => {
+                        logger.warn(`eliminating these corrupted jobs: ${JSON.stringify(jobs)}`);
+                        resolve(activities);
+                    })
+                    .catch(err => {
+                        logger.warn(`failed tp eliminate these corrupted jobs: ${JSON.stringify(jobs)} due to: ${err}`);
+                        reject(err);
+                    });
             });
     });
 };

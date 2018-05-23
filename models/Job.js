@@ -1,5 +1,5 @@
 const mongoose = require('mongoose'),
-      schema   = mongoose.Schema,
+    schema = mongoose.Schema,
 
     job = new schema({
         activity_id: String,
@@ -14,7 +14,7 @@ const mongoose = require('mongoose'),
             id: String
         },
         execution_date: Number,
-    },{strict: true});
+    }, {strict: true});
 
 
 let Job = mongoose.model('Job', job);

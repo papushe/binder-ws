@@ -190,8 +190,13 @@ exports.declineClaimer = (activityId) => {
                     reject(false);
                 }
                 else {
-                    let claimer = data.status.user_id;
-                    data.status.value = 'open';
+                    let declinedClaimer = data.status.user_id;
+
+                    data.status = {
+                        value: 'open',
+                        user_id: '',
+                        fullName: ''
+                    };
                     data.provider = {
                         name: '',
                         id: ''
@@ -201,7 +206,7 @@ exports.declineClaimer = (activityId) => {
                             logger.error(`failed to decline claimer in activity: ${activityId} due to: ${err}`);
                             reject(false);
                         }
-                        logger.info(`claimer: ${claimer} was declined in activity: ${activityId}`);
+                        logger.info(`claimer: ${declinedClaimer} was declined in activity: ${activityId}`);
                         resolve(data);
                     });
                 }
