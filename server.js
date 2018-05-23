@@ -3,28 +3,34 @@ const express = require('express'),
     http = require('http'),
     app = express(),
     server = http.createServer(app),
+
     userContext = 'user',
     communityContext = 'community',
     activityContext = 'activity',
     notificationContext = 'notification',
     messageContext = 'message',
+
     admin = require('firebase-admin'),
     serviceAccount = require('./binder-pnk-firebase-adminsdk-nhbvv-5ced6a0ee2.json'),
+
     userController = require('./controllers/userController'),
     communityController = require('./controllers/communityController'),
     activityController = require('./controllers/activityController'),
     notificationController = require('./controllers/notificationController'),
     messageController = require('./controllers/messageController'),
+
     port = process.env.PORT || require('./config').PORT,
     bodyParser = require('body-parser'),
     logger = require('./utils').getLogger(),
     socketIO = require('socket.io'),
     io = socketIO(server);
-require('./socket/socketService')(io);
+    require('./socket/socketService')(io);
+
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
+
 
 function validateToken(req, res, next) {
     let token = req.get('Authorization');
@@ -90,7 +96,6 @@ app.get(`/${userContext}/search/:query`, userController.search);
 app.post(`/${userContext}/vote`, userController.rank);
 
 
-
 //Community
 app.post(`/${communityContext}/create`, communityController.create);
 
@@ -129,7 +134,6 @@ app.post(`/${activityContext}/approve`, activityController.approve);
 app.post(`/${activityContext}/decline`, activityController.decline);
 
 
-
 //Notification
 app.post(`/${notificationContext}/create`, notificationController.create);
 
@@ -140,7 +144,6 @@ app.get(`/${notificationContext}/get/:keyForFirebase`, notificationController.ge
 app.post(`/${notificationContext}/delete`, notificationController.deleteById);
 
 
-
 //Message
 app.post(`/${messageContext}/create`, messageController.create);
 
@@ -149,12 +152,13 @@ app.get(`/${messageContext}/get/:roomId`, messageController.getByRoomId);
 app.post(`/${messageContext}/save-chat-room`, messageController.saveUserChatByUserId);
 
 
-
-
 app.all('*', (req, res) => {
     res.json({"error": "404 - not found (Wrong input or Wrong url)"});
 });
 
 server.listen(port, () => {
     logger.info(`listening on port ${port}`);
+    logger.info(`looking for jobs to execute...`);
+
+
 });

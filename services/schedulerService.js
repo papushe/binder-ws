@@ -3,6 +3,7 @@ let schedule = require('node-schedule'),
     Promise = require('promise'),
     Utils = require('../utils'),
     logger = Utils.getLogger(),
+    activityService = require('../services/activityService');
     RETRIES_COUNT = 3,
     NOT_EXECUTED_STATE = 'not_executed',
     PENDING_STATE = 'pending',
@@ -12,42 +13,45 @@ exports.getJobsToExecute = () => {
     let activities = [];
     let jobs = [];
     let currentUnixTime = new Date().getTime();
-    let unix2MinAgo = currentUnixTime - (120 * 1000);
+    let unix5MinAgo = currentUnixTime - (5 * 60 * 1000);
+    let unix5MinNext = currentUnixTime + (5 * 60 * 1000);
 
     return new Promise((resolve, reject) => {
         JOB.find({
                 $and: [
 
-                    {execution_date: {$gt: unix2MinAgo}},
+                    {execution_date: {$gte: unix5MinAgo}},
+                    {execution_date: {$lte: unix5MinNext}},
                     {status: {$eq: PENDING_STATE}}
-
                 ]
             },
             (err, data) => {
                 if (err) {
-                    logger.error(`failed to fetch pending jobs from ${Utils.unixToLocal(unix2MinAgo)} due to : ${err}`);
+                    logger.error(`failed to fetch pending jobs from ${Utils.unixToLocal(unix5MinAgo)} due to : ${err}`);
                     reject(err);
                 }
                 if (!data) {
-                    logger.warn(`cant find pending jobs to execute from: ${Utils.unixToLocal(unix2MinAgo)}`);
+                    logger.warn(`cant find pending jobs to execute from: ${Utils.unixToLocal(unix5MinAgo)}`);
                     resolve(activities);
                 }
                 else {
                     data.forEach(job => {
                         job.status = DONE_STATE;
-                        jobs.push(job._id);
-                        activities.push(job.activity_id);
+
+                        job.save((err, data) => {
+                            if (err) {
+                                logger.error(`failed to save jobs: ${jobs} new state: ${DONE_STATE} due to: ${err}`);
+                                reject(err);
+                            }
+                            else {
+                                jobs.push(job._id);
+                                activities.push(job.activity_id);
+                            }
+                        })
                     });
-                    data.save((err, data) => {
-                        if (err) {
-                            logger.error(`failed to save jobs: ${jobs} new state: ${DONE_STATE} due to: ${err}`);
-                            reject(err);
-                        }
-                        else {
-                            logger.info(`Executing jobs: ${jobs}`);
-                            resolve(activities);
-                        }
-                    })
+
+                    logger.info(`Ready to execute these jobs: ${jobs}`);
+                    resolve(activities);
                 }
             });
     })
@@ -92,7 +96,7 @@ exports.scheduleAction = (updatedActivity, action) => {
 };
 
 exports.handleCorruptedJobs = () => {
-    let unix2MinAgo = new Date().getTime() - (2 * 60 * 1000);
+    let unix5MinAgo = new Date().getTime() - (5 * 60 * 1000);
     let activities = [];
     let jobs = [];
 
@@ -100,35 +104,35 @@ exports.handleCorruptedJobs = () => {
         JOB.find({
                 $and: [
 
-                    {execution_date: {$lt: unix2MinAgo}},
+                    {execution_date: {$lt: unix5MinAgo}},
                     {status: {$eq: PENDING_STATE}},
                 ]
             },
             (err, data) => {
                 if (err) {
-                    logger.error(`failed to find corrupted jobs to eliminate since ${Utils.unixToLocal(unix2MinAgo)} due to : ${err}`);
+                    logger.error(`failed to find corrupted jobs to eliminate since ${Utils.unixToLocal(unix5MinAgo)} due to : ${err}`);
                     reject(err);
                 }
                 if (!data) {
-                    logger.warn(`cant find corrupted jobs to eliminate since ${Utils.unixToLocal(unix2MinAgo)} `);
+                    logger.warn(`cant find corrupted jobs to eliminate since ${Utils.unixToLocal(unix5MinAgo)} `);
                     resolve(activities);
                 }
                 else {
                     data.forEach(job => {
                         job.status = NOT_EXECUTED_STATE;
-                        jobs.push(job._id);
-                        activities.push(job.activity_id);
+
+                        job.save((err, data) => {
+                            if (err) {
+                                logger.warn(`failed to save job: ${job._id} new state: ${NOT_EXECUTED_STATE} due to: ${err}`);
+                            }
+                            else {
+                                jobs.push(job._id);
+                                activities.push(job.activity_id);
+                            }
+                        });
+                        logger.warn(`Eliminating these corrupted jobs: ${jobs}`);
+                        resolve(activities);
                     });
-                    data.save((err, data) => {
-                        if (err) {
-                            logger.error(`failed to save jobs: ${jobs} new state: ${NOT_EXECUTED_STATE} due to: ${err}`);
-                            reject(err);
-                        }
-                        else {
-                            logger.warn(`Not executing and eliminating these jobs: ${jobs}`);
-                            resolve(activities);
-                        }
-                    })
                 }
             });
     });
@@ -156,6 +160,45 @@ storeScheduledActivityInDB = (activity) => {
             }
         })
     });
+};
+
+exports.execute = () => {
+    let promises = [];
+    this.handleCorruptedJobs()
+        .then(notExecutedActivities => {
+            this.getJobsToExecute()
+                .then(executedActivities => {
+                    if (!executedActivities && executedActivities.length === 0) {
+                        resolve([]);
+                    }
+                    else {
+                        executedActivities.forEach(activityId => {
+                            promises.push(activityService.getActivityById(activityId));
+                        });
+
+                        Promise.all(promises)
+                            .then(activitiesObjList => {
+                                activitiesObjList.forEach(activity => {
+                                    //TODO add socket emit and save notification
+                                });
+                                resolve(activitiesObjList);
+                            })
+                            .catch(err => {
+                                logger.error(`failed to get all activities which associated to upcoming jobs due to: ${err}`);
+                                reject(err);
+                            });
+                    }
+                })
+                .catch(err => {
+                    logger.error(`failed to executed jobs with related activities due to: ${err}`);
+                    reject(err);
+                });
+        })
+        .catch(err => {
+            logger.error(`failed to clean corrupted jobs due to: ${err}`);
+            reject(err);
+        });
+
 };
 
 

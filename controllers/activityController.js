@@ -123,16 +123,16 @@ exports.decline = (req, res) => {
 
 exports.approve = (req, res) => {
     let {activityId} = req.body;
+    let promises = [];
 
     activityService.setProvider(activityId)
         .then(updatedActivity => {
             userService.addApprovedActivity(activityId, updatedActivity.provider.id)
                 .then(updatedUser => {
                     if (updatedUser) {
-                        schedulerService.scheduleAction(updatedActivity, activityService.execute)
-                            .then(result => {
+                        schedulerService.scheduleAction(updatedActivity, schedulerService.execute)
+                            .then(job => {
                                 res.json(updatedActivity);
-
                             })
                             .catch(err => {
                                 res.json(err);
