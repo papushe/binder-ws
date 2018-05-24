@@ -70,7 +70,6 @@ describe(`Activity Service Integration Tests`, () => {
         expect(result.type).equal(`dog-walker`);
         expect(result.consumer.name).equal(testUser.USER_NAME);
         expect(result.consumer.id).equal(testUser.USER_KEY);
-        expect(result.provider).equal({});
         expect(result.community_id).equal(testUniqueId);
         expect(result.source).equal(`source`);
         expect(result.destination).equal(`destination`);
@@ -91,14 +90,13 @@ describe(`Activity Service Integration Tests`, () => {
             notes: `my notes2`
         });
 
-        let result = await testedService.saveExistingActivity(activity, activity._id);
+        let result = await testedService.saveExistingActivity(activity, activity._id.toString());
 
         expect(result.activity_name).equal(`activity-name2`);
         expect(result.activity_description).equal(`description2`);
         expect(result.type).equal(`dog-walker2`);
         expect(result.consumer.name).equal(testUser.USER_NAME);
         expect(result.consumer.id).equal(testUser.USER_KEY);
-        expect(result.provider).equal({});
         expect(result.community_id).equal(testUniqueId);
         expect(result.source).equal(`source2`);
         expect(result.destination).equal(`destination2`);
@@ -116,13 +114,11 @@ describe(`Activity Service Integration Tests`, () => {
 
     it(`should get community activities with filter`, async () => {
         let result = await testedService.getCommunityActivities(testUniqueId, ['open']);
-        result.should.be.an('array').with.lengthOf(1);
         expect(result.status.value).equal('open');
     });
 
     it(`should get activity by id`, async () => {
         let result = await testedService.getActivityById(activities[0]._id);
-        result.should.be.an('array').with.lengthOf(1);
         expect(result._id.toString()).equal(activities[0]._id.toString());
     });
 

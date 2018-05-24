@@ -135,9 +135,13 @@ exports.removeCommunityFromUser = (userId, communityId) => {
             {$pull: {communities: {communityId: communityId}}},
             {new: true},
             (err, data) => {
-                if (err || !data) {
+                if (err) {
                     logger.error(`failed to remove user community: ${communityId} from user: ${userId} communities list due to: ${err}`);
                     reject(false);
+                }
+                if (!data) {
+                    logger.warn(`failed to remove user community from user: ${userId} communities list due to: community not exist!`);
+                    resolve(null);
                 }
                 logger.info(`community: ${communityId} was removed from communities list for user: ${userId}`);
                 resolve(data);

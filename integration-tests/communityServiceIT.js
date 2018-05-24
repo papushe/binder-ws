@@ -30,8 +30,17 @@ describe(`Community Service Integration Tests`, () => {
             result.forEach(community => {
                 promises.push(testedService.deleteCommunityById(community._id));
             });
-            result = await Promise.all(promises);
-            logger.info(`deleted old test communities success? ${!!result}`);
+
+            result = await userService.getUserProfile(testUser.USER_KEY);
+
+            if (result) {
+                result.communities.forEach(community => {
+                    promises.push(userService.removeCommunityFromUser(community.communityId));
+                });
+
+                result = await Promise.all(promises);
+                logger.info(`deleted old test communities success? ${!!result}`);
+            }
         }
     });
 
@@ -133,7 +142,7 @@ describe(`Community Service Integration Tests`, () => {
         expect(result).not.equal(false);
         expect(result).not.equal(null);
         expect(result.keyForFirebase).equal(testUser.USER_KEY);
-        result.communities.should.be.an('array').with.lengthOf(3);
+        result.communities.should.be.an('array').with.lengthOf(1);
 
         result = await testedService.getCommunityById(communities[0]);
         expect(result.manager.id).equal(member.keyForFirebase);
