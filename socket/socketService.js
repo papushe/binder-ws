@@ -183,8 +183,10 @@ exports.INITSOCKET = (io) => {
                             event: 'enter-to-chat-room',
                             date: Utils.now()
                         });
+                    } else {
+
+                        this.sendNotification(params, 'enterToChatRoom')
                     }
-                    this.sendNotification(params, 'enterToChatRoom')
                 }
 
             });
