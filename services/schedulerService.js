@@ -180,7 +180,7 @@ exports.execute = () => {
                             resolve([]);
                         } else {
                             executedActivities.forEach(activityId => {
-                                promises.push(activityService.getActivityById(activityId));
+                                promises.push(activityService.updateActivityStatus(activityId, 'live'));
                             });
 
                             Promise.all(promises)

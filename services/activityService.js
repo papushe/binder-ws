@@ -87,7 +87,7 @@ exports.saveExistingActivity = (newActivity, activityId) => {
         ACTIVITY.findOne({_id: activityId},
             (err, data) => {
                 if (err || !data) {
-                    logger.error(`Failed to updated activity #${newActivity.activity_name} due to ${err}`);
+                    logger.error(`Failed to updated activity ${newActivity.activity_name} due to ${err}`);
                     reject(false);
                 }
                 data.set({
@@ -105,10 +105,33 @@ exports.saveExistingActivity = (newActivity, activityId) => {
                 data.save(
                     (err, data) => {
                         if (err || !data) {
-                            logger.error(`failed to update activity #${newActivity.activity_name} profile due to: ${err}`);
+                            logger.error(`failed to update activity ${newActivity.activity_name} due to: ${err}`);
                             reject(false);
                         }
                         logger.debug(`activity: ${newActivity.activity_name} was updated`);
+                        resolve(data);
+                    }
+                );
+            })
+    })
+};
+
+exports.updateActivityStatus = (activityId, status) => {
+    return new Promise((resolve, reject) => {
+        ACTIVITY.findOne({_id: activityId},
+            (err, data) => {
+                if (err || !data) {
+                    logger.error(`Failed to updated activity: ${activityId} status to: ${status} due to ${err}`);
+                    reject(false);
+                }
+                data.status.value = status;
+                data.save(
+                    (err, data) => {
+                        if (err || !data) {
+                            logger.error(`failed to update activity: ${activityId} status to: ${status} due to: ${err}`);
+                            reject(false);
+                        }
+                        logger.debug(`activity: ${activityId} status was updated to: ${status}`);
                         resolve(data);
                     }
                 );
@@ -236,3 +259,4 @@ exports.deleteUserActivities = (userId, communityId, filters) => {
             });
     });
 };
+
