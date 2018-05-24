@@ -10,19 +10,20 @@ let schedule = require('node-schedule'),
     DONE_STATE = 'done';
 
 exports.getJobsToExecute = () => {
-    let activities = [];
-    let jobs = [];
-    let promises = [];
     let currentUnixTime = new Date().getTime();
     let unix5MinAgo = currentUnixTime - (5 * 60 * 1000);
     let unix5MinNext = currentUnixTime + (5 * 60 * 1000);
+
+    let activities = [];
+    let jobs = [];
+    let promises = [];
 
     return new Promise((resolve, reject) => {
         JOB.find({
                 $and: [
 
                     {execution_date: {$gte: unix5MinAgo}},
-                    {execution_date: {$lte: unix5MinNext}},
+                    {execution_date: {$lt: unix5MinNext}},
                     {status: {$eq: PENDING_STATE}}
                 ]
             },
@@ -38,7 +39,9 @@ exports.getJobsToExecute = () => {
                 else {
                     data.forEach(job => {
                         job.status = DONE_STATE;
-                        promises.push(job.save);
+                        jobs.push(job._id);
+                        activities.push(job.activity_id);
+                        promises.push(job.save());
                     });
 
                     Promise.all(promises)
@@ -105,7 +108,8 @@ exports.handleCorruptedJobs = () => {
                 $and: [
 
                     {execution_date: {$lt: unix5MinAgo}},
-                    {status: {$eq: PENDING_STATE}},
+                    {status: {$ne: DONE_STATE}},
+                    {status: {$ne: NOT_EXECUTED_STATE}},
                 ]
             },
             (err, data) => {
@@ -124,18 +128,18 @@ exports.handleCorruptedJobs = () => {
                         jobs.push(job._id);
                         activities.push(job.activity_id);
 
-                        promises.push(job.save);
+                        promises.push(job.save());
                     });
+                    Promise.all(promises)
+                        .then(data => {
+                            logger.warn(`eliminating these corrupted jobs: ${JSON.stringify(jobs)}`);
+                            resolve(activities);
+                        })
+                        .catch(err => {
+                            logger.warn(`failed tp eliminate these corrupted jobs: ${JSON.stringify(jobs)} due to: ${err}`);
+                            reject(err);
+                        });
                 }
-                Promise.all(promises)
-                    .then(data => {
-                        logger.warn(`eliminating these corrupted jobs: ${JSON.stringify(jobs)}`);
-                        resolve(activities);
-                    })
-                    .catch(err => {
-                        logger.warn(`failed tp eliminate these corrupted jobs: ${JSON.stringify(jobs)} due to: ${err}`);
-                        reject(err);
-                    });
             });
     });
 };
