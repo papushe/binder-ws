@@ -24,9 +24,13 @@ exports.getActivityById = (activityId) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.findOne({_id: {$eq: activityId}},
             (err, data) => {
-                if (err || !data) {
+                if (err) {
                     logger.error(`failed to get activity: ${activityId} due to: ${err}`);
                     reject(false);
+                }
+                if (!data) {
+                    logger.warn(`cant get non-existed activity: ${activityId}`);
+                    resolve([]);
                 }
                 logger.debug(`got activity ${activityId}`);
                 resolve(data);
@@ -42,7 +46,7 @@ exports.getUserActivities = (userId) => {
                     logger.error(`failed to get user: ${userId} activities due to: ${err}`);
                     reject(false);
                 }
-                logger.info(`got user: ${userId} activities`);
+                logger.debug(`got user: ${userId} activities`);
                 resolve(data);
             });
     });
@@ -84,11 +88,22 @@ exports.deleteActivityById = (activityId) => {
 
 exports.saveExistingActivity = (newActivity, activityId) => {
     return new Promise((resolve, reject) => {
-        ACTIVITY.findOne({_id: activityId},
+        ACTIVITY.findOne({_id: {$eq: activityId}},
             (err, data) => {
-                if (err || !data) {
-                    logger.error(`Failed to updated activity ${newActivity.activity_name} due to ${err}`);
+                if (err) {
+                    logger.error(`Failed to updated activity: ${activityId} due to ${err}`);
                     reject(false);
+                }
+
+                if (!data) {
+                    logger.warn(`Cant update non-existed activity: ${activityId} - creating new one...`);
+                    this.saveNewActivity(newActivity)
+                        .then(activity => {
+                            resolve(activity);
+                        })
+                        .catch(err => {
+                            reject(false);
+                        });
                 }
                 else {
                     data.set({
@@ -184,10 +199,14 @@ exports.setProvider = (activityId) => {
                         logger.warn(`cant set provider in activity: ${activityId} due to: claimer is missing!`);
                         logger.info(`changed activity: ${activityId} to status: ${newStatus}`);
                     }
-                    data.status.value = newStatus;
                     data.provider = {
                         name: newStatus === 'open' ? '' : data.status.fullName,
                         id: newStatus === 'open' ? '' : data.status.user_id
+                    };
+                    data.status = {
+                        value: newStatus,
+                        user_id: '',
+                        fullName: ''
                     };
                     data.save((err, data) => {
                         if (err || !data) {

@@ -128,7 +128,7 @@ exports.setNewManager = (communityId) => {
                                         logger.error(`failed to set a new manager in community: ${communityId} due to: ${err}`);
                                         reject(false);
                                     }
-                                    logger.info(`user: ${newManager} is now a manager in community: ${communityId}`);
+                                    logger.info(`user: ${newManager.keyForFirebase} is now a manager in community: ${communityId}`);
                                     resolve(true);
                                 })
                             }
