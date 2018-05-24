@@ -393,7 +393,7 @@ exports.deleteUserFromConnectedUserInSpecificCommunity = (params, keyForFirebase
 };
 
 exports.enterToPrivateChatRoom = (params) => {
-    roomKey[SOCKET.keyForFirebase] = socket;
+    roomKey[SOCKET.keyForFirebase] = SOCKET;
     connectedUserInSpecificChatRoom[params.room] = roomKey;
 };
 
