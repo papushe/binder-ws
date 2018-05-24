@@ -90,28 +90,30 @@ exports.saveExistingActivity = (newActivity, activityId) => {
                     logger.error(`Failed to updated activity ${newActivity.activity_name} due to ${err}`);
                     reject(false);
                 }
-                data.set({
-                    activity_name: newActivity.activity_name,
-                    activity_description: newActivity.activity_description,
-                    type: newActivity.type,
-                    consumer: newActivity.consumer,
-                    provider: newActivity.provider,
-                    community_id: newActivity.community_id,
-                    activity_date: newActivity.activity_date,
-                    source: newActivity.source,
-                    destination: newActivity.destination,
-                    notes: newActivity.notes
-                });
-                data.save(
-                    (err, data) => {
-                        if (err || !data) {
-                            logger.error(`failed to update activity ${newActivity.activity_name} due to: ${err}`);
-                            reject(false);
+                else {
+                    data.set({
+                        activity_name: newActivity.activity_name,
+                        activity_description: newActivity.activity_description,
+                        type: newActivity.type,
+                        consumer: newActivity.consumer,
+                        provider: newActivity.provider,
+                        community_id: newActivity.community_id,
+                        activity_date: newActivity.activity_date,
+                        source: newActivity.source,
+                        destination: newActivity.destination,
+                        notes: newActivity.notes
+                    });
+                    data.save(
+                        (err, data) => {
+                            if (err || !data) {
+                                logger.error(`failed to update activity ${newActivity.activity_name} due to: ${err}`);
+                                reject(false);
+                            }
+                            logger.debug(`activity: ${newActivity.activity_name} was updated`);
+                            resolve(data);
                         }
-                        logger.debug(`activity: ${newActivity.activity_name} was updated`);
-                        resolve(data);
-                    }
-                );
+                    );
+                }
             })
     })
 };
@@ -192,10 +194,12 @@ exports.setProvider = (activityId) => {
                             logger.error(`failed to set provider in activity: ${activityId} due to: ${err}`);
                             reject(false);
                         }
+                        else {
+                            logger.info(`${data.status.user_id} was set as provider in activity: ${activityId}`);
+                            success = newStatus === 'approved';
+                            resolve({activity: data, success: success});
+                        }
 
-                        logger.info(`${data._doc.status.user_id} was set as provider in activity: ${activityId}`);
-                        success = newStatus === 'approved';
-                        resolve({activity: data, success: success});
                     });
                 }
             });
