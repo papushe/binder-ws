@@ -7,7 +7,8 @@ let schedule = require('node-schedule'),
     RETRIES_COUNT = 3,
     NOT_EXECUTED_STATE = 'not_executed',
     PENDING_STATE = 'pending',
-    DONE_STATE = 'done';
+    DONE_STATE = 'done',
+    IO = require('../socket/socketService');
 
 exports.getJobsToExecute = () => {
     let currentUnixTime = new Date().getTime();
@@ -172,13 +173,12 @@ exports.execute = () => {
     let promises = [];
     return new Promise((resolve, reject) => {
         this.handleCorruptedJobs()
-            .then(notExecutedActivities => {
+            .then(corruptedActivities => {
                 this.getJobsToExecute()
                     .then(executedActivities => {
                         if (!executedActivities && executedActivities.length === 0) {
                             resolve([]);
-                        }
-                        else {
+                        } else {
                             executedActivities.forEach(activityId => {
                                 promises.push(activityService.getActivityById(activityId));
                             });
@@ -186,7 +186,10 @@ exports.execute = () => {
                             Promise.all(promises)
                                 .then(activitiesObjList => {
                                     activitiesObjList.forEach(activity => {
-                                        //TODO add socket emit and save notification
+
+                                        IO.sendNotification(activity, 'onActivityStartConsumer');
+                                        IO.sendNotification(activity, 'onActivityStartProvider');
+
                                     });
                                     resolve(activitiesObjList);
                                 })

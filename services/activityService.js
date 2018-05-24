@@ -144,6 +144,7 @@ exports.setClaimer = (userId, fullName, activityId) => {
 };
 
 exports.setProvider = (activityId) => {
+    let success = false;
     let newStatus = 'approved';
     return new Promise((resolve, reject) => {
         ACTIVITY.findOne({_id: {$eq: activityId}},
@@ -160,16 +161,18 @@ exports.setProvider = (activityId) => {
                     }
                     data.status.value = newStatus;
                     data.provider = {
-                        name: data.status.fullName || '',
-                        id: data.status.user_id || ''
+                        name: newStatus === 'open' ? '' : data.status.fullName,
+                        id: newStatus === 'open' ? '' : data.status.user_id
                     };
                     data.save((err, data) => {
                         if (err || !data) {
                             logger.error(`failed to set provider in activity: ${activityId} due to: ${err}`);
                             reject(false);
                         }
+
                         logger.info(`${data._doc.status.user_id} was set as provider in activity: ${activityId}`);
-                        resolve(data);
+                        success = newStatus === 'approved';
+                        resolve({activity: data, success: success});
                     });
                 }
             });

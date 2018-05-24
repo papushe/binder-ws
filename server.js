@@ -19,13 +19,14 @@ const express = require('express'),
     notificationController = require('./controllers/notificationController'),
     messageController = require('./controllers/messageController'),
     schedulerService = require('./services/schedulerService'),
+    socketService = require('./socket/socketService'),
 
     port = process.env.PORT || require('./config').PORT,
     bodyParser = require('body-parser'),
     logger = require('./utils').getLogger(),
     socketIO = require('socket.io'),
     io = socketIO(server);
-require('./socket/socketService')(io);
+    socketService.INITSOCKET(io);
 
 
 admin.initializeApp({

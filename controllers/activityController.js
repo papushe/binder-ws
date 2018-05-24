@@ -125,25 +125,30 @@ exports.approve = (req, res) => {
     let {activityId} = req.body;
 
     activityService.setProvider(activityId)
-        .then(updatedActivity => {
-            userService.addApprovedActivity(activityId, updatedActivity.provider.id)
-                .then(updatedUser => {
-                    if (updatedUser) {
-                        schedulerService.scheduleAction(updatedActivity, schedulerService.execute)
-                            .then(job => {
-                                res.json(updatedActivity);
-                            })
-                            .catch(err => {
-                                res.json(err);
-                            });
-                    }
-                    else {
-                        res.json(false);
-                    }
+        .then(updateObj => {
+            if (updateObj.success) {
+                userService.addApprovedActivity(activityId, updateObj.activity.provider.id)
+                    .then(updatedUser => {
+                        if (updatedUser) {
+                            schedulerService.scheduleAction(updateObj.activity, schedulerService.execute)
+                                .then(job => {
+                                    res.json(updateObj.activity);
+                                })
+                                .catch(err => {
+                                    res.json(err);
+                                });
+                        }
+                        else {
+                            res.json(false);
+                        }
 
-                }).catch(err => {
-                res.json(err);
-            });
+                    }).catch(err => {
+                    res.json(err);
+                });
+            }
+            else {
+                res.json(null);
+            }
         })
         .catch(err => {
             res.json(err);
