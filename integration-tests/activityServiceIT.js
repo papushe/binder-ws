@@ -17,7 +17,6 @@ let testUtils = require('./testUtils'),
 describe(`Activity Service Integration Tests`, () => {
 
     before(async () => {
-        let promises = [];
         //clean old tests activities and references
         logger.info(`activityServiceIT started at: ${utils.now()}`);
         testUniqueId = `test${new Date().getTime()}`;
