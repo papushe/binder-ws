@@ -23,7 +23,7 @@ exports.saveNewActivity = (newActivity) => {
 
 exports.getActivityById = (activityId) => {
     return new Promise((resolve, reject) => {
-        ACTIVITY.find({id: {$eq: activityId}},
+        ACTIVITY.findOne({_id: {$eq: activityId}},
             (err, data) => {
                 if (err || !data) {
                     logger.error(`failed to get activity: ${activityId} due to: ${err}`);

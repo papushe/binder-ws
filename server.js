@@ -162,7 +162,7 @@ server.listen(port, () => {
     logger.info(`looking for jobs to execute...`);
     schedulerService.execute()
         .then(data => {
-            logger.info(`running jobs on startup for activities: ${JSON.stringify(data)}`);
+            logger.info(`executing jobs on startup for activities: ${JSON.stringify(data)}`);
         })
         .catch(err => {
             logger.error(`failed to execute jobs on startup due to: ${err}`);

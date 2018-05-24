@@ -26,7 +26,11 @@ mongoose.connect(consts, options)
         });
         conn.on('disconnected', () => {
             logger.info('Mongoose: Connection stopped, reconnect');
-            mongoose.connect(consts, options);
+            mongoose.connect(consts, options)
+                .then(() => {})
+                .catch(err => {
+                logger.error(`failed to connect DB  - reason:  ${err}`);
+            });
         });
         conn.on('reconnected', () => {
             logger.info('Mongoose reconnected!');
