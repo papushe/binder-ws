@@ -4,7 +4,6 @@ const mongoose = require('mongoose'),
     activity = new schema({
         activity_name: String,
         activity_description: String,
-        type: String,
         created_at: String,
         consumer: {
             name: String,

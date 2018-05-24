@@ -9,7 +9,6 @@ exports.create = (req, res) => {
     let activityObj = new Activity({
         activity_name: req.body.activityName,
         activity_description: req.body.activityDescription,
-        type: req.body.type,
         created_at: Utils.currentDateTimeInUTC(),
         consumer: req.body.consumer,
         provider: req.body.provider,
@@ -71,7 +70,6 @@ exports.update = (req, res) => {
     let activityObj = new Activity({
         activity_name: req.body.activityName,
         activity_description: req.body.activityDescription,
-        type: req.body.type,
         consumer: req.body.consumer,
         provider: req.body.provider,
         community_id: req.body.communityId,
