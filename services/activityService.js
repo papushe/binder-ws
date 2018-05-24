@@ -1,5 +1,4 @@
 let ACTIVITY = require('../models/Activity'),
-    schedulerService = require('../services/schedulerService'),
     Promise = require('promise'),
     Utils = require('../utils'),
     logger = Utils.getLogger();
