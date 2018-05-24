@@ -1,6 +1,6 @@
 let testUtils = require('./testUtils'),
-    testedService  = require('../services/userService'),
-    User  = require('../models/User'),
+    testedService = require('../services/userService'),
+    User = require('../models/User'),
     utils = require('../utils'),
     logger = utils.getLogger(),
     chai = require('chai'),
@@ -29,7 +29,7 @@ describe(`User Service Integration Tests`, () => {
     });
 
     it(`should create a new user`, async () => {
-         user = new User({
+        user = new User({
             firstName: 'Binder',
             lastName: 'Test',
             location: 'Arlozorov, Ramat Gan',
@@ -67,8 +67,8 @@ describe(`User Service Integration Tests`, () => {
     });
 
     it(`should vote for an user and check user rank`, async () => {
-        let voteUp  = {userId: testKey, up: true};
-        let voteDown  = {userId: testKey, down: true};
+        let voteUp = {userId: testKey, up: true};
+        let voteDown = {userId: testKey, down: true};
 
         let result = await testedService.rankUser(voteUp);
         expect(result).not.equal(false);
