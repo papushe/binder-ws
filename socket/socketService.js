@@ -174,19 +174,19 @@ exports.INITSOCKET = (io) => {
                     SOCKET.join(params.room);
 
                     this.enterToPrivateChatRoom(params);
-
-                    if (params.user.keyForFirebase in allUsers) {
-                        allUsers[params.user.keyForFirebase].emit('chat-room', {
-                            from: params.from,
-                            to: params.user,
-                            room: params.room,
-                            event: 'enter-to-chat-room',
-                            date: Utils.now()
-                        });
-                    } else {
+                    //
+                    // if (params.user.keyForFirebase in allUsers) {
+                    //     allUsers[params.user.keyForFirebase].emit('chat-room', {
+                    //         from: params.from,
+                    //         to: params.user,
+                    //         room: params.room,
+                    //         event: 'enter-to-chat-room',
+                    //         date: Utils.now()
+                    //     });
+                    // } else {
 
                         this.sendNotification(params, 'enterToChatRoom')
-                    }
+                    // }
                 }
 
             });
@@ -208,7 +208,7 @@ exports.INITSOCKET = (io) => {
                             date: Utils.now()
                         });
                     }
-                    this.sendNotification(params, 'joinToChatRoom');
+                    // this.sendNotification(params, 'joinToChatRoom');
                 }
 
             });
