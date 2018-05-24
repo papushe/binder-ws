@@ -128,13 +128,13 @@ exports.handleCorruptedJobs = () => {
 
                         jobs.push(job._id);
                         activities.push(job.activity_id);
-
+                        promises.push(activityService.updateActivityStatus(job.activity_id, 'ignored'));
                         promises.push(job.save());
                     });
                     Promise.all(promises)
                         .then(data => {
                             logger.warn(`eliminating these corrupted jobs: ${JSON.stringify(jobs)}`);
-                            resolve(activities);
+                            resolve();
                         })
                         .catch(err => {
                             logger.warn(`failed tp eliminate these corrupted jobs: ${JSON.stringify(jobs)} due to: ${err}`);
@@ -173,14 +173,14 @@ exports.execute = () => {
     let promises = [];
     return new Promise((resolve, reject) => {
         this.handleCorruptedJobs()
-            .then(corruptedActivities => {
+            .then(() => {
                 this.getJobsToExecute()
                     .then(executedActivities => {
                         if (!executedActivities && executedActivities.length === 0) {
                             resolve([]);
                         } else {
                             executedActivities.forEach(activityId => {
-                                promises.push(activityService.getActivityById(activityId));
+                                promises.push(activityService.updateActivityStatus(activityId, 'live'));
                             });
 
                             Promise.all(promises)
