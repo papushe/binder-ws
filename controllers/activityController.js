@@ -73,6 +73,7 @@ exports.update = (req, res) => {
         activity_description: req.body.activityDescription,
         consumer: req.body.consumer,
         provider: req.body.provider,
+        recurring: req.body.recurring,
         community_id: req.body.communityId,
         source: req.body.source,
         destination: req.body.destination,

@@ -112,6 +112,7 @@ exports.saveExistingActivity = (newActivity, activityId) => {
                         type: newActivity.type,
                         consumer: newActivity.consumer,
                         provider: newActivity.provider,
+                        recurring: newActivity.recurring,
                         community_id: newActivity.community_id,
                         activity_date: newActivity.activity_date,
                         source: newActivity.source,
