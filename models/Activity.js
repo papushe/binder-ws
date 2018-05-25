@@ -5,6 +5,7 @@ const mongoose = require('mongoose'),
         activity_name: String,
         activity_description: String,
         created_at: String,
+        recurring: {type: Number, default: 1},
         consumer: {
             name: String,
             id: String

@@ -10,6 +10,7 @@ exports.create = (req, res) => {
         activity_name: req.body.activityName,
         activity_description: req.body.activityDescription,
         created_at: Utils.currentDateTimeInUTC(),
+        recurring: req.body.recurring,
         consumer: req.body.consumer,
         provider: req.body.provider,
         community_id: req.body.communityId,
