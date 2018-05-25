@@ -8,7 +8,7 @@ let schedule = require('node-schedule'),
     NOT_EXECUTED_STATE = 'not_executed',
     PENDING_STATE = 'pending',
     DONE_STATE = 'done',
-    IO = require('../socket/socketService');
+    sockets = require('../socket/socketService');
 
 exports.getJobsToExecute = () => {
     let currentUnixTime = new Date().getTime();
@@ -187,8 +187,8 @@ exports.execute = () => {
                                 .then(activitiesObjList => {
                                     activitiesObjList.forEach(activity => {
 
-                                        IO.sendNotification(activity, 'onActivityStartConsumer');
-                                        IO.sendNotification(activity, 'onActivityStartProvider');
+                                        sockets.sendNotification(activity, 'onActivityStartConsumer');
+                                        sockets.sendNotification(activity, 'onActivityStartProvider');
 
                                     });
                                     resolve(activitiesObjList);
