@@ -31,6 +31,7 @@ function initLogger () {
 
             new (transports.File) ({
                 filename: `${logDir}/logs.log`,
+                maxSize: 10000000,
                 format: format.combine(
                     formatMessage(),
                     format.simple()
