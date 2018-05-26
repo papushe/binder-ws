@@ -43,7 +43,7 @@ exports.saveNewUser = (newUser) => {
                     reject(false);
                 }
                 logger.info(`new user: ${newUser._id} was created`);
-                resolve(true);
+                resolve(data);
             }
         );
     });
