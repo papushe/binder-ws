@@ -4,6 +4,7 @@ let schedule = require('node-schedule'),
     Utils = require('../utils'),
     logger = Utils.getLogger(),
     activityService = require('../services/activityService'),
+    sockets = require('../socket/socketService'),
 
     NOT_EXECUTED_STATE = 'not_executed',
     PENDING_STATE = 'pending',
@@ -126,24 +127,24 @@ exports.cancelJobs = (activityId) => {
     return new Promise((resolve, reject) => {
         JOB.findOne({activity_id: {$eq: activityId}},
             (err, data) => {
-            if (err) {
-                logger.error(`Failed to cancel job for activity: ${activityId} due to: ${err}`);
-                reject(err);
-            }
-            else if (!data) {
-                logger.warn(`cant cancel non-existed job for activity: ${activityId}`);
-                resolve(null);
-            }
-            else {
-                data.status = `done`;
-                data.execution_time.next = -1;
+                if (err) {
+                    logger.error(`Failed to cancel job for activity: ${activityId} due to: ${err}`);
+                    reject(err);
+                }
+                else if (!data) {
+                    logger.warn(`cant cancel non-existed job for activity: ${activityId}`);
+                    resolve(null);
+                }
+                else {
+                    data.status = `done`;
+                    data.execution_time.next = -1;
 
-                data.save((err, data) => {
-                    logger.info(`Job ${data._id} is cancelled for activity ${activityId}`);
-                    resolve(data);
-                });
-            }
-        })
+                    data.save((err, data) => {
+                        logger.info(`Job ${data._id} is cancelled for activity ${activityId}`);
+                        resolve(data);
+                    });
+                }
+            })
     });
 };
 
@@ -224,8 +225,8 @@ exports.execute = () => {
                             Promise.all(promises)
                                 .then(activitiesObjList => {
                                     activitiesObjList.forEach(activity => {
-                                        IO.sendNotification(activity, 'onActivityStartConsumer');
-                                        IO.sendNotification(activity, 'onActivityStartProvider');
+                                        sockets.sendNotification(activity, 'onActivityStartConsumer');
+                                        sockets.sendNotification(activity, 'onActivityStartProvider');
                                     });
                                     resolve(activitiesObjList);
                                 })
