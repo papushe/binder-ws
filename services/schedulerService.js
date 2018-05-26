@@ -6,10 +6,8 @@ let schedule = require('node-schedule'),
     activityService = require('../services/activityService'),
     sockets = require('../socket/socketService'),
 
-    NOT_EXECUTED_STATE = 'not_executed',
     PENDING_STATE = 'pending',
     DONE_STATE = 'done',
-    CANCELLED_STATE = 'cancelled',
 
     DAY = 24 * 60 * 60 * 1000,
     IO = require('../socket/socketService');
@@ -63,7 +61,7 @@ exports.getJobsToExecute = () => {
 
                     Promise.all(promises)
                         .then(data => {
-                            logger.info(`going to execute these jobs: ${JSON.stringify(jobs)}`);
+                            logger.debug(`going to execute jobs: ${JSON.stringify(jobs)}`);
                             resolve(activities);
                         })
                         .catch(err => {
@@ -115,7 +113,7 @@ exports.cleanJobs = () => {
                         logger.error(`failed to run clean jobs due to : ${err}`);
                     }
                     else {
-                        logger.error(`cleaning jobs task done...`);
+                        logger.info(`cleaning jobs task done...`);
                     }
                     resolve();
                 });
