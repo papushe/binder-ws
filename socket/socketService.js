@@ -322,13 +322,13 @@ module.exports = (io) => {
             socket.on('decline-activity', (params) => {
                 if (params && socket) {
                     logger.debug(`Socket: ${socket.keyForFirebase} Decline ${params.activity.activity_name}`);
-                    if (params.to.id in allUsers) {
+                    if (params.to.user_id in allUsers) {
 
-                        if (params.to.id in connectedUserInSpecificCommunity[params.community._id]) {
+                        if (params.to.user_id in connectedUserInSpecificCommunity[params.community._id]) {
                             onDeclineActivity(params, 'on-decline-activity', params.community._id);
                         } else {
                             onDeclineActivity(params, 'on-decline-activity', params.community._id);
-                            onDeclineActivity(params, 'on-decline-activity-private', params.to.id);
+                            onDeclineActivity(params, 'on-decline-activity-private', params.to.user_id);
                         }
 
                     } else {
