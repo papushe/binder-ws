@@ -5,7 +5,7 @@ const mongoose = require('mongoose'),
         activity_name: String,
         activity_description: String,
         created_at: String,
-        recurring: {type: String, default: `daily`},
+        recurring: {type: String, default: `once`},
         consumer: {
             name: String,
             id: String
@@ -16,7 +16,7 @@ const mongoose = require('mongoose'),
         },
         community_id: String,
         status: {
-            value: String,
+            value: String, //'open', 'claimed', 'approved', 'live', 'done', 'ongoing', 'cancelled'
             user_id: String,
             fullName: String
         },

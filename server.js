@@ -135,6 +135,10 @@ app.post(`/${activityContext}/approve`, activityController.approve);
 
 app.post(`/${activityContext}/decline`, activityController.decline);
 
+app.post(`/${activityContext}/finish`, activityController.finish);
+
+app.post(`/${activityContext}/cancel`, activityController.cancel);
+
 
 //Notification
 app.post(`/${notificationContext}/create`, notificationController.create);
@@ -160,12 +164,11 @@ app.all('*', (req, res) => {
 
 server.listen(port, () => {
     logger.info(`listening on port ${port}`);
-    logger.info(`looking for jobs to execute...`);
     schedulerService.execute()
         .then(data => {
-            logger.info(`executing jobs on startup for activities: ${JSON.stringify(data)}`);
+            logger.info(`initiated execution task  - will be executed every 5 min`);
         })
         .catch(err => {
-            logger.error(`failed to execute jobs on startup due to: ${err}`);
+            logger.error(`failed to initiate execution task on startup due to: ${err}`);
         });
 });

@@ -44,7 +44,7 @@ exports.getByCommunityId = (req, res) => {
     let {communityId, filters} = req.body;
 
     if (!filters || filters.length === 0) {
-        filters = ['open', 'claimed', 'approved', 'live', 'done', 'ignored'];
+        filters = ['open', 'claimed', 'approved', 'live', 'done', 'ongoing', 'cancelled'];
     }
 
     activityService.getCommunityActivities(communityId, filters)
@@ -118,7 +118,6 @@ exports.decline = (req, res) => {
         .catch(err => {
             res.json(err);
         })
-
 };
 
 exports.approve = (req, res) => {
@@ -130,7 +129,7 @@ exports.approve = (req, res) => {
                 userService.addApprovedActivity(activityId, updateObj.activity.provider.id)
                     .then(updatedUser => {
                         if (updatedUser) {
-                            schedulerService.scheduleAction(updateObj.activity, schedulerService.execute)
+                            schedulerService.createNewJob(updateObj.activity)
                                 .then(job => {
                                     res.json(updateObj.activity);
                                 })
@@ -153,4 +152,43 @@ exports.approve = (req, res) => {
         .catch(err => {
             res.json(err);
         });
+};
+
+exports.finish = (req, res) => {
+    let {activityId} = req.body;
+    activityService.finishActivity(activityId)
+        .then(activity => {
+            if (activity.recurring === 'once') {
+                schedulerService.abortJob(activityId)
+                    .then(job => {
+                        res.json(activity);
+                    })
+                    .catch(err => {
+                        res.json(err);
+                    });
+            }
+            else {
+                res.json(activity);
+            }
+        })
+        .catch(err => {
+            res.json(err);
+        })
+};
+
+exports.cancel = (req, res) => {
+    let {activityId} = req.body;
+    activityService.cancelActivity(activityId)
+        .then(activity => {
+            schedulerService.abortJob(activityId)
+                .then(job => {
+                    res.json(activity);
+                })
+                .catch(err => {
+                    res.json(err);
+                });
+        })
+        .catch(err => {
+            res.json(err);
+        })
 };

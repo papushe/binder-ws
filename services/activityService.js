@@ -263,6 +263,64 @@ exports.declineClaimer = (activityId) => {
     });
 };
 
+exports.finishActivity = (activityId) => {
+    return new Promise((resolve, reject) => {
+        ACTIVITY.findOne({_id: {$eq: activityId}},
+            (err, data) => {
+                if (err) {
+                    logger.error(`failed to finish activity: ${activityId} due to: ${err}`);
+                    reject(false);
+                }
+                else if (!data) {
+                    logger.warn(`cant finish non-existed activity: ${activityId}`);
+                    resolve(null)
+                }
+                else {
+                    data.status = {
+                        value: (data.recurring === 'once') ? 'done' : 'ongoing',
+                    };
+                    data.save((err, data) => {
+                        if (err || !data) {
+                            logger.error(`failed to done activity: ${activityId} due to: ${err}`);
+                            reject(false);
+                        }
+                        logger.debug(`activity: ${activityId} was finished`);
+                        resolve(data);
+                    });
+                }
+            });
+    });
+};
+
+exports.cancelActivity = (activityId) => {
+    return new Promise((resolve, reject) => {
+        ACTIVITY.findOne({_id: {$eq: activityId}},
+            (err, data) => {
+                if (err) {
+                    logger.error(`failed to cancel activity: ${activityId} due to: ${err}`);
+                    reject(false);
+                }
+                else if (!data) {
+                    logger.warn(`cant cancel non-existed activity: ${activityId}`);
+                    resolve(null)
+                }
+                else {
+                    data.status = {
+                        value: 'cancelled',
+                    };
+                    data.save((err, data) => {
+                        if (err || !data) {
+                            logger.error(`failed to cancel activity: ${activityId} due to: ${err}`);
+                            reject(false);
+                        }
+                        logger.debug(`activity: ${activityId} was cancelled`);
+                        resolve(data);
+                    });
+                }
+            });
+    });
+};
+
 exports.deleteUserActivities = (userId, communityId, filters) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.remove(

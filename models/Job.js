@@ -3,7 +3,7 @@ const mongoose = require('mongoose'),
 
     job = new schema({
         activity_id: String,
-        status: String,
+        status: String,  // 'pending', 'done'
         created_at: Number,
         consumer: {
             name: String,
@@ -13,9 +13,12 @@ const mongoose = require('mongoose'),
             name: String,
             id: String
         },
-        execution_date: Number,
+        recurring: String,
+        execution_time: {
+          first: Number,
+          next: Number,
+        },
     }, {strict: true});
-
 
 let Job = mongoose.model('Job', job);
 
