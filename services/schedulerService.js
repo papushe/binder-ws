@@ -61,7 +61,7 @@ exports.getJobsToExecute = () => {
 
                     Promise.all(promises)
                         .then(data => {
-                            logger.debug(`going to execute jobs: ${JSON.stringify(jobs)}`);
+                            logger.info(`${data.length} jobs are going to be executed...`);
                             resolve(activities);
                         })
                         .catch(err => {
