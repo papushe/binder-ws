@@ -11,6 +11,7 @@ exports.create = (req, res) => {
         status: req.body.status || 'unread',
         creation_date: Utils.now(),
         event: req.body.event,
+        activity: req.body.activity,
         content: req.body.content || '',
     });
     notificationService.saveNewNotification(notificationObj)

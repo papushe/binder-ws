@@ -306,15 +306,11 @@ module.exports = (io) => {
                     if (params.to.id in allUsers) {
 
                         if (params.to.id in connectedUserInSpecificCommunity[params.community._id]) {
-                            onClaimedActivity(params, 'on-claimed-activity', params.community._id);
                         } else {
-                            onClaimedActivity(params, 'on-claimed-activity', params.community._id);
                             onClaimedActivity(params, 'on-claimed-activity-private', params.to.id);
                         }
-
-                    } else {
-                        onClaimedActivity(params, 'on-claimed-activity', params.community._id);
                     }
+                    onClaimedActivity(params, 'on-claimed-activity', params.community._id);
                     sendNotification(params, 'onClaimedActivity');
                 }
             });
@@ -325,15 +321,11 @@ module.exports = (io) => {
                     if (params.to.user_id in allUsers) {
 
                         if (params.to.user_id in connectedUserInSpecificCommunity[params.community._id]) {
-                            onDeclineActivity(params, 'on-decline-activity', params.community._id);
                         } else {
-                            onDeclineActivity(params, 'on-decline-activity', params.community._id);
                             onDeclineActivity(params, 'on-decline-activity-private', params.to.user_id);
                         }
-
-                    } else {
-                        onDeclineActivity(params, 'on-decline-activity', params.community._id);
                     }
+                    onDeclineActivity(params, 'on-decline-activity', params.community._id);
                     sendNotification(params, 'onDeclineActivity');
                 }
             });
@@ -344,16 +336,13 @@ module.exports = (io) => {
                     if (params.to.user_id in allUsers) {
 
                         if (params.to.user_id in connectedUserInSpecificCommunity[params.community._id]) {
-                            onApproveActivity(params, 'on-approve-activity', params.community._id);
                         } else {
-                            onApproveActivity(params, 'on-approve-activity', params.community._id);
                             onApproveActivity(params, 'on-approve-activity-private', params.to.id);
                         }
-
-                    } else {
-                        onApproveActivity(params, 'on-approve-activity', params.community._id);
                     }
+                    onApproveActivity(params, 'on-approve-activity', params.community._id);
                     sendNotification(params, 'onApproveActivity');
+                    sendNotification(params, 'onApproveActivityConsumer');
                 }
             });
 
@@ -466,7 +455,7 @@ module.exports = (io) => {
                         activity: params.activity,
                         to: params.to,
                         from: params.from,
-                        event: 'user-ask-to-claimed-activity',
+                        event: 'on-claimed-activity',
                         content: `Activity name ${params.activity.activity_name}`,
                         date: Utils.now()
                     });
@@ -475,7 +464,7 @@ module.exports = (io) => {
                         activity: params.activity,
                         to: params.to,
                         from: params.from,
-                        event: 'user-ask-to-claimed-activity',
+                        event: 'on-claimed-activity',
                         content: `Activity name ${params.activity.activity_name}`,
                         date: Utils.now()
                     });
@@ -490,7 +479,7 @@ module.exports = (io) => {
                         activity: params.activity,
                         to: params.to,
                         from: params.from,
-                        event: 'user-decline-activity',
+                        event: 'on-decline-activity',
                         content: `Activity name ${params.activity.activity_name}`,
                         date: Utils.now()
                     });
@@ -499,7 +488,7 @@ module.exports = (io) => {
                         activity: params.activity,
                         to: params.to,
                         from: params.from,
-                        event: 'user-decline-activity',
+                        event: 'on-decline-activity',
                         content: `Activity name ${params.activity.activity_name}`,
                         date: Utils.now()
                     });
@@ -514,7 +503,7 @@ module.exports = (io) => {
                         activity: params.activity,
                         to: params.to,
                         from: params.from,
-                        event: 'user-approve-activity',
+                        event: 'on-approve-activity',
                         content: `Activity name ${params.activity.activity_name}`,
                         date: Utils.now()
                     });
@@ -523,7 +512,7 @@ module.exports = (io) => {
                         activity: params.activity,
                         to: params.to,
                         from: params.from,
-                        event: 'user-approve-activity',
+                        event: 'on-approve-activity',
                         content: `Activity name ${params.activity.activity_name}`,
                         date: Utils.now()
                     });
@@ -648,7 +637,8 @@ module.exports = (io) => {
                         status: 'unread',
                         creation_date: Utils.now(),
                         event: 'user-ask-to-claimed-activity',
-                        communityName: params.activity,
+                        communityName: params.activity.activity_name,
+                        activity:params.activity,
                         content: `Activity ${params.activity.activity_name}`,
                     });
                 } else if (type === 'onApproveActivity') {
@@ -662,7 +652,23 @@ module.exports = (io) => {
                         status: 'unread',
                         creation_date: Utils.now(),
                         event: 'user-approve-activity',
-                        communityName: params.activity,
+                        communityName: params.activity.activity_name,
+                        activity:params.activity,
+                        content: `Activity ${params.activity.activity_name}`,
+                    });
+                } else if (type === 'onApproveActivityConsumer') {
+
+                    to.fullName = params.from.fullName;
+                    to.keyForFirebase = params.from.keyForFirebase;
+
+                    notificationObj = new NOTIFICATION({
+                        from: from,
+                        to: to,
+                        status: 'unread',
+                        creation_date: Utils.now(),
+                        event: 'user-approve-activity',
+                        communityName: params.activity.activity_name,
+                        activity:params.activity,
                         content: `Activity ${params.activity.activity_name}`,
                     });
                 } else if (type === 'onDeclineActivity') {
@@ -676,7 +682,8 @@ module.exports = (io) => {
                         status: 'unread',
                         creation_date: Utils.now(),
                         event: 'user-decline-activity',
-                        communityName: params.activity,
+                        communityName: params.activity.activity_name,
+                        activity:params.activity,
                         content: `Activity ${params.activity.activity_name}`,
                     });
                 } else if (type === 'onActivityStartConsumer') {
@@ -722,9 +729,7 @@ module.exports = (io) => {
                     notificationService.saveNewNotification(notificationObj)
                 }
             }
-
             module.exports.sendNotification = sendNotification;
-
         }
     );
 };

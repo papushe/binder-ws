@@ -14,11 +14,12 @@ const mongoose = require('mongoose'),
         },
         room: String,
         communityName: String,
+        activity: {},
         status: String,
         creation_date: String,
         event: String,
         content: String,
-        user: String
+        user: {}
     }, {strict: true});
 
 
