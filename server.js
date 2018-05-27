@@ -161,7 +161,7 @@ app.all('*', (req, res) => {
 
 server.listen(port, () => {
     logger.info(`listening on port ${port}`);
-    schedulerService.execute()
+    schedulerService.execute(true)
         .then(data => {
             logger.info(`initiated execution task  - will be executed every 5 min`);
         })

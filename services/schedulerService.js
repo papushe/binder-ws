@@ -24,8 +24,7 @@ exports.getJobsToExecute = () => {
     return new Promise((resolve, reject) => {
         JOB.find({
                 $and: [
-
-                    {"execution_time.next": {$gte: unix5MinAgo}},
+                    {"execution_time.next": {$gt: unix5MinAgo}},
                     {"execution_time.next": {$lt: unix5MinNext}},
                     {status: {$eq: PENDING_STATE}}
                 ]
@@ -201,14 +200,15 @@ exports.createNewJob = (activity) => {
     });
 };
 
-exports.execute = () => {
+exports.execute = (runAsTask) => {
     let promises = [];
     let NEXT_FIVE_MIN = new Date().getTime() + (5 * 60 * 1000);
 
     //scheduling next iteration
-    logger.info(`jobs execution started...`);
-    this.scheduleAction(NEXT_FIVE_MIN, this.execute);
-
+    if (runAsTask) {
+        logger.info(`jobs execution started...`);
+        this.scheduleAction(NEXT_FIVE_MIN, this.execute);
+    }
     return new Promise((resolve, reject) => {
         this.cleanJobs()
             .then(() => {

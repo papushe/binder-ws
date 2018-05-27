@@ -3,7 +3,8 @@ let Activity = require('../models/Activity'),
     activityService = require('../services/activityService'),
     userService = require('../services/userService'),
     schedulerService = require('../services/schedulerService'),
-    logger = Utils.getLogger();
+    logger = Utils.getLogger(),
+    next5Min = 5 * 60 *1000;
 
 exports.create = (req, res) => {
     let activityObj = new Activity({
@@ -131,6 +132,9 @@ exports.approve = (req, res) => {
                         if (updatedUser) {
                             schedulerService.createNewJob(updateObj.activity)
                                 .then(job => {
+                                    if (updateObj.activity.activity_date < next5Min) {
+                                        schedulerService.execute(false);
+                                    }
                                     res.json(updateObj.activity);
                                 })
                                 .catch(err => {
