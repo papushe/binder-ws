@@ -15,8 +15,9 @@ const mongoose = require('mongoose'),
         },
         recurring: String,
         execution_time: {
-          first: Number,
-          next: Number,
+            first: Number,
+            next: Number,
+            end: Number
         },
     }, {strict: true});
 

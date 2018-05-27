@@ -26,6 +26,7 @@ exports.getJobsToExecute = () => {
                 $and: [
                     {"execution_time.next": {$gt: unix5MinAgo}},
                     {"execution_time.next": {$lt: unix5MinNext}},
+                    {$match:{$expr:{$gt:["execution_time.end", "execution_time.next"]}}},
                     {status: {$eq: PENDING_STATE}}
                 ]
             },
@@ -173,6 +174,7 @@ exports.abortJob = (activityId) => {
 };
 
 exports.createNewJob = (activity) => {
+    let activityLocalDate = new Date(activity.activity_date);
     let job = new JOB({
         activity_id: activity._id,
         status: 'pending',
@@ -183,6 +185,7 @@ exports.createNewJob = (activity) => {
         execution_time: {
             first: activity.activity_date,
             next: activity.activity_date,
+            end : new Date(activityLocalDate.getFullYear(), activityLocalDate.getMonth() + 3, activityLocalDate.getDate(), activityLocalDate.getHours(), activityLocalDate.getMinutes()).getTime()
         }
     });
 
