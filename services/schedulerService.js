@@ -26,7 +26,7 @@ exports.getJobsToExecute = () => {
                 $and: [
                     {"execution_time.next": {$gt: unix5MinAgo}},
                     {"execution_time.next": {$lt: unix5MinNext}},
-                    {$match:{$expr:{$gt:["execution_time.end", "execution_time.next"]}}},
+                    { $where: "execution_time.end > execution_time.next" },
                     {status: {$eq: PENDING_STATE}}
                 ]
             },
