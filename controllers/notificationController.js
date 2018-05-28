@@ -13,6 +13,7 @@ exports.create = (req, res) => {
         event: req.body.event,
         activity: req.body.activity,
         content: req.body.content || '',
+        user:req.body.user || ''
     });
     notificationService.saveNewNotification(notificationObj)
         .then(response => {

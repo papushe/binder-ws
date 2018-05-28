@@ -602,6 +602,7 @@ module.exports = (io) => {
                     notificationObj = new NOTIFICATION({
                         from: from,
                         to: to,
+                        user: params.from,
                         room: params.user._id, // == community._id
                         status: 'unread',
                         creation_date: Utils.now(),
@@ -638,7 +639,7 @@ module.exports = (io) => {
                         creation_date: Utils.now(),
                         event: 'user-ask-to-claimed-activity',
                         communityName: params.activity.activity_name,
-                        activity:params.activity,
+                        activity: params.activity,
                         content: `Activity ${params.activity.activity_name}`,
                     });
                 } else if (type === 'onApproveActivity') {
@@ -653,7 +654,7 @@ module.exports = (io) => {
                         creation_date: Utils.now(),
                         event: 'user-approve-activity',
                         communityName: params.activity.activity_name,
-                        activity:params.activity,
+                        activity: params.activity,
                         content: `Activity ${params.activity.activity_name}`,
                     });
                 } else if (type === 'onApproveActivityConsumer') {
@@ -666,9 +667,9 @@ module.exports = (io) => {
                         to: to,
                         status: 'unread',
                         creation_date: Utils.now(),
-                        event: 'user-approve-activity',
+                        event: 'you-approved-activity',
                         communityName: params.activity.activity_name,
-                        activity:params.activity,
+                        activity: params.activity,
                         content: `Activity ${params.activity.activity_name}`,
                     });
                 } else if (type === 'onDeclineActivity') {
@@ -683,7 +684,7 @@ module.exports = (io) => {
                         creation_date: Utils.now(),
                         event: 'user-decline-activity',
                         communityName: params.activity.activity_name,
-                        activity:params.activity,
+                        activity: params.activity,
                         content: `Activity ${params.activity.activity_name}`,
                     });
                 } else if (type === 'onActivityStartConsumer') {
@@ -729,6 +730,7 @@ module.exports = (io) => {
                     notificationService.saveNewNotification(notificationObj)
                 }
             }
+
             module.exports.sendNotification = sendNotification;
         }
     );
