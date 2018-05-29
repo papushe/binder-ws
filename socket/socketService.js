@@ -182,8 +182,9 @@ module.exports = (io) => {
                             event: 'enter-to-chat-room',
                             date: Utils.now()
                         });
+                    } else {
+                        // sendNotification(params, 'enterToChatRoom')
                     }
-                    sendNotification(params, 'enterToChatRoom')
                 }
 
             });
@@ -194,18 +195,26 @@ module.exports = (io) => {
                     logger.debug(`Socket: ${socket.keyForFirebase} joined to ${params.room} chat room`);
                     socket.join(params.room);
 
-                    enterToPrivateChatRoom(params);
-
-                    if (params.user.keyForFirebase in allUsers) {
-                        allUsers[params.user.keyForFirebase].emit('change-event-chat-room', {
+                    let isIn = enterToPrivateChatRoom(params);
+                    if (isIn) {
+                        if (params.user.keyForFirebase in allUsers) {
+                            allUsers[params.user.keyForFirebase].emit('change-event-chat-room', {
+                                from: params.from,
+                                to: params.user,
+                                room: params.room,
+                                event: 'joined',
+                                date: Utils.now()
+                            });
+                        }
+                    } else {
+                        allUsers[params.user.keyForFirebase].emit('chat-room', {
                             from: params.from,
                             to: params.user,
                             room: params.room,
-                            event: 'joined',
+                            event: 'enter-to-chat-room',
                             date: Utils.now()
                         });
                     }
-                    sendNotification(params, 'joinToChatRoom');
                 }
 
             });
@@ -379,6 +388,7 @@ module.exports = (io) => {
             function enterToPrivateChatRoom(params) {
                 roomKey[socket.keyForFirebase] = socket;
                 connectedUserInSpecificChatRoom[params.room] = roomKey;
+                return params.user.keyForFirebase in connectedUserInSpecificChatRoom[params.room]
             }
 
             function deleteFromPrivateChatRoom(params) {
@@ -591,7 +601,7 @@ module.exports = (io) => {
                         status: 'unread',
                         creation_date: Utils.now(),
                         event: 'join-to-chat-room',
-                        content: `Chat invitation received from ${from.fullName}`,
+                        content: `${from.fullName} has joined to chat room`,
                     });
                 } else if (type === 'askToJoinPrivateRoom') {
 
