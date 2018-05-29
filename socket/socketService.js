@@ -183,7 +183,7 @@ module.exports = (io) => {
                             date: Utils.now()
                         });
                     } else {
-                        // sendNotification(params, 'enterToChatRoom')
+                        sendNotification(params, 'enterToChatRoom')
                     }
                 }
 
@@ -196,8 +196,8 @@ module.exports = (io) => {
                     socket.join(params.room);
 
                     let isIn = enterToPrivateChatRoom(params);
-                    if (isIn) {
-                        if (params.user.keyForFirebase in allUsers) {
+                    if (params.user.keyForFirebase in allUsers) {
+                        if (isIn) {
                             allUsers[params.user.keyForFirebase].emit('change-event-chat-room', {
                                 from: params.from,
                                 to: params.user,
@@ -205,15 +205,17 @@ module.exports = (io) => {
                                 event: 'joined',
                                 date: Utils.now()
                             });
+                        } else {
+                            allUsers[params.user.keyForFirebase].emit('chat-room', {
+                                from: params.from,
+                                to: params.user,
+                                room: params.room,
+                                event: 'enter-to-chat-room',
+                                date: Utils.now()
+                            });
                         }
                     } else {
-                        allUsers[params.user.keyForFirebase].emit('chat-room', {
-                            from: params.from,
-                            to: params.user,
-                            room: params.room,
-                            event: 'enter-to-chat-room',
-                            date: Utils.now()
-                        });
+                        sendNotification(params, 'joinToChatRoom')
                     }
                 }
 
