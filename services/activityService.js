@@ -306,7 +306,13 @@ exports.cancelActivity = (activityId) => {
                 }
                 else {
                     data.status = {
-                        value: 'cancelled',
+                        value: `cancelled`,
+                        user_id: ``,
+                        fullName: ``
+                    };
+                    data.provider = {
+                        name: ``,
+                        id: ``
                     };
                     data.save((err, data) => {
                         if (err || !data) {

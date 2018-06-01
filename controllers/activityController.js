@@ -4,7 +4,7 @@ let Activity = require('../models/Activity'),
     userService = require('../services/userService'),
     schedulerService = require('../services/schedulerService'),
     logger = Utils.getLogger(),
-    next5Min = 5 * 60 *1000;
+    next5Min = 5 * 60 * 1000;
 
 exports.create = (req, res) => {
     let activityObj = new Activity({
@@ -135,6 +135,11 @@ exports.approve = (req, res) => {
                                     if (updateObj.activity.activity_date < next5Min) {
                                         schedulerService.execute(false);
                                     }
+                                    Utils.sendEmail({
+                                        to: updatedUser.email,
+                                        subject: `${updateObj.activity.activity_name} was approved!`,
+                                        body: `Activity ${updateObj.activity.activity_name} was approved by ${updateObj.activity.consumer.name}`
+                                    });
                                     res.json(updateObj.activity);
                                 })
                                 .catch(err => {
@@ -181,18 +186,24 @@ exports.finish = (req, res) => {
 };
 
 exports.cancel = (req, res) => {
-    let {activityId} = req.body;
-    activityService.cancelActivity(activityId)
-        .then(activity => {
-            schedulerService.abortJob(activityId)
-                .then(job => {
-                    res.json(activity);
+    let {activityId, providerId} = req.body;
+    userService.deleteActivityFromUser(providerId, activityId)
+        .then(consumerObj => {
+            activityService.cancelActivity(activityId)
+                .then(activity => {
+                    schedulerService.abortJob(activityId)
+                        .then(job => {
+                            res.json(activity);
+                        })
+                        .catch(err => {
+                            res.json(err);
+                        });
                 })
                 .catch(err => {
                     res.json(err);
-                });
+                })
         })
         .catch(err => {
             res.json(err);
-        })
+        });
 };
