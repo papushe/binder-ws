@@ -94,8 +94,8 @@ exports.cleanJobs = () => {
     let now = new Date();
 
     return new Promise((resolve, reject) => {
-        //running once a day on 12:30 PM
-        if (now.getDay() !== 6 && now.getHours() === 12 && now.getMinutes() === 30) {
+        //running once a day on 10:00 AM
+        if (now.getDay() !== 6 && now.getHours() === 10 && now.getMinutes() === 00) {
             resolve();
         }
         else {
