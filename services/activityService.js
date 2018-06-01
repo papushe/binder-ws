@@ -215,7 +215,7 @@ exports.setProvider = (activityId) => {
                             reject(false);
                         }
                         else {
-                            logger.info(`${data.status.user_id} was set as provider in activity: ${activityId}`);
+                            logger.info(`${data.provider.id} was set as provider in activity: ${activityId}`);
                             success = newStatus === 'approved';
                             resolve({activity: data, success: success});
                         }
