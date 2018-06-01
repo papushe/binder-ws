@@ -9,8 +9,7 @@ let schedule = require('node-schedule'),
     PENDING_STATE = 'pending',
     DONE_STATE = 'done',
 
-    DAY = 24 * 60 * 60 * 1000,
-    IO = require('../socket/socketService');
+    DAY = 24 * 60 * 60 * 1000;
 
 exports.getJobsToExecute = () => {
     return new Promise((resolve, reject) => {
@@ -170,7 +169,6 @@ exports.abortJob = (activityId) => {
 };
 
 exports.createNewJob = (activity) => {
-    let activityLocalDate = new Date(activity.activity_date);
     let job = new JOB({
         activity_id: activity._id,
         status: 'pending',
