@@ -17,7 +17,6 @@ const mongoose = require('mongoose'),
         execution_time: {
             first: Number,
             next: Number,
-            end: Number
         },
     }, {strict: true});
 

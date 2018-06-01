@@ -13,30 +13,26 @@ let schedule = require('node-schedule'),
     IO = require('../socket/socketService');
 
 exports.getJobsToExecute = () => {
-    let currentUnixTime = new Date().getTime();
-    let unix5MinAgo = currentUnixTime - (5 * 60 * 1000);
-    let unix5MinNext = currentUnixTime + (5 * 60 * 1000);
-
-    let activities = [];
-    let jobs = [];
-    let promises = [];
-
     return new Promise((resolve, reject) => {
+        let now = new Date().getTime(),
+            fiveMin = 5 * 60 * 1000,
+            activities = [],
+            jobs = [],
+            promises = [];
+
         JOB.find({
                 $and: [
-                    {"execution_time.next": {$gt: unix5MinAgo}},
-                    {"execution_time.next": {$lt: unix5MinNext}},
-                    { $where: "execution_time.end > execution_time.next" },
+                    {"execution_time.next": {$gt: now - fiveMin, $lt: now + fiveMin}},
                     {status: {$eq: PENDING_STATE}}
                 ]
             },
             (err, data) => {
                 if (err) {
-                    logger.error(`failed to fetch pending jobs from ${Utils.unixToLocal(unix5MinAgo)} due to : ${err}`);
+                    logger.error(`failed to fetch pending jobs from ${Utils.unixToLocal(now - fiveMin)} due to : ${err}`);
                     reject(err);
                 }
                 if (!data) {
-                    logger.warn(`cant find pending jobs to execute from: ${Utils.unixToLocal(unix5MinAgo)}`);
+                    logger.warn(`cant find pending jobs to execute from: ${Utils.unixToLocal(now - fiveMin)}`);
                     resolve(activities);
                 }
                 else {
@@ -185,7 +181,7 @@ exports.createNewJob = (activity) => {
         execution_time: {
             first: activity.activity_date,
             next: activity.activity_date,
-            end : new Date(activityLocalDate.getFullYear(), activityLocalDate.getMonth() + 3, activityLocalDate.getDate(), activityLocalDate.getHours(), activityLocalDate.getMinutes()).getTime()
+            end: new Date(activityLocalDate.getFullYear(), activityLocalDate.getMonth() + 3, activityLocalDate.getDate(), activityLocalDate.getHours(), activityLocalDate.getMinutes()).getTime()
         }
     });
 

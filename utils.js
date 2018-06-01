@@ -3,6 +3,7 @@ let fs = require('fs'),
     winston = require('winston'),
     config = require('./config'),
     nodeMailer = require('nodemailer'),
+    request = require('request').defaults({encoding: null}),
     {createLogger, format, transports} = winston,
     DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss',
     logDir = 'logs',
@@ -63,7 +64,7 @@ exports.sendEmail = (options) => {
         if (err) {
             logger.error(`failed to send email to: ${opt.to} due to: ${err}`);
         } else {
-            logger.info(`email was sent to user: ${opt.to} with status: ${JSON.stringify(info)}`);
+            logger.info(`email was sent to user: ${opt.to} with status: ${info.statusCode}`);
         }
     });
 };
@@ -73,6 +74,33 @@ exports.getLogger = () => {
     return logger;
 };
 
+exports.getRandomString = (length) => {
+    length = 10;
+    let text = "";
+    let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (let i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+};
+
+exports.base64Encode = (url) => {
+    return new Promise((resolve, reject) => {
+        request.get(url, (error, response, body) => {
+            if (error || response.statusCode !== 200) {
+                logger.error(`failed to encode ${url} to base64 due to: ${error}`);
+                resolve(null);
+            }
+            else {
+                resolve("data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64'));
+            }
+        });
+    });
+};
+
+/**
+ * Time conversion
+ * */
 exports.getUnixTime = (dateStr) => {
     let localDateWithOffset = new Date(dateStr);
     return localDateWithOffset.getTime() - (localDateWithOffset.getTimezoneOffset() * 60 * 1000);
@@ -86,7 +114,6 @@ exports.unixToUTC = (epoch) => {
     return moment.utc(epoch).format(DATE_FORMAT);
 };
 
-
 exports.now = () => {
     return moment().format(DATE_FORMAT);
 };
@@ -94,16 +121,6 @@ exports.now = () => {
 exports.isAfter = (date) => {
     let nowBefore2Min = (new Date().getTime()) - (2 * 60 * 1000);
     return moment(nowBefore2Min).isAfter(date);
-};
-
-exports.getRandomString = (length) => {
-    length = 10;
-    let text = "";
-    let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
 };
 
 exports.normalizeDate = (date) => {
@@ -118,4 +135,5 @@ exports.UTCTimeToLocalDateTime = (date) => {
     let stillUtc = moment.utc(date).toDate();
     return moment(stillUtc).local().format(DATE_FORMAT);
 };
+
 

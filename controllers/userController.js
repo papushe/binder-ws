@@ -34,17 +34,18 @@ exports.create = (req, res) => {
         profilePic: req.body.profilePic,
         keyForFirebase: req.body.keyForFirebase
     });
-  userService.saveNewUser(newUser)
-      .then(response => {
-        res.json(response);
-    })
-      .catch(err => {
-          res.json(err);
-      });
+
+    userService.saveNewUser(newUser)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(err => {
+            res.json(err);
+        });
 };
 
 exports.getProfile = (req, res) => {
-let userId = req.params.key;
+    let userId = req.params.key;
     userService.getUserProfile(userId)
         .then(response => {
             res.json(response);
@@ -56,7 +57,7 @@ let userId = req.params.key;
 
 exports.update = (req, res) => {
     let profileObj = {
-        keyForFirebase:req.body.keyForFirebase,
+        keyForFirebase: req.body.keyForFirebase,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         location: req.body.location,
@@ -84,7 +85,7 @@ exports.deleteProfile = (req, res) => {
             if (communities.length === 0) {
                 userService.deleteUser(userId)
                     .then(response => {
-                         res.json(response);
+                        res.json(response);
                     })
                     .catch(err => {
                         res.json(err);
@@ -105,7 +106,7 @@ exports.deleteProfile = (req, res) => {
                         res.json(err);
                     });
             }
-         })
+        })
         .catch(err => {
             res.json(err);
         });
