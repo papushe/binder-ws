@@ -131,37 +131,26 @@ module.exports = (io) => {
             socket.on('activities-change', (params) => {
 
                 if (params && socket) {
+                    let event = '';
                     if (params.event === 'create') {
+                        event = 'add-new-activity';
                         logger.debug(`Socket: ${params.activity.activity_name} was created by ${socket.keyForFirebase}`);
-                        io.to(params.room).emit('activities-change', {
-                            activity: params.activity,
-                            from: params.from,
-                            communityId: params.communityId,
-                            room: params.communityId,
-                            date: Utils.now(),
-                            event: 'add-new-activity'
-                        });
                     } else if (params.event === 'update') {
+                        event = 'update-activity';
                         logger.debug(`Socket: ${params.activity.activity_name} was updated by ${socket.keyForFirebase}`);
-                        io.to(params.room).emit('activities-change', {
-                            activity: params.activity,
-                            from: params.from,
-                            communityId: params.communityId,
-                            room: params.communityId,
-                            date: Utils.now(),
-                            event: 'update-activity'
-                        });
                     } else {
                         logger.debug(`Socket: ${params.activity.activity_name} was deleted by ${socket.keyForFirebase}`);
-                        io.to(params.room).emit('activities-change', {
-                            activity: params.activity,
-                            from: params.from,
-                            communityId: params.communityId,
-                            room: params.communityId,
-                            date: Utils.now(),
-                            event: 'delete-activity'
-                        });
+                        event = 'delete-activity';
                     }
+
+                    io.to(params.room).emit('activities-change', {
+                        activity: params.activity,
+                        from: params.from,
+                        communityId: params.communityId,
+                        room: params.communityId,
+                        date: Utils.now(),
+                        event: event
+                    });
                 }
 
             });
@@ -265,22 +254,6 @@ module.exports = (io) => {
 
                 if (params && socket) {
                     logger.debug(`Socket: ${socket.keyForFirebase} ask to join to ${params.user.communityName} community`);
-                    // if (params.user.manager.id in allUsers) {
-                    //
-                    //     allUsers[params.user.manager.id].emit('user-ask-to-join-private-room', {
-                    //         community: params.user, // == community obj
-                    //         to: params.user.manager.name,
-                    //         from: params.from,
-                    //         room: params.user._id, // == community _id
-                    //         event: 'user-ask-to-join-private-room',
-                    //         communityName: params.user.communityName,
-                    //         content: `Community name ${params.user.communityName}`,
-                    //         date: Utils.now()
-                    //     });
-                    // } else {
-                    //
-                    //
-                    // }
 
                     sendNotification(params, 'askToJoinPrivateRoom');
                 }
@@ -290,22 +263,7 @@ module.exports = (io) => {
             socket.on('decline-user-join-private-room', (params) => {
 
                 if (params && socket) {
-                    // if (params.from.keyForFirebase in allUsers) {
-                    //
-                    //     logger.debug(`Socket: ${socket.keyForFirebase} decline ${params.from.fullName} user to join to ${params.communityName} community`);
-                    //
-                    //     allUsers[params.from.keyForFirebase].emit('user-ask-to-join-private-room', {
-                    //         communityName: params.communityName,
-                    //         to: params.to,
-                    //         from: params.from,
-                    //         event: 'manager-decline-user-join-private-room',
-                    //         content: `Community name ${params.communityName}`,
-                    //         date: Utils.now()
-                    //     });
-                    // } else {
-                    //
-                    //
-                    // }
+
                     sendNotification(params, 'declineUserJoinPrivateRoom');
                 }
 
