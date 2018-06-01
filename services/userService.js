@@ -57,9 +57,9 @@ exports.rankUser = (vote) => {
 
 exports.saveNewUser = (newUser) => {
     return new Promise((resolve, reject) => {
-        normalizeImg(newUser.profilePic)
-            .then(img => {
-                newUser.profilePic = img;
+        // normalizeImg(newUser.profilePic)
+        //     .then(img => {
+        //         newUser.profilePic = img;
                 newUser.save((err, data) => {
                         if (err || !data) {
                             logger.error(`failed to create user: ${newUser} due to: ${err}`);
@@ -69,7 +69,7 @@ exports.saveNewUser = (newUser) => {
                         resolve(data);
                     }
                 );
-            });
+            // });
     });
 
 };
@@ -126,8 +126,8 @@ exports.updateUserProfile = (profileObj) => {
                         });
                 }
                 else if (data) {
-                    normalizeImg(profileObj.profilePic)
-                        .then(img => {
+                    // normalizeImg(profileObj.profilePic)
+                    //     .then(img => {
                             data.set({
                                 keyForFirebase: profileObj.keyForFirebase,
                                 firstName: profileObj.firstName || '',
@@ -137,7 +137,7 @@ exports.updateUserProfile = (profileObj) => {
                                 dateOfBirth: profileObj.dateOfBirth || '',
                                 skills: profileObj.skills || '',
                                 description: profileObj.description || '',
-                                profilePic: img || ''
+                                profilePic: profileObj.profilePic || ''
                             });
                             data.save(
                                 (err, data) => {
@@ -149,7 +149,7 @@ exports.updateUserProfile = (profileObj) => {
                                     resolve(data);
                                 }
                             );
-                        });
+                        // });
                 }
             })
     });
