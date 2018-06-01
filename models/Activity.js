@@ -4,7 +4,7 @@ const mongoose = require('mongoose'),
     activity = new schema({
         activity_name: String,
         activity_description: String,
-        created_at: String,
+        created_at: {type: Number, default: new Date().getTime()},
         recurring: {type: String, default: `once`},
         consumer: {
             name: String,
