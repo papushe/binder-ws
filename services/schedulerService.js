@@ -181,7 +181,6 @@ exports.createNewJob = (activity) => {
         execution_time: {
             first: activity.activity_date,
             next: activity.activity_date,
-            end: new Date(activityLocalDate.getFullYear(), activityLocalDate.getMonth() + 3, activityLocalDate.getDate(), activityLocalDate.getHours(), activityLocalDate.getMinutes()).getTime()
         }
     });
 
