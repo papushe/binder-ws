@@ -84,20 +84,6 @@ exports.getRandomString = (length) => {
     return text;
 };
 
-exports.base64Encode = (url) => {
-    return new Promise((resolve, reject) => {
-        request.get(url, (error, response, body) => {
-            if (error || response.statusCode !== 200) {
-                logger.error(`failed to encode ${url} to base64 due to: ${error}`);
-                resolve(null);
-            }
-            else {
-                resolve("data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64'));
-            }
-        });
-    });
-};
-
 /**
  * Time conversion
  * */
