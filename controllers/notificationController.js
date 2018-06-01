@@ -13,7 +13,8 @@ exports.create = (req, res) => {
         event: req.body.event,
         activity: req.body.activity,
         content: req.body.content || '',
-        user:req.body.user || ''
+        user: req.body.user || '',
+        isAddToCalender: req.body.isAddToCalender
     });
     notificationService.saveNewNotification(notificationObj)
         .then(response => {
@@ -25,10 +26,18 @@ exports.create = (req, res) => {
 };
 
 exports.update = (req, res) => {
-    let notificationObj = {
-        status: req.body.status,
-        keyForFirebase: req.body.keyForFirebase
-    };
+    let notificationObj = {};
+    if (req.body.from === 'notificationPage') {
+        notificationObj = {
+            status: req.body.status,
+            keyForFirebase: req.body.keyForFirebase
+        };
+    } else {
+        notificationObj = {
+            isAddToCalender: req.body.isAddToCalender,
+            keyForFirebase: req.body.keyForFirebase
+        };
+    }
     notificationService.updateNotification(notificationObj)
         .then(response => {
             res.json(response);

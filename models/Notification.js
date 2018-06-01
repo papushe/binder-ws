@@ -19,7 +19,8 @@ const mongoose = require('mongoose'),
         creation_date: String,
         event: String,
         content: String,
-        user: {}
+        user: {},
+        isAddToCalender: Boolean
     }, {strict: true});
 
 

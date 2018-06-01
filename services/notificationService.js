@@ -27,13 +27,19 @@ exports.updateNotification = (notificationObj) => {
                     logger.error(`failed to update notification: ${notificationObj.keyForFirebase} due to: ${err}`);
                     reject(false);
                 }
-                data.set({
-                    status: notificationObj.status
-                });
+                if (notificationObj.status) {
+                    data.set({
+                        status: notificationObj.status
+                    });
+                } else if (notificationObj.isAddToCalender) {
+                    data.set({
+                        isAddToCalender: notificationObj.isAddToCalender
+                    });
+                }
                 data.save(
                     (err, data) => {
                         if (err || !data) {
-                            logger.error(`failed to save notification: ${notificationObj.to.keyForFirebase} due to: ${err}`);
+                            logger.error(`failed to save notification: ${notificationObj.keyForFirebase} due to: ${err}`);
                             reject(false);
                         }
                         logger.debug(`notification: ${notificationObj.keyForFirebase} was updated`);
