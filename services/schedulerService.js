@@ -200,7 +200,6 @@ exports.execute = (runAsTask) => {
 
     //scheduling next iteration
     if (runAsTask) {
-        logger.info(`jobs execution started...`);
         this.scheduleAction(NEXT_FIVE_MIN, this.execute);
     }
     return new Promise((resolve, reject) => {
