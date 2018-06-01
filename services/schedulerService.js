@@ -94,8 +94,9 @@ exports.cleanJobs = () => {
     let now = new Date();
 
     return new Promise((resolve, reject) => {
-        //running once a day on 10:00 AM
-        if (now.getDay() !== 6 && now.getHours() === 10 && now.getMinutes() === 00) {
+        //running once a day on 20:30
+        if (now.getHours() === 20 && now.getMinutes() === 30) {
+            logger.info(`cleaning jobs task done...`);
             resolve();
         }
         else {
@@ -108,9 +109,6 @@ exports.cleanJobs = () => {
                 (err, data) => {
                     if (err) {
                         logger.error(`failed to run clean jobs due to : ${err}`);
-                    }
-                    else {
-                        logger.info(`cleaning jobs task done...`);
                     }
                     resolve();
                 });
