@@ -164,7 +164,13 @@ exports.finish = (req, res) => {
             if (activity.recurring === 'once') {
                 schedulerService.abortJob(activityId)
                     .then(job => {
-                        res.json(activity);
+                        activityService.updateActivityStatus(activity._id, 'done')
+                            .then(activity => {
+                                res.json(activity);
+                            })
+                            .catch(err => {
+                                res.json(err);
+                            })
                     })
                     .catch(err => {
                         res.json(err);
