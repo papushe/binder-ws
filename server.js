@@ -148,7 +148,6 @@ app.post(`/${notificationContext}/delete`, notificationController.deleteById);
 
 
 //Message
-app.post(`/${messageContext}/create`, messageController.create);
 
 app.get(`/${messageContext}/get/:roomId`, messageController.getByRoomId);
 
