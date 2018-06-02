@@ -332,9 +332,19 @@ module.exports = (io) => {
 
                     allUsers[socket.keyForFirebase] = socket;
                 }
+                io.emit('users-changed', {
+                    keyForFirebase: socket.keyForFirebase,
+                    event: 'joined'
+                });
+
+
             }
 
             function deleteUserFromAllUsers(keyForFirebase) {
+                io.emit('users-changed', {
+                    keyForFirebase: socket.keyForFirebase,
+                    event: 'left'
+                });
                 delete allUsers[keyForFirebase];
             }
 
@@ -709,7 +719,7 @@ module.exports = (io) => {
                     notificationObj = new NOTIFICATION({
                         from: from,
                         to: to,
-                        activity:params.activity,
+                        activity: params.activity,
                         status: 'unread',
                         creation_date: Utils.now(),
                         event: 'activity-finish',
