@@ -24,7 +24,7 @@ describe(`Message Service Integration Tests`, () => {
     });
 
     after(async () => {
-
+        //TODO: Papushe, please store all messages test creates, then delete them all.
     });
 
     it(`should create a new chat message`, async () => {
