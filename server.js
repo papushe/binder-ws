@@ -163,7 +163,7 @@ server.listen(port, () => {
     logger.info(`listening on port ${port}`);
     schedulerService.execute(true)
         .then(data => {
-            logger.info(`initiated execution task  - will be executed every 5 min`);
+            logger.info(`initiated execution task - will be executed every 5 min`);
         })
         .catch(err => {
             logger.error(`failed to initiate execution task on startup due to: ${err}`);
