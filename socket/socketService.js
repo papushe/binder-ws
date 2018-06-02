@@ -315,6 +315,13 @@ module.exports = (io) => {
                 }
             });
 
+            socket.on('finish-activity', (params) => {
+                if (params && socket) {
+                    logger.debug(`Socket: ${socket.keyForFirebase} finish ${params.activity.activity_name}`);
+                    sendNotification(params, 'onFinishActivity');
+                }
+            });
+
 
 // socket functions
             function addUserToAllUsers(socket, params) {
@@ -690,6 +697,24 @@ module.exports = (io) => {
                         event: 'activity-is-about-to-start',
                         communityName: params, //activity
                         content: `Activity ${params.activity_name} is about to start`,
+                    });
+                } else if (type === 'onFinishActivity') {
+
+                    from.fullName = params.from.fullName;
+                    from.keyForFirebase = socket.keyForFirebase;
+
+                    to.fullName = params.to.name;
+                    to.keyForFirebase = params.to.id;
+
+                    notificationObj = new NOTIFICATION({
+                        from: from,
+                        to: to,
+                        activity:params.activity,
+                        status: 'unread',
+                        creation_date: Utils.now(),
+                        event: 'activity-finish',
+                        communityName: params, //activity
+                        content: `Activity ${params.activity.activity_name} has finished`,
                     });
                 }
 
