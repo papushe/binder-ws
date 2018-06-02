@@ -45,7 +45,6 @@ describe(`User Service Integration Tests`, () => {
 
         expect(result).not.equal(false);
         expect(result).not.equal(null);
-        expect(result).equal(true);
     });
 
     it(`should get user profile`, async () => {
