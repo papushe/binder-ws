@@ -1,8 +1,6 @@
 let fs = require('fs'),
     moment = require('./node_modules/moment/moment'),
     winston = require('winston'),
-    config = require('./config'),
-    nodeMailer = require('nodemailer'),
     {createLogger, format, transports} = winston,
     DATE_FORMAT = 'YYYY-MM-DD HH:mm:ss',
     logDir = 'logs',
@@ -11,14 +9,6 @@ let fs = require('fs'),
 const formatMessage = format((info, opts) => {
     info.message = `${moment().format(DATE_FORMAT)} - ${info.message}`;
     return info;
-});
-
-const transporter = nodeMailer.createTransport({
-    service: config.BINDER_MAIL_SERVICE,
-    auth: {
-        user: config.BINDER_MAIL_USER,
-        pass: config.BINDER_MAIL_PASS
-    }
 });
 
 initLogger = () => {
@@ -48,23 +38,6 @@ initLogger = () => {
                 )
             })
         ]
-    });
-};
-
-exports.sendEmail = (options) => {
-    let opt = {
-        from: config.BINDER_MAIL_USER,
-        to: options.to,
-        subject: options.subject || `Message from Binder team`,
-        text: options.body
-    };
-
-    transporter.sendMail(opt, (err, info) => {
-        if (err) {
-            logger.error(`failed to send email to: ${opt.to} due to: ${err}`);
-        } else {
-            logger.info(`email was sent to user: ${opt.to} with status: ${info.statusCode}`);
-        }
     });
 };
 

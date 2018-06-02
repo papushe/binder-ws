@@ -134,11 +134,6 @@ exports.approve = (req, res) => {
                                     if (updateObj.activity.activity_date < next5Min) {
                                         schedulerService.execute(false);
                                     }
-                                    Utils.sendEmail({
-                                        to: updatedUser.email,
-                                        subject: `${updateObj.activity.activity_name} was approved!`,
-                                        body: `Activity ${updateObj.activity.activity_name} was approved by ${updateObj.activity.consumer.name}`
-                                    });
                                     res.json(updateObj.activity);
                                 })
                                 .catch(err => {
