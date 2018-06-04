@@ -119,7 +119,8 @@ module.exports = (io) => {
                                     community: params.community,
                                     from: params.from,
                                     date: Utils.now(),
-                                    event: 'on-delete-community'
+                                    event: 'on-delete-community',
+                                    content: `${params.from.fullName} delete ${params.community.communityName}`,
                                 });
                                 sendNotification(params, 'onDeleteCommunity')
                             }
@@ -131,16 +132,20 @@ module.exports = (io) => {
             socket.on('activities-change', (params) => {
 
                 if (params && socket) {
-                    let event = '';
+                    let event = '',
+                        content = ``;
                     if (params.event === 'create') {
                         event = 'add-new-activity';
+                        content = `${params.from.fullName} create new activity: ${params.activity.activity_name}`;
                         logger.debug(`Socket: ${params.activity.activity_name} was created by ${socket.keyForFirebase}`);
                     } else if (params.event === 'update') {
                         event = 'update-activity';
+                        content = `${params.from.fullName} update ${params.activity.activity_name} activity`;
                         logger.debug(`Socket: ${params.activity.activity_name} was updated by ${socket.keyForFirebase}`);
                     } else {
                         logger.debug(`Socket: ${params.activity.activity_name} was deleted by ${socket.keyForFirebase}`);
                         event = 'delete-activity';
+                        content = `${params.from.fullName} delete ${params.activity.activity_name} activity`;
                     }
 
                     io.to(params.room).emit('activities-change', {
@@ -149,7 +154,8 @@ module.exports = (io) => {
                         communityId: params.communityId,
                         room: params.communityId,
                         date: Utils.now(),
-                        event: event
+                        event: event,
+                        content: content
                     });
                 }
 
@@ -169,6 +175,7 @@ module.exports = (io) => {
                             to: params.user,
                             room: params.room,
                             event: 'enter-to-chat-room',
+                            content: `${params.from.fullName} Invited you to chat`,
                             date: Utils.now()
                         });
                     } else {
@@ -192,6 +199,7 @@ module.exports = (io) => {
                                 to: params.user,
                                 room: params.room,
                                 event: 'joined',
+                                content: `${params.from.fullName} has joined to chat room`,
                                 date: Utils.now()
                             });
                         } else {
@@ -200,6 +208,7 @@ module.exports = (io) => {
                                 to: params.user,
                                 room: params.room,
                                 event: 'enter-to-chat-room',
+                                content: `${params.from.fullName} Invited you to chat`,
                                 date: Utils.now()
                             });
                         }
@@ -383,6 +392,7 @@ module.exports = (io) => {
                     user: params.user,
                     communityId: params.roomId,
                     event: 'deleted',
+                    content: `${params.from.fullName} delete you from community`,
                     date: Utils.now()
                 });
             }
@@ -394,6 +404,7 @@ module.exports = (io) => {
                     user: params.user,
                     communityId: params.roomId,
                     event: event,
+                    content: `${params.from.fullName} delete you from community`,
                     date: Utils.now()
                 });
             }
@@ -405,6 +416,7 @@ module.exports = (io) => {
                     user: params.user,
                     communityId: params.roomId,
                     event: 'joined',
+                    content:`${params.from.fullName} add you to community`,
                     date: Utils.now()
                 });
             }
@@ -443,7 +455,7 @@ module.exports = (io) => {
                         to: params.to,
                         from: params.from,
                         event: 'on-claimed-activity',
-                        content: `Activity name ${params.activity.activity_name}`,
+                        content: `${params.from.fullName} ask to claimed Activity ${params.activity.activity_name}`,
                         date: Utils.now()
                     });
                 } else {
@@ -452,7 +464,7 @@ module.exports = (io) => {
                         to: params.to,
                         from: params.from,
                         event: 'on-claimed-activity',
-                        content: `Activity name ${params.activity.activity_name}`,
+                        content: `${params.from.fullName} ask to claimed Activity ${params.activity.activity_name}`,
                         date: Utils.now()
                     });
                 }
@@ -467,7 +479,7 @@ module.exports = (io) => {
                         to: params.to,
                         from: params.from,
                         event: 'on-decline-activity',
-                        content: `Activity name ${params.activity.activity_name}`,
+                        content: `${params.from.fullName} decline ${params.activity.activity_name} request`,
                         date: Utils.now()
                     });
                 } else {
@@ -476,7 +488,7 @@ module.exports = (io) => {
                         to: params.to,
                         from: params.from,
                         event: 'on-decline-activity',
-                        content: `Activity name ${params.activity.activity_name}`,
+                        content: `${params.from.fullName} decline ${params.activity.activity_name} request`,
                         date: Utils.now()
                     });
                 }
@@ -491,7 +503,7 @@ module.exports = (io) => {
                         to: params.to,
                         from: params.from,
                         event: 'on-approve-activity',
-                        content: `Activity name ${params.activity.activity_name}`,
+                        content: `${params.from.fullName} approve ${params.activity.activity_name} request`,
                         date: Utils.now()
                     });
                 } else {
@@ -500,7 +512,7 @@ module.exports = (io) => {
                         to: params.to,
                         from: params.from,
                         event: 'on-approve-activity',
-                        content: `Activity name ${params.activity.activity_name}`,
+                        content: `${params.from.fullName} approve ${params.activity.activity_name} request`,
                         date: Utils.now()
                     });
                 }
@@ -568,7 +580,7 @@ module.exports = (io) => {
                         status: 'unread',
                         creation_date: Utils.now(),
                         event: 'enter-to-chat-room',
-                        content: `Chat invitation received from ${from.fullName}`,
+                        content: `${params.from.fullName} Invited you to chat`,
                     });
                 } else if (type === 'joinToChatRoom') {
                     notificationObj = new NOTIFICATION({
@@ -595,7 +607,7 @@ module.exports = (io) => {
                         creation_date: Utils.now(),
                         event: 'user-ask-to-join-private-room',
                         communityName: params.user.communityName,
-                        content: `Community ${params.user.communityName}`,
+                        content: `${params.from.fullName} ask to join to ${params.user.communityName}`,
                     });
                 } else if (type === 'declineUserJoinPrivateRoom') {
 
@@ -612,7 +624,7 @@ module.exports = (io) => {
                         creation_date: Utils.now(),
                         event: 'manager-decline-user-join-private-room',
                         communityName: params.communityName,
-                        content: `Community ${params.communityName}`,
+                        content: `${params.from.fullName} decline your request to join to ${params.user.communityName}`
                     });
                 } else if (type === 'onClaimedActivity') {
 
@@ -627,7 +639,7 @@ module.exports = (io) => {
                         event: 'user-ask-to-claimed-activity',
                         communityName: params.activity.activity_name,
                         activity: params.activity,
-                        content: `Activity ${params.activity.activity_name}`,
+                        content: `${params.from.fullName} ask to claimed Activity ${params.activity.activity_name}`,
                     });
                 } else if (type === 'onApproveActivity') {
 
@@ -642,7 +654,7 @@ module.exports = (io) => {
                         event: 'user-approve-activity',
                         communityName: params.activity.activity_name,
                         activity: params.activity,
-                        content: `Activity ${params.activity.activity_name}`,
+                        content: `${params.from.fullName} approve ${params.activity.activity_name} request`,
                     });
                 } else if (type === 'onApproveActivityConsumer') {
 
@@ -657,7 +669,7 @@ module.exports = (io) => {
                         event: 'you-approved-activity',
                         communityName: params.activity.activity_name,
                         activity: params.activity,
-                        content: `Activity ${params.activity.activity_name}`,
+                        content: `You approve ${params.activity.activity_name} request`,
                     });
                 } else if (type === 'onDeclineActivity') {
 
@@ -672,7 +684,7 @@ module.exports = (io) => {
                         event: 'user-decline-activity',
                         communityName: params.activity.activity_name,
                         activity: params.activity,
-                        content: `Activity ${params.activity.activity_name}`,
+                        content: `${params.from.fullName} decline ${params.activity.activity_name} request`,
                     });
                 } else if (type === 'onActivityStartConsumer') {
 
