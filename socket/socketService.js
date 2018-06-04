@@ -331,6 +331,13 @@ module.exports = (io) => {
                 }
             });
 
+            socket.on('cancel-activity', (params) => {
+                if (params && socket) {
+                    logger.debug(`Socket: ${socket.keyForFirebase} finish ${params.activity.activity_name}`);
+                    sendNotification(params, 'onCancelActivity');
+                }
+            });
+
 
 // socket functions
             function addUserToAllUsers(socket, params) {
@@ -416,7 +423,7 @@ module.exports = (io) => {
                     user: params.user,
                     communityId: params.roomId,
                     event: 'joined',
-                    content:`${params.from.fullName} add you to community`,
+                    content: `${params.from.fullName} add you to community`,
                     date: Utils.now()
                 });
             }
@@ -737,6 +744,29 @@ module.exports = (io) => {
                         event: 'activity-finish',
                         communityName: params, //activity
                         content: `Activity ${params.activity.activity_name} has finished`,
+                    });
+                }
+                else if (type === 'onCancelActivity') {
+
+                    from.fullName = params.from.fullName;
+                    from.keyForFirebase = socket.keyForFirebase;
+
+                    if (params.from.fullName == params.activity.provider.name) {
+                        to.fullName = params.activity.consumer.name;
+                        to.keyForFirebase = params.activity.consumer.id;
+                    } else {
+                        to.fullName = params.activity.provider.name;
+                        to.keyForFirebase = params.activity.provider.id;
+                    }
+
+                    notificationObj = new NOTIFICATION({
+                        from: from,
+                        to: to,
+                        activity: params.activity,
+                        status: 'unread',
+                        creation_date: Utils.now(),
+                        event: 'activity-canceled',
+                        content: `Activity ${params.activity.activity_name} has canceled`,
                     });
                 }
 
