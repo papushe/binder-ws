@@ -4,7 +4,7 @@ const mongoose = require('mongoose'),
     community = new schema({
         communityName: String,
         communityDescription: String,
-        creationDate: String,
+        creationDate: Number,
         manager: {
             id: String,
             name: String,

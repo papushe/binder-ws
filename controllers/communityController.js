@@ -15,7 +15,7 @@ exports.create = (req, res) => {
     let newCommunity = new COMMUNITY({
         communityName: req.body.communityName,
         communityDescription: req.body.communityDescription,
-        creationDate: Utils.now(),
+        creationDate: new Date().getTime(),
         manager: {
             id: req.body.managerId,
             name: req.body.managerName,

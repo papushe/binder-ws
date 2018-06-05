@@ -66,7 +66,7 @@ describe(`Community Service Integration Tests`, () => {
                     id: testUser.USER_KEY,
                     name: testUser.USER_NAME
                 },
-                creationDate: utils.now(),
+                creationDate: new Date().getTime(),
                 members: {
                     memberId: testUser.USER_KEY
                 },
@@ -79,7 +79,7 @@ describe(`Community Service Integration Tests`, () => {
                     id: testUser.USER_KEY,
                     name: testUser.USER_NAME
                 },
-                creationDate: utils.now(),
+                creationDate: new Date().getTime(),
                 members: {
                     memberId: testUser.USER_KEY
                 },
