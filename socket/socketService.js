@@ -251,7 +251,7 @@ module.exports = (io) => {
                         from: params.from.fullName,
                         room: params.room,
                         to: params.to,
-                        date: Utils.now()
+                        date: new Date().getTime()
                     });
                     saveMessage(params);
                 }
@@ -411,7 +411,7 @@ module.exports = (io) => {
                     communityId: params.roomId,
                     event: event,
                     content: `${params.from.fullName} delete you from community`,
-                    date: Utils.now()
+                    date: new Date().getTime()
                 });
             }
 
@@ -423,7 +423,7 @@ module.exports = (io) => {
                     communityId: params.roomId,
                     event: 'joined',
                     content: `${params.from.fullName} add you to community`,
-                    date: Utils.now()
+                    date: new Date().getTime()
                 });
             }
 
@@ -434,7 +434,7 @@ module.exports = (io) => {
                     user: params.user,
                     communityId: params.roomId,
                     event: 'joined',
-                    date: Utils.now()
+                    date: new Date().getTime()
                 });
             }
 
@@ -443,7 +443,7 @@ module.exports = (io) => {
 
                 let msgObj = new MESSAGE({
                     from: params.from.fullName,
-                    date: Utils.now(),
+                    date: new Date().getTime(),
                     room: params.room,
                     text: params.message
                 });
@@ -462,7 +462,7 @@ module.exports = (io) => {
                         from: params.from,
                         event: 'on-claimed-activity',
                         content: `${params.from.fullName} ask to claimed Activity ${params.activity.activity_name}`,
-                        date: Utils.now()
+                        date: new Date().getTime()
                     });
                 } else {
                     allUsers[to].emit(type, {
@@ -471,7 +471,7 @@ module.exports = (io) => {
                         from: params.from,
                         event: 'on-claimed-activity',
                         content: `${params.from.fullName} ask to claimed Activity ${params.activity.activity_name}`,
-                        date: Utils.now()
+                        date: new Date().getTime()
                     });
                 }
             }
@@ -486,7 +486,7 @@ module.exports = (io) => {
                         from: params.from,
                         event: 'on-decline-activity',
                         content: `${params.from.fullName} decline ${params.activity.activity_name} request`,
-                        date: Utils.now()
+                        date: new Date().getTime()
                     });
                 } else {
                     allUsers[to].emit(type, {
@@ -495,7 +495,7 @@ module.exports = (io) => {
                         from: params.from,
                         event: 'on-decline-activity',
                         content: `${params.from.fullName} decline ${params.activity.activity_name} request`,
-                        date: Utils.now()
+                        date: new Date().getTime()
                     });
                 }
             }
@@ -510,7 +510,7 @@ module.exports = (io) => {
                         from: params.from,
                         event: 'on-approve-activity',
                         content: `${params.from.fullName} approve ${params.activity.activity_name} request`,
-                        date: Utils.now()
+                        date: new Date().getTime()
                     });
                 } else {
                     allUsers[to].emit(type, {
@@ -519,7 +519,7 @@ module.exports = (io) => {
                         from: params.from,
                         event: 'on-approve-activity',
                         content: `${params.from.fullName} approve ${params.activity.activity_name} request`,
-                        date: Utils.now()
+                        date: new Date().getTime()
                     });
                 }
             }
@@ -553,7 +553,6 @@ module.exports = (io) => {
                         to: to,
                         room: params.roomId,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         communityName: params.roomName,
                         event: 'add-to-community-by-manager',
                         content: `${from.fullName} added you to ${params.roomName} community`,
@@ -564,7 +563,6 @@ module.exports = (io) => {
                         to: to,
                         room: params.roomId,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'deleted-by-manager',
                         content: `${from.fullName} deleted you from ${params.roomName} community`,
                     });
@@ -574,7 +572,6 @@ module.exports = (io) => {
                         to: to,
                         room: params.roomId,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'delete-community',
                         content: `${from.fullName} deleted ${params.community.communityName} permanently`,
                     });
@@ -584,7 +581,6 @@ module.exports = (io) => {
                         to: to,
                         room: params.room,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'enter-to-chat-room',
                         content: `${params.from.fullName} Invited you to chat`,
                     });
@@ -594,7 +590,6 @@ module.exports = (io) => {
                         to: to,
                         room: params.room,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'join-to-chat-room',
                         content: `${from.fullName} has joined to chat room`,
                     });
@@ -610,7 +605,6 @@ module.exports = (io) => {
                         user: params.from,
                         room: params.user._id, // == community._id
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'user-ask-to-join-private-room',
                         communityName: params.user.communityName,
                         content: `${params.from.fullName} ask to join to ${params.user.communityName}`,
@@ -627,7 +621,6 @@ module.exports = (io) => {
                         from: from,
                         to: to,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'manager-decline-user-join-private-room',
                         communityName: params.communityName,
                         content: `${params.from.fullName} decline your request to join to ${params.user.communityName}`
@@ -641,7 +634,6 @@ module.exports = (io) => {
                         from: from,
                         to: to,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'user-ask-to-claimed-activity',
                         communityName: params.activity.activity_name,
                         activity: params.activity,
@@ -656,7 +648,6 @@ module.exports = (io) => {
                         from: from,
                         to: to,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'user-approve-activity',
                         communityName: params.activity.activity_name,
                         activity: params.activity,
@@ -671,7 +662,6 @@ module.exports = (io) => {
                         from: from,
                         to: to,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'you-approved-activity',
                         communityName: params.activity.activity_name,
                         activity: params.activity,
@@ -686,7 +676,6 @@ module.exports = (io) => {
                         from: from,
                         to: to,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'user-decline-activity',
                         communityName: params.activity.activity_name,
                         activity: params.activity,
@@ -704,7 +693,6 @@ module.exports = (io) => {
                         from: from,
                         to: to,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'activity-is-about-to-start',
                         communityName: params, //activity
                         content: `Activity ${params.activity_name} is about to start`,
@@ -721,7 +709,6 @@ module.exports = (io) => {
                         from: from,
                         to: to,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'activity-is-about-to-start',
                         communityName: params, //activity
                         content: `Activity ${params.activity_name} is about to start`,
@@ -739,7 +726,6 @@ module.exports = (io) => {
                         to: to,
                         activity: params.activity,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'activity-finish',
                         communityName: params, //activity
                         content: `Activity ${params.activity.activity_name} has finished`,
@@ -750,7 +736,7 @@ module.exports = (io) => {
                     from.fullName = params.from.fullName;
                     from.keyForFirebase = socket.keyForFirebase;
 
-                    if (params.from.fullName == params.activity.provider.name) {
+                    if (params.from.fullName === params.activity.provider.name) {
                         to.fullName = params.activity.consumer.name;
                         to.keyForFirebase = params.activity.consumer.id;
                     } else {
@@ -763,7 +749,6 @@ module.exports = (io) => {
                         to: to,
                         activity: params.activity,
                         status: 'unread',
-                        creation_date: Utils.now(),
                         event: 'activity-canceled',
                         content: `Activity ${params.activity.activity_name} has canceled`,
                     });
