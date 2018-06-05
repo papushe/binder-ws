@@ -9,7 +9,6 @@ exports.create = (req, res) => {
         room: req.body.room,
         communityName: req.body.communityName || '',
         status: req.body.status || 'unread',
-        creation_date: new Date().getTime(),
         event: req.body.event,
         activity: req.body.activity,
         content: req.body.content || '',
