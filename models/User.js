@@ -7,7 +7,7 @@ const mongoose = require('mongoose'),
             email: String,
             phoneNumber: String,
             dateOfBirth: String,
-            creationDate: String,
+            creationDate: {type: Number, default: new Date().getTime()},
             communities: [{
                 communityId: String,
                 role: String,

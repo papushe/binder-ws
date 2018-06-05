@@ -170,7 +170,6 @@ exports.createNewJob = (activity) => {
     let job = new JOB({
         activity_id: activity._id,
         status: 'pending',
-        created_at: new Date().getTime(),
         consumer: activity.consumer,
         provider: activity.provider,
         recurring: activity.recurring,

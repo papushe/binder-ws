@@ -4,7 +4,7 @@ const mongoose = require('mongoose'),
     job = new schema({
         activity_id: String,
         status: String,  // 'pending', 'done'
-        created_at: Number,
+        created_at: {type: Number, default: new Date().getTime()},
         consumer: {
             name: String,
             id: String

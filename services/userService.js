@@ -86,7 +86,6 @@ exports.updateUserProfile = (profileObj) => {
                         email: profileObj.email,
                         phoneNumber: profileObj.phoneNumber || '',
                         dateOfBirth: profileObj.dateOfBirth || '',
-                        creationDate: Utils.now(),
                         skills: profileObj.skills || '',
                         description: profileObj.description || '',
                         profilePic: profileObj.profilePic || '',

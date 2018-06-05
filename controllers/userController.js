@@ -28,7 +28,6 @@ exports.create = (req, res) => {
         email: req.body.email,
         phoneNumber: req.body.phoneNumber,
         dateOfBirth: req.body.dateOfBirth,
-        creationDate: Utils.now(),
         skills: req.body.skills,
         description: req.body.description,
         profilePic: req.body.profilePic,
