@@ -4,7 +4,7 @@ const mongoose = require('mongoose'),
     message = new schema({
 
         from: String,
-        date: String,
+        date: {type: Number, default: new Date().getTime()},
         room: String,
         text: String
 

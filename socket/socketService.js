@@ -234,7 +234,6 @@ module.exports = (io) => {
                                 to: params.user,
                                 room: params.room,
                                 event: 'left',
-                                date: Utils.now()
                             });
                             socket.leave(params.room);
                         }
