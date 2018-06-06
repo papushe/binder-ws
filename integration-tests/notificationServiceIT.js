@@ -7,11 +7,9 @@ let testUtils = require('./testUtils'),
     logger = utils.getLogger(),
     chai = require('chai'),
     expect = chai.expect,
-    testUniqueId,
-    chats = [],
-    messages = [];
+    testUniqueId;
 
-describe(`Message Service Integration Tests`, () => {
+xdescribe(`Message Service Integration Tests`, () => {
 
     before(async () => {
         logger.info(`messagesServiceIT started at: ${utils.now()}`);
@@ -26,15 +24,7 @@ describe(`Message Service Integration Tests`, () => {
     });
 
     after(async () => {
-        let promises = [];
-        messages.forEach(item => {
-            promises.push(messageService.deleteMessageById(item._id));
-        });
-        chats.forEach(item => {
-            promises.push(testedService.removeChatFromUser(testUser.USER_KEY, '00000'));
-        });
 
-        let result = await Promise.all(promises);
     });
 
     it(`should create a new chat message`, async () => {
@@ -48,8 +38,6 @@ describe(`Message Service Integration Tests`, () => {
 
         let result = await messageService.saveUserChat(obj, testUser.USER_KEY);
 
-        chats.push(result);
-
         expect(result.chats[0].chatRoomId).equal('00000');
         expect(result.chats[0].talkedToId).equal('11111');
         expect(result.chats[0].talkedToName).equal('moshe');
@@ -59,27 +47,25 @@ describe(`Message Service Integration Tests`, () => {
     it(`should save new message`, async () => {
         let msgObj = new MESSAGE({
             from: 'Itzik',
-            date: new Date().getTime(),
+            date: utils.now(),
             room: '00000',
             text: 'Hi how r u?'
         });
 
         let result = await messageService.saveNewMessage(msgObj);
 
-        messages.push(result);
-
         expect(result.from).equal('Itzik');
         expect(result.room).equal('00000');
         expect(result.text).equal('Hi how r u?');
     });
 
-    it(`should get room messages`, async () => {
+     it(`should get room messages`, async () => {
 
-        let result = await messageService.getRoomMessages('00000');
+         let result = await messageService.getRoomMessages('00000');
 
-        expect(result[0].from).equal('Itzik');
-        expect(result[0].room).equal('00000');
-        expect(result[0].text).equal('Hi how r u?');
+         expect(result[0].from).equal('Itzik');
+         expect(result[0].room).equal('00000');
+         expect(result[0].text).equal('Hi how r u?');
 
-    });
+     });
 });

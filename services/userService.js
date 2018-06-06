@@ -267,3 +267,24 @@ exports.deleteActivityFromUser = (userId, activityId) => {
     });
 };
 
+
+exports.removeChatFromUser = (userId, chatRoomId) => {
+    return new Promise((resolve, reject) => {
+        USER.findOneAndUpdate(
+            {keyForFirebase: {$eq: userId}},
+            {$pull: {chats: {chatRoomId: chatRoomId}}},
+            {new: true},
+            (err, data) => {
+                if (err) {
+                    logger.error(`failed to remove user chat: ${chatRoomId} from user: ${userId} chat list due to: ${err}`);
+                    reject(false);
+                }
+                if (!data) {
+                    logger.warn(`failed to remove user chat from user: ${userId} chats list due to: chat not exist!`);
+                    resolve(null);
+                }
+                logger.info(`chat: ${chatRoomId} was removed from chats list for user: ${userId}`);
+                resolve(data);
+            });
+    });
+};

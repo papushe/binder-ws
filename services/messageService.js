@@ -50,3 +50,17 @@ exports.saveUserChat = (obj, userId) => {
             });
     });
 };
+
+exports.deleteMessageById = (messageId) => {
+    return new Promise((resolve, reject) => {
+        MESSAGE.deleteOne({_id: {$eq: messageId}},
+            (err, data) => {
+                if (err || !data) {
+                    logger.error(`failed to delete message: ${messageId} due to: ${err}`);
+                    reject(false);
+                }
+                logger.info(`message: ${messageId} was deleted!`);
+                resolve(true);
+            });
+    });
+};
