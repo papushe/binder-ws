@@ -7,6 +7,7 @@ const Utils = require('../utils'),
 
 module.exports = (io) => {
     let allUsers = {},
+        allUsersList = [],
         roomKey = {},
         connectedUserInSpecificCommunity = {},
         connectedUserInSpecificChatRoom = {};
@@ -347,9 +348,10 @@ module.exports = (io) => {
                 } else {
 
                     allUsers[socket.keyForFirebase] = socket;
+                    allUsersList.push(params.keyForFirebase);
                 }
                 io.emit('users-changed', {
-                    keyForFirebase: socket.keyForFirebase,
+                    allUsersList: allUsersList,
                     event: 'joined'
                 });
 
@@ -357,11 +359,15 @@ module.exports = (io) => {
             }
 
             function deleteUserFromAllUsers(keyForFirebase) {
+                delete allUsers[keyForFirebase];
+                let index = allUsersList.indexOf(keyForFirebase);
+                if (index > -1) {
+                    allUsersList.splice(index, 1);
+                }
                 io.emit('users-changed', {
-                    keyForFirebase: socket.keyForFirebase,
+                    allUsersList: allUsersList,
                     event: 'left'
                 });
-                delete allUsers[keyForFirebase];
             }
 
             function addUserToConnectedUserInSpecificCommunity(params, socket) {
