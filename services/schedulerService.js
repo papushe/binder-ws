@@ -197,10 +197,10 @@ exports.execute = (runAsTask) => {
     let promises = [];
     let NEXT_FIVE_MIN = new Date().getTime() + (5 * 60 * 1000);
 
-    //scheduling next iteration
     if (runAsTask) {
         this.scheduleAction(NEXT_FIVE_MIN, this.execute);
     }
+
     return new Promise((resolve, reject) => {
         this.cleanJobs()
             .then(() => {
