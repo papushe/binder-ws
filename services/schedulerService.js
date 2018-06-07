@@ -14,24 +14,24 @@ let schedule = require('node-schedule'),
 exports.getJobsToExecute = () => {
     return new Promise((resolve, reject) => {
         let now = new Date().getTime(),
-            fiveMin = 5 * 60 * 1000,
+            TEN_MIN = 10 * 60 * 1000,
             activities = [],
             jobs = [],
             promises = [];
 
         JOB.find({
                 $and: [
-                    {"execution_time.next": {$gt: now - fiveMin, $lt: now + fiveMin}},
+                    {"execution_time.next": {$gt: now - TEN_MIN, $lt: now + TEN_MIN}},
                     {status: {$eq: PENDING_STATE}}
                 ]
             },
             (err, data) => {
                 if (err) {
-                    logger.error(`failed to fetch pending jobs from ${Utils.unixToLocal(now - fiveMin)} due to : ${err}`);
+                    logger.error(`failed to fetch pending jobs from ${Utils.unixToLocal(now - TEN_MIN)} due to : ${err}`);
                     reject(err);
                 }
                 if (!data) {
-                    logger.warn(`cant find pending jobs to execute from: ${Utils.unixToLocal(now - fiveMin)}`);
+                    logger.warn(`cant find pending jobs to execute from: ${Utils.unixToLocal(now - TEN_MIN)}`);
                     resolve(activities);
                 }
                 else {
