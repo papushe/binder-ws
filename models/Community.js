@@ -1,10 +1,11 @@
 const mongoose = require('mongoose'),
+    Utils = require('../utils'),
     schema = mongoose.Schema,
 
     community = new schema({
         communityName: String,
         communityDescription: String,
-        creationDate: {type: Number, default: new Date().getTime()},
+        creationDate: {type: Number, default: Utils.getUnixTime},
         manager: {
             id: String,
             name: String,

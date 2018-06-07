@@ -1,4 +1,5 @@
 const mongoose = require('mongoose'),
+    Utils = require('../utils'),
     schema = mongoose.Schema,
     user = new schema({
             firstName: String,
@@ -7,7 +8,7 @@ const mongoose = require('mongoose'),
             email: String,
             phoneNumber: String,
             dateOfBirth: String,
-            creationDate: {type: Number, default: new Date().getTime()},
+            creationDate: {type: Number, default: Utils.getUnixTime},
             communities: [{
                 communityId: String,
                 role: String,

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose'),
+    Utils = require('../utils'),
     schema = mongoose.Schema,
 
     notification = new schema({
@@ -16,7 +17,7 @@ const mongoose = require('mongoose'),
         communityName: String,
         activity: {},
         status: String,
-        creation_date: {type: Number, default: new Date().getTime()},
+        creation_date: {type: Number, default: Utils.getUnixTime},
         event: String,
         content: String,
         user: {},

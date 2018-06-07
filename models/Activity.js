@@ -1,10 +1,11 @@
 const mongoose = require('mongoose'),
+      Utils = require('../utils'),
       schema   = mongoose.Schema,
 
     activity = new schema({
         activity_name: String,
         activity_description: String,
-        created_at: {type: Number, default: new Date().getTime()},
+        created_at: {type: Number, default: Utils.getUnixTime},
         recurring: {type: String, default: `once`},
         consumer: {
             name: String,

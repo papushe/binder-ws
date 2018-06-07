@@ -60,8 +60,13 @@ exports.getRandomString = (length) => {
  * Time conversion
  * */
 exports.getUnixTime = (dateStr) => {
-    let localDateWithOffset = new Date(dateStr);
-    return localDateWithOffset.getTime() - (localDateWithOffset.getTimezoneOffset() * 60 * 1000);
+    if (dateStr) {
+        let localDateWithOffset = new Date(dateStr);
+        return localDateWithOffset.getTime() - (localDateWithOffset.getTimezoneOffset() * 60 * 1000);
+    }
+    else {
+        return new Date().getTime();
+    }
 };
 
 exports.unixToLocal = (epoch) => {

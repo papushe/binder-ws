@@ -1,10 +1,11 @@
 const mongoose = require('mongoose'),
+    Utils = require('../utils'),
     schema = mongoose.Schema,
 
     job = new schema({
         activity_id: String,
         status: String,  // 'pending', 'done'
-        created_at: {type: Number, default: new Date().getTime()},
+        created_at: {type: Number, default: Utils.getUnixTime},
         consumer: {
             name: String,
             id: String
