@@ -161,7 +161,7 @@ exports.finish = (req, res) => {
     let {activityId} = req.body;
     activityService.finishActivity(activityId)
         .then(activity => {
-            if (activity.recurring === 'once') {
+            if (activity.recurring.toLowerCase() === 'once') {
                 schedulerService.abortJob(activityId)
                     .then(job => {
                         activityService.updateActivityStatus(activity._id, 'done')

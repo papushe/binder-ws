@@ -277,7 +277,7 @@ exports.finishActivity = (activityId) => {
                 }
                 else {
                     data.status = {
-                        value: (data.recurring === 'once') ? 'done' : 'ongoing',
+                        value: (data.recurring.toLowerCase() === 'once') ? 'done' : 'ongoing',
                     };
                     data.save((err, data) => {
                         if (err || !data) {

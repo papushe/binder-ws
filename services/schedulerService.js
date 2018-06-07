@@ -36,7 +36,7 @@ exports.getJobsToExecute = () => {
                 }
                 else {
                     data.forEach(job => {
-                        if (!job.recurring || job.recurring === 'once') {
+                        if (!job.recurring || job.recurring.toLowerCase() === 'once') {
                             job.status = DONE_STATE;
                         }
                         else if (job.recurring === 'daily') {
