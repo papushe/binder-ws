@@ -1,71 +1,110 @@
 let testUtils = require('./testUtils'),
-    testedService = require('../services/userService'),
-    messageService = require('../services/messageService'),
+    userService = require('../services/userService'),
+    notificationService = require('../services/notificationService'),
     testUser = testUtils.user,
-    MESSAGE = require('../models/Message'),
+    NOTIFICATION = require('../models/Notification'),
     utils = require('../utils'),
     logger = utils.getLogger(),
     chai = require('chai'),
     expect = chai.expect,
-    testUniqueId;
+    testUniqueId,
+    notifications = [],
+    notificationId;
 
-xdescribe(`Message Service Integration Tests`, () => {
+describe(`Notification Service Integration Tests`, () => {
 
     before(async () => {
         logger.info(`messagesServiceIT started at: ${utils.now()}`);
         testUniqueId = `test${new Date().getTime()}`;
-        let result = await testedService.getUserProfile(testUser.USER_KEY);
+        let result = await userService.getUserProfile(testUser.USER_KEY);
 
         if (result) {
-            result.chats = [{}];
-            result = await testedService.updateUserProfile(result);
+            result = await userService.updateUserProfile(result);
             logger.info(`deleted old activities success? ${!!result}`);
         }
     });
 
     after(async () => {
-
-    });
-
-    it(`should create a new chat message`, async () => {
-        let obj = {
-            chatRoomId: '00000',
-            talkedToId: '11111',
-            talkedToName: 'moshe',
-            talkedFromName: 'papushe',
-            profilePic: '',
-        };
-
-        let result = await messageService.saveUserChat(obj, testUser.USER_KEY);
-
-        expect(result.chats[0].chatRoomId).equal('00000');
-        expect(result.chats[0].talkedToId).equal('11111');
-        expect(result.chats[0].talkedToName).equal('moshe');
-        expect(result.chats[0].talkedFromName).equal('papushe');
-    });
-
-    it(`should save new message`, async () => {
-        let msgObj = new MESSAGE({
-            from: 'Itzik',
-            date: utils.now(),
-            room: '00000',
-            text: 'Hi how r u?'
+        let promises = [];
+        notifications.forEach(item => {
+            promises.push(notificationService.deleteNotificationById(item._id));
         });
 
-        let result = await messageService.saveNewMessage(msgObj);
-
-        expect(result.from).equal('Itzik');
-        expect(result.room).equal('00000');
-        expect(result.text).equal('Hi how r u?');
+        let result = await Promise.all(promises);
     });
 
-     it(`should get room messages`, async () => {
+    it(`should create a new notification message`, async () => {
+        let notificationObj = new NOTIFICATION({
+            from: {
+                fullName: 'moshe',
+                keyForFirebase: '1111',
+                profilePic: ''
+            },
+            to: {
+                fullName: 'itzik',
+                keyForFirebase: testUser.USER_KEY,
+                profilePic: ''
+            },
+            room: '0000',
+            communityName: 'community',
+            status: 'unread',
+            event: 'test',
+            activity: 'activity',
+            content: 'nothing',
+            user: '',
+            isAddToCalender: false
+        });
 
-         let result = await messageService.getRoomMessages('00000');
+        let result = await notificationService.saveNewNotification(notificationObj);
 
-         expect(result[0].from).equal('Itzik');
-         expect(result[0].room).equal('00000');
-         expect(result[0].text).equal('Hi how r u?');
+        notifications.push(result);
+        notificationId=result._id;
+        expect(result.from.fullName).equal('moshe');
+        expect(result.from.keyForFirebase).equal('1111');
+        expect(result.to.fullName).equal('itzik');
+        expect(result.to.keyForFirebase).equal(testUser.USER_KEY);
+        expect(result.room).equal('0000');
+        expect(result.communityName).equal('community');
+        expect(result.status).equal('unread');
+        expect(result.event).equal('test');
+        expect(result.activity).equal('activity');
+        expect(result.content).equal('nothing');
 
-     });
+    });
+
+    it(`should update notification`, async () => {
+        let notificationObj = {
+            status: 'read',
+            keyForFirebase: notificationId
+        };
+
+        let result = await notificationService.updateNotification(notificationObj);
+
+        expect(result.status).equal('read');
+
+    });
+
+    it(`should get notification by id`, async () => {
+
+        let result = await notificationService.getUserNotifications(testUser.USER_KEY);
+
+        expect(result[0].from.fullName).equal('moshe');
+        expect(result[0].from.keyForFirebase).equal('1111');
+        expect(result[0].to.fullName).equal('itzik');
+        expect(result[0].to.keyForFirebase).equal(testUser.USER_KEY);
+        expect(result[0].room).equal('0000');
+        expect(result[0].communityName).equal('community');
+        expect(result[0].status).equal('read');
+        expect(result[0].event).equal('test');
+        expect(result[0].activity).equal('activity');
+        expect(result[0].content).equal('nothing');
+
+    });
+
+    it(`should get notification by id`, async () => {
+
+        let result = await notificationService.deleteNotificationById(notificationId);
+        expect(result).equal(true);
+    });
+
 });
