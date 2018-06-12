@@ -136,6 +136,8 @@ app.post(`/${activityContext}/finish`, activityController.finish);
 
 app.post(`/${activityContext}/cancel`, activityController.cancel);
 
+app.post(`/${activityContext}/vote`, activityController.vote);
+
 
 //Notification
 app.post(`/${notificationContext}/create`, notificationController.create);

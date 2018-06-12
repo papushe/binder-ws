@@ -1,6 +1,6 @@
 const mongoose = require('mongoose'),
-      Utils = require('../utils'),
-      schema   = mongoose.Schema,
+    Utils = require('../utils'),
+    schema = mongoose.Schema,
 
     activity = new schema({
         activity_name: String,
@@ -24,8 +24,9 @@ const mongoose = require('mongoose'),
         source: String,
         destination: String,
         activity_date: Number,
-        notes: String
-    },{strict: true});
+        notes: String,
+        isVote: Boolean
+    }, {strict: true});
 
 
 let Activity = mongoose.model('Activity', activity);

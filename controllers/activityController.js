@@ -90,6 +90,18 @@ exports.update = (req, res) => {
 
 };
 
+exports.vote = (req, res) => {
+    let activityId = req.body.activityId;
+    activityService.vote(activityId)
+        .then(response => {
+            res.json(response);
+        })
+        .catch(err => {
+            res.json(err);
+        })
+
+};
+
 exports.claim = (req, res) => {
     let {userId, fullName, activityId} = req.body;
     activityService.setClaimer(userId, fullName, activityId)

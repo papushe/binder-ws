@@ -292,6 +292,33 @@ exports.finishActivity = (activityId) => {
     });
 };
 
+exports.vote = (activityId) => {
+    return new Promise((resolve, reject) => {
+        ACTIVITY.findOne({_id: {$eq: activityId}},
+            (err, data) => {
+                if (err) {
+                    logger.error(`failed to vote activity: ${activityId} due to: ${err}`);
+                    reject(false);
+                }
+                else if (!data) {
+                    logger.warn(`cant finish vote activity: ${activityId}`);
+                    resolve(null)
+                }
+                else {
+                    data.isVote = true;
+                    data.save((err, data) => {
+                        if (err || !data) {
+                            logger.error(`failed to vote activity: ${activityId} due to: ${err}`);
+                            reject(false);
+                        }
+                        logger.debug(`activity: ${activityId} was vote`);
+                        resolve(data);
+                    });
+                }
+            });
+    });
+};
+
 exports.cancelActivity = (activityId) => {
     return new Promise((resolve, reject) => {
         ACTIVITY.findOne({_id: {$eq: activityId}},
