@@ -77,3 +77,17 @@ exports.deleteNotificationById = (notificationId) => {
             });
     });
 };
+
+exports.deleteAllNotificationById = (userId) => {
+    return new Promise((resolve, reject) => {
+        NOTIFICATION.deleteMany({"to.keyForFirebase": {$eq: userId}},
+            (err, data) => {
+                if (err || !data) {
+                    logger.error(`failed to delete notification: ${userId} due to: ${err}`);
+                    reject(false);
+                }
+                logger.debug(`notification: ${userId} was deleted!`);
+                resolve(data);
+            });
+    });
+};

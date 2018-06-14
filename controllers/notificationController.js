@@ -67,3 +67,13 @@ exports.deleteById = (req, res) => {
             res.json(err);
         });
 };
+exports.deleteAllByUserId = (req, res) => {
+    let userId = req.body.keyForFirebase;
+    notificationService.deleteAllNotificationById(userId)
+        .then(response => {
+            res.json(true);
+        })
+        .catch(err => {
+            res.json(err);
+        });
+};

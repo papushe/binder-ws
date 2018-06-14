@@ -148,6 +148,8 @@ app.get(`/${notificationContext}/get/:keyForFirebase`, notificationController.ge
 
 app.post(`/${notificationContext}/delete`, notificationController.deleteById);
 
+app.post(`/${notificationContext}/delete-all`, notificationController.deleteAllByUserId);
+
 
 //Message
 
