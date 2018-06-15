@@ -87,7 +87,7 @@ exports.deleteAllNotificationById = (userId) => {
                     reject(false);
                 }
                 logger.debug(`notification: ${userId} was deleted!`);
-                resolve(data);
+                resolve(true);
             });
     });
 };

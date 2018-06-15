@@ -12,6 +12,7 @@ let testUtils = require('./testUtils'),
     testUniqueId,
     tomorrow = new Date().getTime() + (24 * 60 * 60 * 1000),
     activity,
+    activityID,
     activities = [];
 
 describe(`Activity Service Integration Tests`, () => {
@@ -57,6 +58,8 @@ describe(`Activity Service Integration Tests`, () => {
 
         let result = await testedService.saveNewActivity(activity);
 
+        activityID = result._id;
+
         activities.push(result);
 
         expect(result.activity_name).equal(`activity-name`);
@@ -68,6 +71,11 @@ describe(`Activity Service Integration Tests`, () => {
         expect(result.destination).equal(`destination`);
         expect(result.notes).equal(`my notes`);
 
+    });
+
+    it(`should set isVote flag as true`, async () => {
+        let result = await testedService.vote(activityID);
+        expect(result.isVote).equal(true);
     });
 
     it(`should update an existed activity`, async () => {

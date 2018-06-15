@@ -58,7 +58,7 @@ describe(`Notification Service Integration Tests`, () => {
         let result = await notificationService.saveNewNotification(notificationObj);
 
         notifications.push(result);
-        notificationId=result._id;
+        notificationId = result._id;
         expect(result.from.fullName).equal('moshe');
         expect(result.from.keyForFirebase).equal('1111');
         expect(result.to.fullName).equal('itzik');
@@ -101,9 +101,15 @@ describe(`Notification Service Integration Tests`, () => {
 
     });
 
-    it(`should get notification by id`, async () => {
+    it(`should delete notification by id`, async () => {
 
         let result = await notificationService.deleteNotificationById(notificationId);
+        expect(result).equal(true);
+    });
+
+    it(`should delete all users notifications by id`, async () => {
+
+        let result = await notificationService.deleteAllNotificationById(testUser.USER_KEY);
         expect(result).equal(true);
     });
 
