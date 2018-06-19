@@ -122,8 +122,10 @@ module.exports = (io) => {
                                 event: 'deleted',
                                 content: `${params.from.fullName} delete ${params.community.communityName}`,
                             });
-                            params.member = member;
-                            sendNotification(params, 'onDeleteCommunity')
+                            if (member.memberId != keyForFirebase) {
+                                params.member = member;
+                                sendNotification(params, 'onDeleteCommunity')
+                            }
                         });
                     }
                 }
