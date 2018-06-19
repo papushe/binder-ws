@@ -113,18 +113,17 @@ module.exports = (io) => {
                     let members = params.community.members;
                     logger.debug(`Socket: ${socket.keyForFirebase} deleted ${params.community.communityName} permanently`);
 
-                    if (members && members.length > 1) {
+                    if (members && members.length > 0) {
                         members.forEach(member => {
-                            if (member.memberId !== keyForFirebase) {
-                                allUsers[member.memberId].emit('on-delete-community', {
-                                    community: params.community,
-                                    from: params.from,
-                                    date: new Date().getTime(),
-                                    event: 'on-delete-community',
-                                    content: `${params.from.fullName} delete ${params.community.communityName}`,
-                                });
-                                sendNotification(params, 'onDeleteCommunity')
-                            }
+                            allUsers[member.memberId].emit('on-delete-community', {
+                                community: params.community,
+                                from: params.from,
+                                date: new Date().getTime(),
+                                event: 'deleted',
+                                content: `${params.from.fullName} delete ${params.community.communityName}`,
+                            });
+                            params.member = member;
+                            sendNotification(params, 'onDeleteCommunity')
                         });
                     }
                 }
@@ -576,6 +575,8 @@ module.exports = (io) => {
                         date: new Date().getTime()
                     });
                 } else if (type === 'onDeleteCommunity') {
+                    to.keyForFirebase = params.member.memberId;
+
                     notificationObj = new NOTIFICATION({
                         from: from,
                         to: to,
