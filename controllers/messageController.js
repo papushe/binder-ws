@@ -1,7 +1,4 @@
-let MESSAGE = require('../models/Message'),
-    Utils = require('../utils'),
-    messageService = require('../services/messageService'),
-    logger = Utils.getLogger();
+let messageService = require('../services/messageService');
 
 exports.getByRoomId = (req, res) => {
     let roomId = req.params.roomId;

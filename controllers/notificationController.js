@@ -1,5 +1,4 @@
 let NOTIFICATION = require('../models/Notification'),
-    Utils = require('../utils'),
     notificationService = require('../services/notificationService');
 
 exports.create = (req, res) => {

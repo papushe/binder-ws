@@ -1,9 +1,7 @@
 let Activity = require('../models/Activity'),
-    Utils = require('../utils'),
     activityService = require('../services/activityService'),
     userService = require('../services/userService'),
-    schedulerService = require('../services/schedulerService'),
-    logger = Utils.getLogger();
+    schedulerService = require('../services/schedulerService');
 
 exports.create = (req, res) => {
     let activityObj = new Activity({
